@@ -6,8 +6,8 @@ Freud API Crawler
 .. image:: https://img.shields.io/pypi/v/freud_api_crawler.svg
         :target: https://pypi.python.org/pypi/freud_api_crawler
 
-.. image:: https://img.shields.io/travis/csae8092/freud_api_crawler.svg
-        :target: https://travis-ci.com/csae8092/freud_api_crawler
+.. image:: https://img.shields.io/travis/acdh-oeaw/freud_api_crawler.svg
+        :target: https://travis-ci.com/acdh-oeaw/freud_api_crawler
 
 .. image:: https://readthedocs.org/projects/freud-api-crawler/badge/?version=latest
         :target: https://freud-api-crawler.readthedocs.io/en/latest/?badge=latest
