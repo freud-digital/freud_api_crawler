@@ -27,17 +27,19 @@ class TestFreud_api_crawler(unittest.TestCase):
         else:
             self.assertFalse(frd_obj.authenticated)
 
-    def test_001_endpoints(self):
+    def test_001_endpoints_no_auth(self):
         """Test of endpoints-method"""
         frd_obj = frd.FrdClient(user=False, pw=False)
         endpoints = frd_obj.list_endpoints()
         self.assertFalse(endpoints)
 
-        frd_obj = frd.FrdClient()
-        endpoints = frd_obj.list_endpoints()
-        self.assertTrue(endpoints)
-        print(endpoints.keys())
-        self.assertTrue('node' in endpoints.keys())
+    # def test_002_endpoints_with_auth(self):
+    #     """Test of endpoints-method"""
+    #     frd_obj = frd.FrdClient()
+    #     endpoints = frd_obj.list_endpoints()
+    #     self.assertTrue(endpoints)
+    #     print(endpoints.keys())
+    #     self.assertTrue('node' in endpoints.keys())
 
     def test_command_line_interface(self):
         """Test the CLI."""
