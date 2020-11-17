@@ -103,3 +103,8 @@ ENV/
 
 # IDE settings
 .vscode/
+
+
+# Jupyter Notebook
+
+*.ipynb

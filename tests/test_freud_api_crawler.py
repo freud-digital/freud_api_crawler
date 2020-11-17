@@ -2,11 +2,11 @@
 
 """Tests for `freud_api_crawler` package."""
 
-
+import os
 import unittest
 from click.testing import CliRunner
 
-from freud_api_crawler import freud_api_crawler
+from freud_api_crawler import freud_api_crawler as frd
 from freud_api_crawler import cli
 
 
@@ -19,8 +19,25 @@ class TestFreud_api_crawler(unittest.TestCase):
     def tearDown(self):
         """Tear down test fixtures, if any."""
 
-    def test_000_something(self):
-        """Test something."""
+    def test_000_not_authenticated(self):
+        """Test if os-envs are set"""
+        frd_obj = frd.FrdClient()
+        if frd.FRD_PW and frd.FRD_PW:
+            self.assertTrue(frd_obj.authenticated)
+        else:
+            self.assertFalse(frd_obj.authenticated)
+
+    def test_001_endpoints(self):
+        """Test of endpoints-method"""
+        frd_obj = frd.FrdClient(user=False, pw=False)
+        endpoints = frd_obj.list_endpoints()
+        self.assertFalse(endpoints)
+
+        frd_obj = frd.FrdClient()
+        endpoints = frd_obj.list_endpoints()
+        self.assertTrue(endpoints)
+        print(endpoints.keys())
+        self.assertTrue('node' in endpoints.keys())
 
     def test_command_line_interface(self):
         """Test the CLI."""
