@@ -3,7 +3,7 @@ python:
 - 3.8
 - 3.7
 install: pip install -U tox-travis
-script: tox
+script: make test
 deploy:
   provider: pypi
   distributions: sdist bdist_wheel
