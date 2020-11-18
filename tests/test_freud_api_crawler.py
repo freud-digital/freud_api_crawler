@@ -33,13 +33,25 @@ class TestFreud_api_crawler(unittest.TestCase):
         endpoints = frd_obj.list_endpoints()
         self.assertFalse(endpoints)
 
-    # def test_002_endpoints_with_auth(self):
-    #     """Test of endpoints-method"""
-    #     frd_obj = frd.FrdClient()
-    #     endpoints = frd_obj.list_endpoints()
-    #     self.assertTrue(endpoints)
-    #     print(endpoints.keys())
-    #     self.assertTrue('node' in endpoints.keys())
+    def test_002_endpoints_with_auth(self):
+        """Test of endpoints-method"""
+        frd_obj = frd.FrdClient()
+        endpoints = frd_obj.list_endpoints()
+        self.assertTrue(endpoints)
+        print(endpoints.keys())
+        self.assertTrue('node' in endpoints.keys())
+
+    def test_003_endpoints_no_auth(self):
+        """Test of endpoints-method"""
+        frd_obj = frd.FrdClient(user=False, pw=False)
+        endpoints = frd_obj.list_endpoints()
+        self.assertFalse(endpoints)
+
+    def test_004_FrdManifestation_init_test(self):
+        """Test of endpoints-method"""
+        manifestation_id = "f1fc9bf2-9fb6-40e1-ae37-dff5b75b7152"
+        frd_obj = frd.FrdManifestation(manifestation_id)
+        self.assertEqual(frd_obj.manifestation_id, manifestation_id)
 
     def test_command_line_interface(self):
         """Test the CLI."""

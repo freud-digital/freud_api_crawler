@@ -108,3 +108,20 @@ class FrdClient():
         else:
             print("no user and password set")
             self.authenticated = False
+
+
+class FrdManifestation(FrdClient):
+
+    """class to deal with Manifestations
+    :param manifestation_id: The hash ID of a Manifestation Node
+    :type gnd_id: str
+
+    :return: A FrdClient instance
+    """
+
+    def __init__(
+        self,
+        manifestation_id=None
+    ):
+        super().__init__()
+        self.manifestation_id = manifestation_id
