@@ -31,8 +31,6 @@ class FrdClient():
         else:
             return {}
 
-        return r.json()
-
     def crawl_endpoint(self, url_part, important_values):
         """ method for iterating over drupal-endpoints
         :param url_part: specific API endpoint, e.g. 'werk' -> {drupalbase}/jsonapi/node/{url_part}
@@ -116,8 +114,39 @@ class FrdManifestation(FrdClient):
     :param manifestation_id: The hash ID of a Manifestation Node
     :type gnd_id: str
 
-    :return: A FrdClient instance
+    :return: A FrdManifestation instance
     """
+
+    def get_manifest(self):
+        """ returns the manifest json as python dict
+
+        :return: a Manifestation representation
+        """
+        if self.authenticated:
+            r = requests.get(
+                self.manifestation_endpoint, auth=(self.user, self.pw)
+            )
+            print(r)
+            result = r.json()
+        else:
+            result = {}
+        return result
+
+    def get_pages(self):
+        """ method returning related page-ids/urls
+
+        :returns a list of dicts {'id': 'hash-id', 'url': 'page_url'}
+        """
+
+        page_list = []
+        for x in self.manifestation['data']['relationships']['field_seiten']['data']:
+            node_type = x['type'].split('--')[1]
+            page = {
+                'id': x['id'],
+                'url': f"{self.endpoint}node/{node_type}/{x['id']}"
+            }
+            page_list.append(page)
+        return page_list
 
     def __init__(
         self,
@@ -125,3 +154,7 @@ class FrdManifestation(FrdClient):
     ):
         super().__init__()
         self.manifestation_id = manifestation_id
+        self.manifestation_endpoint = f"{self.endpoint}node/manifestation/{manifestation_id}"
+        self.manifestation = self.get_manifest()
+        self.pages = self.get_pages()
+        self.page_count = len(self.pages)

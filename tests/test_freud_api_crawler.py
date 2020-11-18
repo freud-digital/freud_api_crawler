@@ -49,9 +49,32 @@ class TestFreud_api_crawler(unittest.TestCase):
 
     def test_004_FrdManifestation_init_test(self):
         """Test of endpoints-method"""
-        manifestation_id = "f1fc9bf2-9fb6-40e1-ae37-dff5b75b7152"
+        manifestation_id = "ac48318b-f85f-4990-adad-2a8e57f2d974"
         frd_obj = frd.FrdManifestation(manifestation_id)
         self.assertEqual(frd_obj.manifestation_id, manifestation_id)
+
+    def test_005_FrdManifestation_init_test(self):
+        """Test of endpoints-method"""
+        manifestation_id = "ac48318b-f85f-4990-adad-2a8e57f2d974"
+        frd_obj = frd.FrdManifestation(manifestation_id)
+        self.assertEqual(
+            frd_obj.manifestation_endpoint,
+            f'https://www.freud-edition.net/jsonapi/node/manifestation/{manifestation_id}'
+        )
+
+    def test_005_FrdManifestation_return_manifestation(self):
+        """Test of endpoints-method"""
+        manifestation_id = "ac48318b-f85f-4990-adad-2a8e57f2d974"
+        frd_obj = frd.FrdManifestation(manifestation_id)
+        fetch_man_id = frd_obj.manifestation['data']['id']
+        self.assertEqual(fetch_man_id, manifestation_id)
+
+    def test_006_FrdManifestation_page_count(self):
+        """Test of endpoints-method"""
+        manifestation_id = "ac48318b-f85f-4990-adad-2a8e57f2d974"
+        frd_obj = frd.FrdManifestation(manifestation_id)
+        pages = frd_obj.page_count
+        self.assertEqual(pages, 2)
 
     def test_command_line_interface(self):
         """Test the CLI."""
