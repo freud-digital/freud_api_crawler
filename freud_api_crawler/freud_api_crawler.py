@@ -1,4 +1,5 @@
 import os
+import json
 import time
 from collections import defaultdict
 
@@ -31,41 +32,41 @@ class FrdClient():
         else:
             return {}
 
-    def crawl_endpoint(self, url_part, important_values):
-        """ method for iterating over drupal-endpoints
-        :param url_part: specific API endpoint, e.g. 'werk' -> {drupalbase}/jsonapi/node/{url_part}
-        :type gnd_id: str
-        :param important_values: simple attribute names, e.g. ['title', 'field_year']
-        :type user: list
-
-        :return: print things
-        """
-
-        url = f"{self.endpoint}node/{url_part}?page[limit]={self.page_size}"
-        next_page = True
-        counter = 0
-        auth = ()
-        while next_page:
-            print(url)
-            response = requests.get(url, auth=(self.user, self.pw))
-            result = response.json()
-            links = result['links']
-            for y in result['data']:
-                self_uri = y['links']['self']['href']
-                print(self_uri)
-                attributes = y['attributes']
-                for val in important_values:
-                    print(attributes[val])
-            if links.get('next', False):
-                url = links['next']['href']
-            else:
-                next_page = False
-            counter += 1
-            print(counter)
-            if self.limit > 0:
-                if counter >= self.limit:
-                    next_page = False
-            time.sleep(self.sleep)
+    # def crawl_endpoint(self, url_part, important_values):
+    #     """ method for iterating over drupal-endpoints
+    #     :param url_part: specific API endpoint, e.g. 'werk' -> {drupalbase}/jsonapi/node/{url_part}
+    #     :type gnd_id: str
+    #     :param important_values: simple attribute names, e.g. ['title', 'field_year']
+    #     :type user: list
+    #
+    #     :return: print things
+    #     """
+    #
+    #     url = f"{self.endpoint}node/{url_part}?page[limit]={self.page_size}"
+    #     next_page = True
+    #     counter = 0
+    #     auth = ()
+    #     while next_page:
+    #         print(url)
+    #         response = requests.get(url, auth=(self.user, self.pw))
+    #         result = response.json()
+    #         links = result['links']
+    #         for y in result['data']:
+    #             self_uri = y['links']['self']['href']
+    #             print(self_uri)
+    #             attributes = y['attributes']
+    #             for val in important_values:
+    #                 print(attributes[val])
+    #         if links.get('next', False):
+    #             url = links['next']['href']
+    #         else:
+    #             next_page = False
+    #         counter += 1
+    #         print(counter)
+    #         if self.limit > 0:
+    #             if counter >= self.limit:
+    #                 next_page = False
+    #         time.sleep(self.sleep)
 
     def __init__(
         self,
@@ -122,14 +123,19 @@ class FrdManifestation(FrdClient):
 
         :return: a Manifestation representation
         """
-        if self.authenticated:
-            r = requests.get(
-                self.manifestation_endpoint, auth=(self.user, self.pw)
+        r = requests.get(
+            self.manifestation_endpoint, auth=(self.user, self.pw)
+        )
+        status_code = r.status_code
+        if status_code != 200:
+            print(
+                f"could not access {self.manifestation_endpoint} because\
+                of {status_code}, using local sample"
             )
-            print(r)
-            result = r.json()
+            with open('freud_api_crawler/sample_mainfest.json') as json_file:
+                result = json.load(json_file)
         else:
-            result = {}
+            result = r.json()
         return result
 
     def get_pages(self):
@@ -137,7 +143,6 @@ class FrdManifestation(FrdClient):
 
         :returns a list of dicts {'id': 'hash-id', 'url': 'page_url'}
         """
-
         page_list = []
         for x in self.manifestation['data']['relationships']['field_seiten']['data']:
             node_type = x['type'].split('--')[1]
@@ -156,5 +161,15 @@ class FrdManifestation(FrdClient):
         self.manifestation_id = manifestation_id
         self.manifestation_endpoint = f"{self.endpoint}node/manifestation/{manifestation_id}"
         self.manifestation = self.get_manifest()
+        self.man_attrib = self.manifestation['data']['attributes']
+        for x in self.man_attrib.keys():
+            value = self.man_attrib[x]
+            if isinstance(value, dict):
+                for y in value.keys():
+                    dict_key = f"{x}__{y}"
+                    setattr(self, f"md__{dict_key}", value[y])
+            else:
+                setattr(self, f"md__{x}", value)
+        self.meta_attributes = [x for x in dir(self) if x.startswith('md__')]
         self.pages = self.get_pages()
         self.page_count = len(self.pages)
