@@ -1,0 +1,467 @@
+{
+    "jsonapi": {
+        "version": "1.0",
+        "meta": {
+            "links": {
+                "self": {
+                    "href": "http:\/\/jsonapi.org\/format\/1.0\/"
+                }
+            }
+        }
+    },
+    "data": {
+        "type": "node--manifestation",
+        "id": "a10e8c78-adad-4ca2-bfcb-b51bedcd7b58",
+        "links": {
+            "self": {
+                "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58?resourceVersion=id%3A78973"
+            }
+        },
+        "attributes": {
+            "drupal_internal__nid": 40776,
+            "drupal_internal__vid": 78973,
+            "langcode": "und",
+            "revision_timestamp": 1603271120,
+            "revision_log": null,
+            "status": false,
+            "title": "II. Die infantile Sexualit\u00e4t",
+            "created": 1578572990,
+            "changed": 1603271120,
+            "promote": false,
+            "sticky": false,
+            "default_langcode": true,
+            "revision_translation_affected": true,
+            "content_translation_source": "und",
+            "content_translation_outdated": false,
+            "metatag": null,
+            "path": {
+                "alias": "\/werke\/ii-die-infantile-sexualitat\/druckversion",
+                "pid": 38551,
+                "langcode": "und"
+            },
+            "body": null,
+            "field_anmerkung_intern_": {
+                "value": "\u003Cp\u003EOCR korr. CH, Fu\u00dfnoten nachtragen, wenn Formatierungen und Zeilenumbr\u00fcche in Fn m\u00f6glich sind.\u003C\/p\u003E\r\n\r\n\u003Cp\u003E\u0022Absatz ff. n\u00e4chste Seite\u0022 und Seitenzahl Funktion erg\u00e4nzt SL\u003C\/p\u003E\r\n\r\n\u003Cp\u003EEndnotenummerierung: hochgestellt\u003C\/p\u003E\r\n\r\n\u003Cp\u003EDritte OCR-Korrektur SL\u003C\/p\u003E\r\n",
+                "format": "filtered_html",
+                "processed": "\u003Cp\u003EOCR korr. CH, Fu\u00dfnoten nachtragen, wenn Formatierungen und Zeilenumbr\u00fcche in Fn m\u00f6glich sind.\u003C\/p\u003E\n\u003Cp\u003E\u0022Absatz ff. n\u00e4chste Seite\u0022 und Seitenzahl Funktion erg\u00e4nzt SL\u003C\/p\u003E\n\u003Cp\u003EEndnotenummerierung: hochgestellt\u003C\/p\u003E\n\u003Cp\u003EDritte OCR-Korrektur SL\u003C\/p\u003E"
+            },
+            "field_aufbewahrungsort_container": {
+                "value": "Freud_1905_Drei_Abhandlungen",
+                "format": "filtered_html",
+                "processed": "\u003Cp\u003EFreud_1905_Drei_Abhandlungen\u003C\/p\u003E"
+            },
+            "field_comment_source": null,
+            "field_completeness": "complete",
+            "field_copyright_ok": true,
+            "field_date_source": "2020-01-09",
+            "field_datum": null,
+            "field_extent_sheets": null,
+            "field_faksimile_exists": null,
+            "field_manufacturer": "Franz Deuticke",
+            "field_message": null,
+            "field_ocr": true,
+            "field_printer": "K. u. k. Hofbuchdruckerei Karl Prochaska in Teschen",
+            "field_referenztext": false,
+            "field_rescan": false,
+            "field_short_desc": null,
+            "field_show_source": false,
+            "field_signatur_grienstein": null,
+            "field_signatur_sfe_manifestation": "",
+            "field_signatur_sfe_type": null,
+            "field_size": null,
+            "field_status": 0,
+            "field_status_ocr": true,
+            "field_status_register": false,
+            "field_status_tei_export": false,
+            "field_subtitle": null,
+            "field_umfang": 0,
+            "field_umschrift": true
+        },
+        "relationships": {
+            "node_type": {
+                "data": {
+                    "type": "node_type--node_type",
+                    "id": "33c786f9-55d9-43bb-b856-6ab605f08171"
+                },
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/node_type?resourceVersion=id%3A78973"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/relationships\/node_type?resourceVersion=id%3A78973"
+                    }
+                }
+            },
+            "revision_uid": {
+                "data": null,
+                "links": {
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/relationships\/revision_uid?resourceVersion=id%3A78973"
+                    }
+                }
+            },
+            "uid": {
+                "data": null,
+                "links": {
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/relationships\/uid?resourceVersion=id%3A78973"
+                    }
+                }
+            },
+            "field_obertitel": {
+                "data": null,
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/field_obertitel?resourceVersion=id%3A78973"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/relationships\/field_obertitel?resourceVersion=id%3A78973"
+                    }
+                }
+            },
+            "field_archive_original": {
+                "data": null,
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/field_archive_original?resourceVersion=id%3A78973"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/relationships\/field_archive_original?resourceVersion=id%3A78973"
+                    }
+                }
+            },
+            "field_art": {
+                "data": {
+                    "type": "taxonomy_term--dokumentenart",
+                    "id": "eb76f14c-0b6f-4a0f-b57b-3e78f7cded36"
+                },
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/field_art?resourceVersion=id%3A78973"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/relationships\/field_art?resourceVersion=id%3A78973"
+                    }
+                }
+            },
+            "field_aufbewahrungsort": {
+                "data": {
+                    "type": "taxonomy_term--archive",
+                    "id": "0fd1eab6-5292-468c-8d35-10d7345ea492"
+                },
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/field_aufbewahrungsort?resourceVersion=id%3A78973"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/relationships\/field_aufbewahrungsort?resourceVersion=id%3A78973"
+                    }
+                }
+            },
+            "field_chapters": {
+                "data": [],
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/field_chapters?resourceVersion=id%3A78973"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/relationships\/field_chapters?resourceVersion=id%3A78973"
+                    }
+                }
+            },
+            "field_doc_component": {
+                "data": {
+                    "type": "taxonomy_term--komponente",
+                    "id": "534566aa-d87f-4023-b269-336178aa8136"
+                },
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/field_doc_component?resourceVersion=id%3A78973"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/relationships\/field_doc_component?resourceVersion=id%3A78973"
+                    }
+                }
+            },
+            "field_font": {
+                "data": [{
+                    "type": "taxonomy_term--font",
+                    "id": "fda26909-fc2f-4deb-b81d-5b1b3c7de654"
+                }],
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/field_font?resourceVersion=id%3A78973"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/relationships\/field_font?resourceVersion=id%3A78973"
+                    }
+                }
+            },
+            "field_format": {
+                "data": {
+                    "type": "taxonomy_term--papierformate",
+                    "id": "45d00cd4-50df-410b-8751-8bf90187097c"
+                },
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/field_format?resourceVersion=id%3A78973"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/relationships\/field_format?resourceVersion=id%3A78973"
+                    }
+                }
+            },
+            "field_manifestation_typ": {
+                "data": null,
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/field_manifestation_typ?resourceVersion=id%3A78973"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/relationships\/field_manifestation_typ?resourceVersion=id%3A78973"
+                    }
+                }
+            },
+            "field_mediatype": {
+                "data": {
+                    "type": "taxonomy_term--medientyp",
+                    "id": "88b6dbc5-49dd-44b5-b936-c4e28213a5f2"
+                },
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/field_mediatype?resourceVersion=id%3A78973"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/relationships\/field_mediatype?resourceVersion=id%3A78973"
+                    }
+                }
+            },
+            "field_original_kopie": {
+                "data": {
+                    "type": "taxonomy_term--originalkopie",
+                    "id": "205bcae5-d21e-4322-91cb-c4f362d947dc"
+                },
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/field_original_kopie?resourceVersion=id%3A78973"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/relationships\/field_original_kopie?resourceVersion=id%3A78973"
+                    }
+                }
+            },
+            "field_publication": {
+                "data": {
+                    "type": "node--bibliography",
+                    "id": "6b9242ea-082a-4358-aca0-9d2ba52f3897"
+                },
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/field_publication?resourceVersion=id%3A78973"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/relationships\/field_publication?resourceVersion=id%3A78973"
+                    }
+                }
+            },
+            "field_publications": {
+                "data": [{
+                    "type": "paragraph--commented_reference",
+                    "id": "2ff40a81-5f6c-4e25-a5fd-ff245e9c3ab7",
+                    "meta": {
+                        "target_revision_id": 6099
+                    }
+                }],
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/field_publications?resourceVersion=id%3A78973"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/relationships\/field_publications?resourceVersion=id%3A78973"
+                    }
+                }
+            },
+            "field_seiten": {
+                "data": [{
+                    "type": "node--manifestation_seite",
+                    "id": "ded83806-2853-4912-9ec2-111438960a36"
+                }, {
+                    "type": "node--manifestation_seite",
+                    "id": "16e474c5-9fd7-4e1c-8f89-6b3a60c18100"
+                }, {
+                    "type": "node--manifestation_seite",
+                    "id": "946a0702-7a9a-481d-b079-ae471b968264"
+                }, {
+                    "type": "node--manifestation_seite",
+                    "id": "470d161f-79bc-43e2-946d-a4a34109237f"
+                }, {
+                    "type": "node--manifestation_seite",
+                    "id": "ec614c66-88fc-4b3f-aa52-0dfb46d73632"
+                }, {
+                    "type": "node--manifestation_seite",
+                    "id": "8c9e7943-98ac-4c3e-bd2e-0634de683a90"
+                }, {
+                    "type": "node--manifestation_seite",
+                    "id": "22fa9349-e7fb-44de-86e7-0a8fc6956373"
+                }, {
+                    "type": "node--manifestation_seite",
+                    "id": "1cba9f7c-aefc-47ce-b172-3efe8e0e7fb9"
+                }, {
+                    "type": "node--manifestation_seite",
+                    "id": "81d347fc-89e5-4728-ab68-6b1ce7dd3b5e"
+                }, {
+                    "type": "node--manifestation_seite",
+                    "id": "511409a0-46e9-4f65-a15f-f31345ef7bb6"
+                }, {
+                    "type": "node--manifestation_seite",
+                    "id": "e9fef9f0-5d64-4bd0-a4c5-4b5765b92811"
+                }, {
+                    "type": "node--manifestation_seite",
+                    "id": "310e0713-d874-44ae-bbed-d29be42f6298"
+                }, {
+                    "type": "node--manifestation_seite",
+                    "id": "5ebb3374-4999-4911-bc7f-f9e3a512523e"
+                }, {
+                    "type": "node--manifestation_seite",
+                    "id": "aca6796f-2a0c-485a-abec-dc3340fc8657"
+                }, {
+                    "type": "node--manifestation_seite",
+                    "id": "d849bb2c-bf2e-42af-8320-6806ad0bd848"
+                }, {
+                    "type": "node--manifestation_seite",
+                    "id": "5828d40d-a20e-4e1f-8fd2-d763e6296884"
+                }, {
+                    "type": "node--manifestation_seite",
+                    "id": "4cc28154-59e5-4af4-8667-ee9eb988e14f"
+                }, {
+                    "type": "node--manifestation_seite",
+                    "id": "9fcdce63-cff2-4eb4-ae12-f6a3da98410b"
+                }, {
+                    "type": "node--manifestation_seite",
+                    "id": "d3bd5532-fe3f-4309-9b54-a3fd31f9c317"
+                }, {
+                    "type": "node--manifestation_seite",
+                    "id": "5126755a-eeae-4f53-82f9-aaa3a6fd81a9"
+                }, {
+                    "type": "node--manifestation_seite",
+                    "id": "38d2a395-2162-4f10-a108-efad550ef9d8"
+                }, {
+                    "type": "node--manifestation_seite",
+                    "id": "300579d6-f737-4f46-8d9a-dd3cee978fdd"
+                }],
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/field_seiten?resourceVersion=id%3A78973"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/relationships\/field_seiten?resourceVersion=id%3A78973"
+                    }
+                }
+            },
+            "field_signature": {
+                "data": null,
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/field_signature?resourceVersion=id%3A78973"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/relationships\/field_signature?resourceVersion=id%3A78973"
+                    }
+                }
+            },
+            "field_signature_sfg": {
+                "data": null,
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/field_signature_sfg?resourceVersion=id%3A78973"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/relationships\/field_signature_sfg?resourceVersion=id%3A78973"
+                    }
+                }
+            },
+            "field_sprache": {
+                "data": [{
+                    "type": "taxonomy_term--sprache",
+                    "id": "64953bac-8dbd-4c61-87ad-eaa3aac7bdba"
+                }],
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/field_sprache?resourceVersion=id%3A78973"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/relationships\/field_sprache?resourceVersion=id%3A78973"
+                    }
+                }
+            },
+            "field_texte": {
+                "data": [{
+                    "type": "paragraph--text",
+                    "id": "d75e4a88-3838-41a8-a831-14941ab3c21b",
+                    "meta": {
+                        "target_revision_id": 6100
+                    }
+                }],
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/field_texte?resourceVersion=id%3A78973"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/relationships\/field_texte?resourceVersion=id%3A78973"
+                    }
+                }
+            },
+            "field_vorlage": {
+                "data": {
+                    "type": "file--file",
+                    "id": "d75b12a1-d71b-47b4-be5e-3d5b43d56223",
+                    "meta": {
+                        "display": true,
+                        "description": ""
+                    }
+                },
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/field_vorlage?resourceVersion=id%3A78973"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/relationships\/field_vorlage?resourceVersion=id%3A78973"
+                    }
+                }
+            },
+            "field_werk": {
+                "data": {
+                    "type": "node--werk",
+                    "id": "9d035a03-28d7-4013-adaf-63337d78ece4"
+                },
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/field_werk?resourceVersion=id%3A78973"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/relationships\/field_werk?resourceVersion=id%3A78973"
+                    }
+                }
+            },
+            "field_zustand": {
+                "data": [{
+                    "type": "taxonomy_term--zustand",
+                    "id": "35c2ac40-531d-40b1-b431-1faf26b1f58e"
+                }],
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/field_zustand?resourceVersion=id%3A78973"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58\/relationships\/field_zustand?resourceVersion=id%3A78973"
+                    }
+                }
+            }
+        }
+    },
+    "links": {
+        "self": {
+            "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation\/a10e8c78-adad-4ca2-bfcb-b51bedcd7b58"
+        }
+    }
+}

@@ -1,0 +1,118 @@
+{
+    "jsonapi": {
+        "version": "1.0",
+        "meta": {
+            "links": {
+                "self": {
+                    "href": "http:\/\/jsonapi.org\/format\/1.0\/"
+                }
+            }
+        }
+    },
+    "data": {
+        "type": "node--manifestation_seite",
+        "id": "5126755a-eeae-4f53-82f9-aaa3a6fd81a9",
+        "links": {
+            "self": {
+                "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation_seite\/5126755a-eeae-4f53-82f9-aaa3a6fd81a9?resourceVersion=id%3A71244"
+            }
+        },
+        "attributes": {
+            "drupal_internal__nid": 42354,
+            "drupal_internal__vid": 71244,
+            "langcode": "de",
+            "revision_timestamp": 1581727924,
+            "revision_log": "Updated the \u003Cem class=\u0022placeholder\u0022\u003EText\u003C\/em\u003E field through in-place editing.",
+            "status": false,
+            "title": "Seite 20",
+            "created": 1581727924,
+            "changed": 1601290219,
+            "promote": false,
+            "sticky": false,
+            "default_langcode": true,
+            "revision_translation_affected": true,
+            "content_translation_source": "und",
+            "content_translation_outdated": false,
+            "metatag": null,
+            "path": {
+                "alias": null,
+                "pid": null,
+                "langcode": "de"
+            },
+            "body": {
+                "value": "\u003Cp\u003E\u003Cspan class=\u0022pagenumber\u0022\u003E50\u003C\/span\u003E\u003C\/p\u003E\r\n\r\n\u003Cp class=\u0022ff\u0022\u003ESexualit\u00e4t derselben gesetzt zu werden. Die sexuell erregende\u003Cbr \/\u003E\r\nWirkung mancher an sich unlustiger Affekte, des \u00c4ngstigens,\u003Cbr \/\u003E\r\nSchauderns, Grausens erh\u00e4lt sich bei einer gro\u00dfen Anzahl Men-\u003Cbr \/\u003E\r\nschen auch durch\u2019s reife Leben und ist wohl die Erkl\u00e4rung\u003Cbr \/\u003E\r\ndaf\u00fcr, da\u00df soviel Personen der Gelegenheit zu solchen Sen-\u003Cbr \/\u003E\r\nsationen nachjagen, wenn nur gewisse Nebenumst\u00e4nde (die An-\u003Cbr \/\u003E\r\ngeh\u00f6rigkeit zu einer Scheinwelt, Lekt\u00fcre, Theater) den Ernst\u003Cbr \/\u003E\r\nder Unlustempfindung d\u00e4mpfen.\u003C\/p\u003E\r\n\r\n\u003Cp\u003ELie\u00dfe sich annehmen, da\u00df auch intensiven schmerzhaften\u003Cbr \/\u003E\r\nEmpfindungen die gleiche erogene Wirkung zukommt, zumal\u003Cbr \/\u003E\r\nwenn der Schmerz durch eine Nebenbedingung abget\u00f6nt oder\u003Cbr \/\u003E\r\nferner gehalten wird, so l\u00e4ge in diesem Verh\u00e4ltnis eine der\u003Cbr \/\u003E\r\nHauptwurzeln f\u00fcr den masochistisch-sadistischen Trieb, in dessen\u003Cbr \/\u003E\r\nvielf\u00e4ltige Zusammengesetztheit wir so allm\u00e4hlich Einblick ge-\u003Cbr \/\u003E\r\nwinnen.\u003C\/p\u003E\r\n\r\n\u003Cp class=\u0022marginalie_place\u0022\u003EIntellektuelle\u003Cbr \/\u003E\r\nArbeit.\u003C\/p\u003E\r\n\r\n\u003Cp\u003EEndlich ist es unverkennbar, da\u00df die Konzentration der\u003Cbr \/\u003E\r\nAufmerksamkeit auf eine intellektuelle Leistung und geistige\u003Cbr \/\u003E\r\nAnspannung \u00fcberhaupt bei vielen jugendlichen wie reiferen\u003Cbr \/\u003E\r\nPersonen eine sexuelle Miterregung zur Folge hat, die wohl\u003Cbr \/\u003E\r\nals die einzig berechtigte Grundlage f\u00fcr die sonst so zweifel-\u003Cbr \/\u003E\r\nhafte Ableitung nerv\u00f6ser St\u00f6rungen von geistiger \u201e\u00dcber-\u003Cbr \/\u003E\r\narbeitung\u201c zu gelten hat.\u003C\/p\u003E\r\n\r\n\u003Cp\u003E\u00dcberblicken wir nun nach diesen weder vollst\u00e4ndig noch\u003Cbr \/\u003E\r\nvollz\u00e4hlig mitgeteilten Proben und Andeutungen die Quellen\u003Cbr \/\u003E\r\nder kindlichen Sexualerregung, so lassen sich folgende Allgemein-\u003Cbr \/\u003E\r\nheiten ahnen oder erkennen: Es scheint auf die ausgiebigste\u003Cbr \/\u003E\r\nWeise daf\u00fcr gesorgt, da\u00df der Proze\u00df der Sexualerregung, \u2014\u003Cbr \/\u003E\r\ndessen Wesen uns nun freilich recht r\u00e4tselhaft geworden ist, \u2014\u003Cbr \/\u003E\r\nin Gang gebracht werde. Es sorgen daf\u00fcr vor allem in mehr\u003Cbr \/\u003E\r\noder minder direkter Weise die Erregungen der sensiblen Ober-\u003Cbr \/\u003E\r\nfl\u00e4chen \u2014 Haut und Sinnesorgane \u2014, am unmittelbarsten die\u003Cbr \/\u003E\r\nReizeinwirkungen auf gewisse als erogene Zonen zu bezeichnende\u003Cbr \/\u003E\r\nStellen. Bei diesen Quellen der Sexualerregung ist wohl die\u003Cbr \/\u003E\r\nQualit\u00e4t der Reize das Ma\u00dfgebende, wenngleich das Moment\u003Cbr \/\u003E\r\nder Intensit\u00e4t (beim Schmerz) nicht v\u00f6llig gleichgiltig ist.\u003Cbr \/\u003E\r\nAber \u00fcberdies sind Veranstaltungen im Organismus vorhanden,\u003Cbr \/\u003E\r\nwelche zur Folge haben, da\u00df die Sexualerregung als Neben-\u003C\/p\u003E\r\n",
+                "format": "restricted_html",
+                "processed": "\u003Cp\u003E\u003Cspan class=\u0022pagenumber\u0022\u003E50\u003C\/span\u003E\u003C\/p\u003E\n\u003Cp class=\u0022ff\u0022\u003ESexualit\u00e4t derselben gesetzt zu werden. Die sexuell erregende\u003Cbr \/\u003E\nWirkung mancher an sich unlustiger Affekte, des \u00c4ngstigens,\u003Cbr \/\u003E\nSchauderns, Grausens erh\u00e4lt sich bei einer gro\u00dfen Anzahl Men-\u003Cbr \/\u003E\nschen auch durch\u2019s reife Leben und ist wohl die Erkl\u00e4rung\u003Cbr \/\u003E\ndaf\u00fcr, da\u00df soviel Personen der Gelegenheit zu solchen Sen-\u003Cbr \/\u003E\nsationen nachjagen, wenn nur gewisse Nebenumst\u00e4nde (die An-\u003Cbr \/\u003E\ngeh\u00f6rigkeit zu einer Scheinwelt, Lekt\u00fcre, Theater) den Ernst\u003Cbr \/\u003E\nder Unlustempfindung d\u00e4mpfen.\u003C\/p\u003E\n\u003Cp\u003ELie\u00dfe sich annehmen, da\u00df auch intensiven schmerzhaften\u003Cbr \/\u003E\nEmpfindungen die gleiche erogene Wirkung zukommt, zumal\u003Cbr \/\u003E\nwenn der Schmerz durch eine Nebenbedingung abget\u00f6nt oder\u003Cbr \/\u003E\nferner gehalten wird, so l\u00e4ge in diesem Verh\u00e4ltnis eine der\u003Cbr \/\u003E\nHauptwurzeln f\u00fcr den masochistisch-sadistischen Trieb, in dessen\u003Cbr \/\u003E\nvielf\u00e4ltige Zusammengesetztheit wir so allm\u00e4hlich Einblick ge-\u003Cbr \/\u003E\nwinnen.\u003C\/p\u003E\n\u003Cp class=\u0022marginalie_place\u0022\u003EIntellektuelle\u003Cbr \/\u003E\nArbeit.\u003C\/p\u003E\n\u003Cp\u003EEndlich ist es unverkennbar, da\u00df die Konzentration der\u003Cbr \/\u003E\nAufmerksamkeit auf eine intellektuelle Leistung und geistige\u003Cbr \/\u003E\nAnspannung \u00fcberhaupt bei vielen jugendlichen wie reiferen\u003Cbr \/\u003E\nPersonen eine sexuelle Miterregung zur Folge hat, die wohl\u003Cbr \/\u003E\nals die einzig berechtigte Grundlage f\u00fcr die sonst so zweifel-\u003Cbr \/\u003E\nhafte Ableitung nerv\u00f6ser St\u00f6rungen von geistiger \u201e\u00dcber-\u003Cbr \/\u003E\narbeitung\u201c zu gelten hat.\u003C\/p\u003E\n\u003Cp\u003E\u00dcberblicken wir nun nach diesen weder vollst\u00e4ndig noch\u003Cbr \/\u003E\nvollz\u00e4hlig mitgeteilten Proben und Andeutungen die Quellen\u003Cbr \/\u003E\nder kindlichen Sexualerregung, so lassen sich folgende Allgemein-\u003Cbr \/\u003E\nheiten ahnen oder erkennen: Es scheint auf die ausgiebigste\u003Cbr \/\u003E\nWeise daf\u00fcr gesorgt, da\u00df der Proze\u00df der Sexualerregung, \u2014\u003Cbr \/\u003E\ndessen Wesen uns nun freilich recht r\u00e4tselhaft geworden ist, \u2014\u003Cbr \/\u003E\nin Gang gebracht werde. Es sorgen daf\u00fcr vor allem in mehr\u003Cbr \/\u003E\noder minder direkter Weise die Erregungen der sensiblen Ober-\u003Cbr \/\u003E\nfl\u00e4chen \u2014 Haut und Sinnesorgane \u2014, am unmittelbarsten die\u003Cbr \/\u003E\nReizeinwirkungen auf gewisse als erogene Zonen zu bezeichnende\u003Cbr \/\u003E\nStellen. Bei diesen Quellen der Sexualerregung ist wohl die\u003Cbr \/\u003E\nQualit\u00e4t der Reize das Ma\u00dfgebende, wenngleich das Moment\u003Cbr \/\u003E\nder Intensit\u00e4t (beim Schmerz) nicht v\u00f6llig gleichgiltig ist.\u003Cbr \/\u003E\nAber \u00fcberdies sind Veranstaltungen im Organismus vorhanden,\u003Cbr \/\u003E\nwelche zur Folge haben, da\u00df die Sexualerregung als Neben-\u003C\/p\u003E",
+                "summary": ""
+            }
+        },
+        "relationships": {
+            "node_type": {
+                "data": {
+                    "type": "node_type--node_type",
+                    "id": "a44068a2-f576-4879-a12b-385ebe6deaf4"
+                },
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation_seite\/5126755a-eeae-4f53-82f9-aaa3a6fd81a9\/node_type?resourceVersion=id%3A71244"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation_seite\/5126755a-eeae-4f53-82f9-aaa3a6fd81a9\/relationships\/node_type?resourceVersion=id%3A71244"
+                    }
+                }
+            },
+            "revision_uid": {
+                "data": null,
+                "links": {
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation_seite\/5126755a-eeae-4f53-82f9-aaa3a6fd81a9\/relationships\/revision_uid?resourceVersion=id%3A71244"
+                    }
+                }
+            },
+            "uid": {
+                "data": null,
+                "links": {
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation_seite\/5126755a-eeae-4f53-82f9-aaa3a6fd81a9\/relationships\/uid?resourceVersion=id%3A71244"
+                    }
+                }
+            },
+            "field_faksimile": {
+                "data": {
+                    "type": "file--file",
+                    "id": "ce2926a2-0b15-4de4-ae3a-aa72567d381b",
+                    "meta": {
+                        "alt": null,
+                        "title": null,
+                        "width": 1108,
+                        "height": 1591
+                    }
+                },
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation_seite\/5126755a-eeae-4f53-82f9-aaa3a6fd81a9\/field_faksimile?resourceVersion=id%3A71244"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation_seite\/5126755a-eeae-4f53-82f9-aaa3a6fd81a9\/relationships\/field_faksimile?resourceVersion=id%3A71244"
+                    }
+                }
+            },
+            "field_handschrift": {
+                "data": null,
+                "links": {
+                    "related": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation_seite\/5126755a-eeae-4f53-82f9-aaa3a6fd81a9\/field_handschrift?resourceVersion=id%3A71244"
+                    },
+                    "self": {
+                        "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation_seite\/5126755a-eeae-4f53-82f9-aaa3a6fd81a9\/relationships\/field_handschrift?resourceVersion=id%3A71244"
+                    }
+                }
+            }
+        }
+    },
+    "links": {
+        "self": {
+            "href": "http:\/\/www.freud-edition.net\/jsonapi\/node\/manifestation_seite\/5126755a-eeae-4f53-82f9-aaa3a6fd81a9"
+        }
+    }
+}

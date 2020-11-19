@@ -9,6 +9,17 @@ FRD_API = os.environ.get('FRD_API', 'https://www.freud-edition.net/jsonapi/')
 FRD_USER = os.environ.get('FRD_USER', False)
 FRD_PW = os.environ.get('FRD_PW', False)
 
+SAMPLE_MANIFESTATION = os.path.join(
+    os.path.dirname(__file__),
+    "fixtures",
+    "manifestation.json"
+)
+SAMPLE_MANIFESTATION_PAGE = os.path.join(
+    os.path.dirname(__file__),
+    "fixtures",
+    "manifestation_seite.json"
+)
+
 
 class FrdClient():
 
@@ -132,7 +143,7 @@ class FrdManifestation(FrdClient):
                 f"could not access {self.manifestation_endpoint} because\
                 of {status_code}, using local sample"
             )
-            with open('freud_api_crawler/sample_mainfest.json') as json_file:
+            with open(SAMPLE_MANIFESTATION) as json_file:
                 result = json.load(json_file)
         else:
             result = r.json()
