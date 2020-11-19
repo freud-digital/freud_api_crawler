@@ -10,6 +10,9 @@ from freud_api_crawler import freud_api_crawler as frd
 from freud_api_crawler import cli
 
 
+MANIFESTATION_ID = "ac48318b-f85f-4990-adad-2a8e57f2d974"
+
+
 class TestFreud_api_crawler(unittest.TestCase):
     """Tests for `freud_api_crawler` package."""
 
@@ -49,30 +52,26 @@ class TestFreud_api_crawler(unittest.TestCase):
 
     def test_004_FrdManifestation_init_test(self):
         """Test of endpoints-method"""
-        manifestation_id = "ac48318b-f85f-4990-adad-2a8e57f2d974"
-        frd_obj = frd.FrdManifestation(manifestation_id)
-        self.assertEqual(frd_obj.manifestation_id, manifestation_id)
+        frd_obj = frd.FrdManifestation(MANIFESTATION_ID)
+        self.assertEqual(frd_obj.manifestation_id, MANIFESTATION_ID)
 
     def test_005_FrdManifestation_init_test(self):
         """Test of endpoints-method"""
-        manifestation_id = "ac48318b-f85f-4990-adad-2a8e57f2d974"
-        frd_obj = frd.FrdManifestation(manifestation_id)
+        frd_obj = frd.FrdManifestation(MANIFESTATION_ID)
         self.assertEqual(
             frd_obj.manifestation_endpoint,
-            f'https://www.freud-edition.net/jsonapi/node/manifestation/{manifestation_id}'
+            f'https://www.freud-edition.net/jsonapi/node/manifestation/{MANIFESTATION_ID}'
         )
 
     def test_005_FrdManifestation_return_manifestation(self):
         """Test of endpoints-method"""
-        manifestation_id = "ac48318b-f85f-4990-adad-2a8e57f2d974"
-        frd_obj = frd.FrdManifestation(manifestation_id)
+        frd_obj = frd.FrdManifestation(MANIFESTATION_ID)
         fetch_man_id = frd_obj.manifestation['data']['id']
-        self.assertEqual(fetch_man_id, manifestation_id)
+        self.assertEqual(fetch_man_id, MANIFESTATION_ID)
 
     def test_006_FrdManifestation_page_count(self):
         """Test of endpoints-method"""
-        manifestation_id = "ac48318b-f85f-4990-adad-2a8e57f2d974"
-        frd_obj = frd.FrdManifestation(manifestation_id)
+        frd_obj = frd.FrdManifestation(MANIFESTATION_ID)
         pages = frd_obj.page_count
         self.assertEqual(pages, 2)
 
