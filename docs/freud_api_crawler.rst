@@ -20,6 +20,14 @@ freud\_api\_crawler.freud\_api\_crawler module
     :undoc-members:
     :show-inheritance:
 
+freud\_api\_crawler.string\_utils module
+----------------------------------------
+
+.. automodule:: freud_api_crawler.string_utils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------

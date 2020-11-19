@@ -1,9 +1,11 @@
 import os
 import json
 import time
+import requests
 from collections import defaultdict
 
-import requests
+from . string_utils import clean_markup
+
 
 FRD_API = os.environ.get('FRD_API', 'https://www.freud-edition.net/jsonapi/')
 FRD_USER = os.environ.get('FRD_USER', False)
@@ -195,6 +197,32 @@ class FrdManifestation(FrdClient):
                 result = json.load(json_file)
         else:
             result = r.json()
+        return result
+
+    def process_page(self, page_json):
+        """ processes a page_json to something more useful
+
+        :param page_json: The API response of a manifestation_seite endpoint
+        :type page_json: dict
+
+        :return: A dict containing a cleaned body with needed metatdata\
+
+        {
+            'id': page_id,
+            'body': <div xml:id=page_id><p>lorem ipsum</p></div>
+        }
+
+        :rtype: dict
+        """
+        page_attributes = page_json['data']['attributes']
+        page_id = page_json['data']['id']
+        body = page_attributes['body']['processed']
+        wrapped_body = f'<div xml:id="page__{page_id}">{body}</div>'
+        cleaned_body = clean_markup(body)
+        result = {
+            'id': page_id,
+            'body': cleaned_body
+        }
         return result
 
     def __init__(

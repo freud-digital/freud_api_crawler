@@ -7,6 +7,7 @@ import unittest
 from click.testing import CliRunner
 
 from freud_api_crawler import freud_api_crawler as frd
+from freud_api_crawler import string_utils
 from freud_api_crawler import cli
 
 
@@ -97,6 +98,23 @@ class TestFreud_api_crawler(unittest.TestCase):
             page = frd_obj.get_page(page_id=x)
             test_item = page['data']['id']
             self.assertEqual(test_item, MANIFESTATION_PAGE_ID)
+
+    def test_011_str_cleaning(self):
+        """test clean_markup function"""
+        frd_obj = self.frd_manifestion_obj
+        page = frd_obj.get_page(page_id=MANIFESTATION_PAGE_ID)
+        body = page['data']['attributes']['body']['processed']
+        test_pattern = string_utils.CLEAN_UP_PATTERNS[0][0]
+        cleaned_body = string_utils.clean_markup(body)
+        self.assertTrue(test_pattern not in cleaned_body)
+
+    def test_012_str_cleaning(self):
+        """test clean_markup function"""
+        frd_obj = self.frd_manifestion_obj
+        page = frd_obj.get_page(page_id=MANIFESTATION_PAGE_ID)
+        result = frd_obj.process_page(page)
+        self.assertEqual(result['id'],  MANIFESTATION_PAGE_ID)
+        self.assertTrue('body' in result.keys())
 
     def test_command_line_interface(self):
         """Test the CLI."""
