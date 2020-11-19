@@ -124,15 +124,17 @@ class FrdManifestation(FrdClient):
 
     """class to deal with Manifestations
     :param manifestation_id: The hash ID of a Manifestation Node
-    :type gnd_id: str
+    :type manifestation_id: str
 
     :return: A FrdManifestation instance
+    :rtype: class:`freud_api_crawler.freud_api_crawler.FrdManifestation`
     """
 
     def get_manifest(self):
         """ returns the manifest json as python dict
 
         :return: a Manifestation representation
+        :rtrype: dict
         """
         r = requests.get(
             self.manifestation_endpoint, auth=(self.user, self.pw)
@@ -152,7 +154,8 @@ class FrdManifestation(FrdClient):
     def get_pages(self):
         """ method returning related page-ids/urls
 
-        :returns a list of dicts {'id': 'hash-id', 'url': 'page_url'}
+        :return: a list of dicts `[{'id': 'hash-id', 'url': 'page_url'}]`
+        :rtype: list
         """
         page_list = []
         for x in self.manifestation['data']['relationships']['field_seiten']['data']:
@@ -163,6 +166,36 @@ class FrdManifestation(FrdClient):
             }
             page_list.append(page)
         return page_list
+
+    def get_page(self, page_id):
+        """ fetches a page matching the given id or url and returns the manifestation_seite json
+
+        :param page_id: A hash-id or url to a manifestation_seite endpoint
+        :type page_id: string
+
+        :return: A manifestation_seite dict
+        :rtype: dict
+        """
+
+        if not page_id.startswith('http'):
+            url = f"{self.endpoint}node/manifestation_seite/{page_id}"
+        else:
+            url = page_id
+
+        r = requests.get(
+            url, auth=(self.user, self.pw)
+        )
+
+        status_code = r.status_code
+        if status_code != 200:
+            print(
+                f" {url} -> {status_code} -> using local sample"
+            )
+            with open(SAMPLE_MANIFESTATION_PAGE) as json_file:
+                result = json.load(json_file)
+        else:
+            result = r.json()
+        return result
 
     def __init__(
         self,

@@ -10,7 +10,11 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = ['requests', 'Click>=7.0', ]
+requirements = [
+    'requests==2.25.0',
+    'Click>=7.0',
+    'lxml==4.6.1'
+]
 
 setup_requirements = []
 

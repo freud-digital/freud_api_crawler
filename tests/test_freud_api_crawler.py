@@ -11,6 +11,9 @@ from freud_api_crawler import cli
 
 
 MANIFESTATION_ID = "a10e8c78-adad-4ca2-bfcb-b51bedcd7b58"
+MANIFESTATION_PAGE_ID = "5126755a-eeae-4f53-82f9-aaa3a6fd81a9"
+MANIFESTATION_PAGE_URL = "https://www.freud-edition.net/jsonapi/node/manifestation_\
+seite/5126755a-eeae-4f53-82f9-aaa3a6fd81a9"
 
 
 class TestFreud_api_crawler(unittest.TestCase):
@@ -86,6 +89,14 @@ class TestFreud_api_crawler(unittest.TestCase):
         frd_obj = self.frd_manifestion_obj
         test_item = frd_obj.md__title
         self.assertEqual(test_item, 'II. Die infantile Sexualität')
+
+    def test_010_FrdManifestation_page(self):
+        """Check loading of manifestation_seite"""
+        frd_obj = self.frd_manifestion_obj
+        for x in [MANIFESTATION_PAGE_ID, MANIFESTATION_PAGE_URL]:
+            page = frd_obj.get_page(page_id=x)
+            test_item = page['data']['id']
+            self.assertEqual(test_item, MANIFESTATION_PAGE_ID)
 
     def test_command_line_interface(self):
         """Test the CLI."""
