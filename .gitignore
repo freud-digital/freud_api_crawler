@@ -113,3 +113,4 @@ ENV/
 
 *.ipynb
 hansi.xml
+set_env_variabes.sh

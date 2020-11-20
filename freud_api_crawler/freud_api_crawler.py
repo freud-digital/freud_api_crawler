@@ -1,8 +1,10 @@
 import os
 import json
 import time
-import requests
 from collections import defaultdict
+
+import requests
+import lxml.etree as ET
 
 from . string_utils import clean_markup
 
@@ -22,10 +24,20 @@ SAMPLE_MANIFESTATION_PAGE = os.path.join(
     "manifestation_seite.json"
 )
 
+TEI_DUMMY = os.path.join(
+    os.path.dirname(__file__),
+    "fixtures",
+    "tei_dummy.xml"
+)
+
 
 class FrdClient():
 
     """Main Class to interact with freud.net-API """
+
+    def tei_dummy(self):
+        doc = ET.parse(TEI_DUMMY)
+        return doc
 
     def list_endpoints(self):
         """ returns a list of existing API-Endpoints
@@ -115,11 +127,16 @@ class FrdClient():
         self.page_size = page_size
         self.limit = limit
         self.sleep = sleep
+        self.nsmap = {
+            "tei": "http://www.tei-c.org/ns/1.0",
+            "xml": "http://www.w3.org/XML/1998/namespace",
+        }
         if self.pw and self.user:
             self.authenticated = True
         else:
             print("no user and password set")
             self.authenticated = False
+        self.tei_dummy = self.tei_dummy()
 
 
 class FrdManifestation(FrdClient):

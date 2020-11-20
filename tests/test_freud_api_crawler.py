@@ -116,6 +116,13 @@ class TestFreud_api_crawler(unittest.TestCase):
         self.assertEqual(result['id'],  MANIFESTATION_PAGE_ID)
         self.assertTrue('body' in result.keys())
 
+    def test_013_check_dummy_tei(self):
+        """test clean_markup function"""
+        frd_obj = self.frd_manifestion_obj
+        doc = frd_obj.tei_dummy
+        root_el = doc.xpath('//tei:TEI', namespaces=frd_obj.nsmap)[0]
+        self.assertEqual(root_el.tag, '{http://www.tei-c.org/ns/1.0}TEI')
+
     def test_command_line_interface(self):
         """Test the CLI."""
         runner = CliRunner()
