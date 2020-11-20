@@ -6,6 +6,8 @@ import os
 import unittest
 from click.testing import CliRunner
 
+import lxml.etree as ET
+
 from freud_api_crawler import freud_api_crawler as frd
 from freud_api_crawler import string_utils
 from freud_api_crawler import cli
@@ -117,11 +119,19 @@ class TestFreud_api_crawler(unittest.TestCase):
         self.assertTrue('body' in result.keys())
 
     def test_013_check_dummy_tei(self):
-        """test clean_markup function"""
+        """test for dummy tei"""
         frd_obj = self.frd_manifestion_obj
         doc = frd_obj.tei_dummy
         root_el = doc.xpath('//tei:TEI', namespaces=frd_obj.nsmap)[0]
         self.assertEqual(root_el.tag, '{http://www.tei-c.org/ns/1.0}TEI')
+
+    def test_014_check_tei_serialiazer(self):
+        """test tei serialisation"""
+        frd_obj = self.frd_manifestion_obj
+        xml = frd_obj.make_xml()
+        xml_str = ET.tostring(xml).decode('utf-8')
+        print(type(xml), type(xml_str))
+        self.assertTrue(frd_obj.manifestation_id in xml_str)
 
     def test_command_line_interface(self):
         """Test the CLI."""

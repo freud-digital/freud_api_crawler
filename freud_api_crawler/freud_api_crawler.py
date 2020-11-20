@@ -235,12 +235,44 @@ class FrdManifestation(FrdClient):
         page_id = page_json['data']['id']
         body = page_attributes['body']['processed']
         wrapped_body = f'<div xml:id="page__{page_id}">{body}</div>'
-        cleaned_body = clean_markup(body)
+        cleaned_body = clean_markup(wrapped_body)
         result = {
             'id': page_id,
+            'title': page_attributes['title'],
+            'attr': page_attributes,
             'body': cleaned_body
         }
         return result
+
+    def make_xml(self, save=False):
+
+        """serializes a manifestation as XML/TEI document
+
+        :param save: if set, a XML/TEI file `{self.manifestation_id}.xml` is saved
+        :param type: bool
+
+        :return: A lxml.etree
+        """
+        doc = self.tei_dummy
+        root_el = doc.xpath('//tei:TEI', namespaces=self.nsmap)[0]
+        root_el.attrib["{http://www.w3.org/XML/1998/namespace}base"] = f"https://whatever.com"
+        root_el.attrib[
+            "{http://www.w3.org/XML/1998/namespace}id"
+        ] = f"manifestation__{self.manifestation_id}"
+        title = doc.xpath('//tei:title[@type="manifestation"]', namespaces=self.nsmap)[0]
+        title.text = f"{self.md__title}"
+        body = doc.xpath('//tei:body', namespaces=self.nsmap)[0]
+        pages = self.pages
+        for x in pages[:3]:
+            page_json = self.get_page(x['id'])
+            pp = self.process_page(page_json)
+            div = ET.fromstring(pp['body'])
+            body.append(div)
+        if save:
+            file = f"manifestation__{self.manifestation_id}.xml"
+            with open(file, 'wb') as f:
+                f.write(ET.tostring(doc, encoding="utf-8"))
+        return doc
 
     def __init__(
         self,
