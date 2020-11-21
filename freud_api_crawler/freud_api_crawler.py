@@ -6,7 +6,7 @@ from collections import defaultdict
 import requests
 import lxml.etree as ET
 
-from . string_utils import clean_markup
+from freud_api_crawler.string_utils import clean_markup
 
 
 FRD_API = os.environ.get('FRD_API', 'https://www.freud-edition.net/jsonapi/')
@@ -276,9 +276,10 @@ class FrdManifestation(FrdClient):
 
     def __init__(
         self,
-        manifestation_id=None
+        manifestation_id=None,
+        **kwargs
     ):
-        super().__init__()
+        super().__init__(**kwargs)
         self.manifestation_id = manifestation_id
         self.manifestation_endpoint = f"{self.endpoint}node/manifestation/{manifestation_id}"
         self.manifestation = self.get_manifest()

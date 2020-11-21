@@ -2,15 +2,24 @@
 import sys
 import click
 
+from . import freud_api_crawler as frd
+
 
 @click.command()
-def main(args=None):
+@click.argument('user', envvar='FRD_USER')
+@click.argument('pw', envvar='FRD_PW')
+@click.option('-m', default='a10e8c78-adad-4ca2-bfcb-b51bedcd7b58', show_default=True)
+def cli(user, pw, m):
     """Console script for freud_api_crawler."""
-    click.echo("Replace this message by putting your code into "
-               "freud_api_crawler.cli.main")
-    click.echo("See click documentation at https://click.palletsprojects.com/")
-    return 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())  # pragma: no cover
+    frd_manifestation = frd.FrdManifestation(
+        user=user,
+        pw=pw,
+        manifestation_id=m
+    )
+    xml = frd_manifestation.make_xml()
+    click.echo(
+        click.style(
+            f"processed Manifestation\n###\n {frd_manifestation.md__title}\
+            {frd_manifestation.manifestation_id}\n###", fg='green'
+        )
+    )

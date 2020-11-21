@@ -35,7 +35,7 @@ setup(
     description="A client to interact with freud-net API",
     entry_points={
         'console_scripts': [
-            'freud_api_crawler=freud_api_crawler.cli:main',
+            'freud_api_crawler=freud_api_crawler.cli:cli',
         ],
     },
     install_requires=requirements,
