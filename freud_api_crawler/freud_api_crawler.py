@@ -12,6 +12,8 @@ from freud_api_crawler.string_utils import clean_markup
 FRD_API = os.environ.get('FRD_API', 'https://www.freud-edition.net/jsonapi/')
 FRD_USER = os.environ.get('FRD_USER', False)
 FRD_PW = os.environ.get('FRD_PW', False)
+FRD_SESSION = os.environ.get('FRD_SESSION', False)
+FRD_TOKEN = os.environ.get('FRD_TOKEN', False)
 
 SAMPLE_MANIFESTATION = os.path.join(
     os.path.dirname(__file__),
@@ -45,7 +47,11 @@ class FrdClient():
         """
         if self.authenticated:
             r = requests.get(
-                self.endpoint, auth=(self.user, self.pw)
+                self.endpoint,
+                auth=(self.user, self.pw),
+                headers={
+                    'Cookie': self.cookie
+                }
             )
             result = r.json()
             d = defaultdict(list)
@@ -93,11 +99,16 @@ class FrdClient():
     #                 next_page = False
     #         time.sleep(self.sleep)
 
+    def get_cookie(self):
+        return f"{self.session}={self.token}"
+
     def __init__(
         self,
         endpoint=FRD_API,
         user=FRD_USER,
         pw=FRD_PW,
+        session=FRD_SESSION,
+        token=FRD_TOKEN,
         page_size=10,
         limit=10,
         sleep=0.5
@@ -124,6 +135,9 @@ class FrdClient():
         self.endpoint = endpoint
         self.user = user
         self.pw = pw
+        self.session = session
+        self.token = token
+        self.cookie = self.get_cookie()
         self.page_size = page_size
         self.limit = limit
         self.sleep = sleep
@@ -131,7 +145,7 @@ class FrdClient():
             "tei": "http://www.tei-c.org/ns/1.0",
             "xml": "http://www.w3.org/XML/1998/namespace",
         }
-        if self.pw and self.user:
+        if self.pw and self.user or self.session and self.token:
             self.authenticated = True
         else:
             print("no user and password set")
@@ -156,7 +170,11 @@ class FrdManifestation(FrdClient):
         :rtrype: dict
         """
         r = requests.get(
-            self.manifestation_endpoint, auth=(self.user, self.pw)
+            self.manifestation_endpoint,
+            auth=(self.user, self.pw),
+            headers={
+                'Cookie': self.cookie
+            }
         )
         status_code = r.status_code
         if status_code != 200:
@@ -201,8 +219,14 @@ class FrdManifestation(FrdClient):
         else:
             url = page_id
 
+        print(url)
+
         r = requests.get(
-            url, auth=(self.user, self.pw)
+            f"{url}?include=field_faksimile",
+            auth=(self.user, self.pw),
+            headers={
+                'Cookie': self.cookie
+            }
         )
 
         status_code = r.status_code
@@ -236,11 +260,16 @@ class FrdManifestation(FrdClient):
         body = page_attributes['body']['processed']
         wrapped_body = f'<div xml:id="page__{page_id}">{body}</div>'
         cleaned_body = clean_markup(wrapped_body)
+        faks = page_json['included'][0]
         result = {
             'id': page_id,
             'title': page_attributes['title'],
             'attr': page_attributes,
-            'body': cleaned_body
+            'body': cleaned_body,
+            'faks': faks,
+            'faks__id': faks['id'],
+            'faks__url': faks['links']['self']['href'],
+            'faks__payload': faks['attributes']['uri']['url']
         }
         return result
 
@@ -263,7 +292,7 @@ class FrdManifestation(FrdClient):
         title.text = f"{self.md__title}"
         body = doc.xpath('//tei:body', namespaces=self.nsmap)[0]
         pages = self.pages
-        for x in pages[:3]:
+        for x in pages:
             page_json = self.get_page(x['id'])
             pp = self.process_page(page_json)
             div = ET.fromstring(pp['body'])

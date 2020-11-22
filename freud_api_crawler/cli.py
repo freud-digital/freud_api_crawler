@@ -8,15 +8,19 @@ from . import freud_api_crawler as frd
 @click.command()
 @click.argument('user', envvar='FRD_USER')
 @click.argument('pw', envvar='FRD_PW')
+@click.argument('session', envvar='FRD_SESSION')
+@click.argument('token', envvar='FRD_TOKEN')
 @click.option('-m', default='a10e8c78-adad-4ca2-bfcb-b51bedcd7b58', show_default=True)
-def cli(user, pw, m):
+def cli(user, pw, session, token, m):
     """Console script for freud_api_crawler."""
     frd_manifestation = frd.FrdManifestation(
         user=user,
         pw=pw,
+        session=session,
+        token=token,
         manifestation_id=m
     )
-    xml = frd_manifestation.make_xml()
+    xml = frd_manifestation.make_xml(save=True)
     click.echo(
         click.style(
             f"processed Manifestation\n###\n {frd_manifestation.md__title}\

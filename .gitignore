@@ -114,4 +114,6 @@ ENV/
 *.ipynb
 hansi.xml
 set_env_variabes.sh
+export_env_variables.sh
 manifestation__*.xml
+hansi*
