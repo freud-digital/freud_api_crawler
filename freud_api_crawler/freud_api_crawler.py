@@ -6,7 +6,9 @@ from collections import defaultdict
 import requests
 import lxml.etree as ET
 
-from freud_api_crawler.string_utils import clean_markup
+from freud_api_crawler.string_utils import clean_markup, extract_page_nr
+
+from freud_api_crawler.tei_utils import make_pb
 
 
 FRD_API = os.environ.get('FRD_API', 'https://www.freud-edition.net/jsonapi/')
@@ -261,9 +263,11 @@ class FrdManifestation(FrdClient):
         wrapped_body = f'<div xml:id="page__{page_id}">{body}</div>'
         cleaned_body = clean_markup(wrapped_body)
         faks = page_json['included'][0]
+        page_nr = extract_page_nr(page_attributes['title'])
         result = {
             'id': page_id,
             'title': page_attributes['title'],
+            'page_nr': page_nr,
             'attr': page_attributes,
             'body': cleaned_body,
             'faks': faks,
@@ -292,10 +296,17 @@ class FrdManifestation(FrdClient):
         title.text = f"{self.md__title}"
         body = doc.xpath('//tei:body', namespaces=self.nsmap)[0]
         pages = self.pages
-        for x in pages:
+        for x in pages[:3]:
             page_json = self.get_page(x['id'])
             pp = self.process_page(page_json)
             div = ET.fromstring(pp['body'])
+            pb_el = make_pb(
+                pp['page_nr'],
+                pp['faks__url'],
+                pp['faks__id']
+            )
+            cur_div = div.xpath('//div', namespaces=self.nsmap)[0]
+            cur_div.insert(0, pb_el)
             body.append(div)
         if save:
             file = f"manifestation__{self.manifestation_id}.xml"
