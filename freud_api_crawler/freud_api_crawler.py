@@ -34,6 +34,8 @@ TEI_DUMMY = os.path.join(
     "tei_dummy.xml"
 )
 
+CUR_LOC = os.path.dirname(__file__)
+
 
 class FrdClient():
 
@@ -64,42 +66,6 @@ class FrdClient():
             return d
         else:
             return {}
-
-    # def crawl_endpoint(self, url_part, important_values):
-    #     """ method for iterating over drupal-endpoints
-    #     :param url_part: specific API endpoint, e.g. 'werk' -> {drupalbase}/jsonapi/node/{url_part}
-    #     :type gnd_id: str
-    #     :param important_values: simple attribute names, e.g. ['title', 'field_year']
-    #     :type user: list
-    #
-    #     :return: print things
-    #     """
-    #
-    #     url = f"{self.endpoint}node/{url_part}?page[limit]={self.page_size}"
-    #     next_page = True
-    #     counter = 0
-    #     auth = ()
-    #     while next_page:
-    #         print(url)
-    #         response = requests.get(url, auth=(self.user, self.pw))
-    #         result = response.json()
-    #         links = result['links']
-    #         for y in result['data']:
-    #             self_uri = y['links']['self']['href']
-    #             print(self_uri)
-    #             attributes = y['attributes']
-    #             for val in important_values:
-    #                 print(attributes[val])
-    #         if links.get('next', False):
-    #             url = links['next']['href']
-    #         else:
-    #             next_page = False
-    #         counter += 1
-    #         print(counter)
-    #         if self.limit > 0:
-    #             if counter >= self.limit:
-    #                 next_page = False
-    #         time.sleep(self.sleep)
 
     def get_cookie(self):
         return f"{self.session}={self.token}"
@@ -143,6 +109,8 @@ class FrdClient():
         self.page_size = page_size
         self.limit = limit
         self.sleep = sleep
+        self.werk_ep = f"{self.endpoint}node/werk"
+        self.manifestation_ep = f"{self.endpoint}node/manifestation"
         self.nsmap = {
             "tei": "http://www.tei-c.org/ns/1.0",
             "xml": "http://www.w3.org/XML/1998/namespace",
@@ -153,6 +121,86 @@ class FrdClient():
             print("no user and password set")
             self.authenticated = False
         self.tei_dummy = self.tei_dummy()
+
+class FrdWerk(FrdClient):
+    """class to deal with Werke
+    :param werk_id: The hash ID of a Werk Node
+    :type werk_id: str
+
+    :return: A FrdWork instance
+    :rtype: class:`freud_api_crawler.freud_api_crawler.FrdWerk`
+    """
+
+    def get_werk(self):
+        """ returns the werk json as python dict
+
+        :return: a Werk representation
+        :rtrype: dict
+        """
+        url = f"{self.werk_ep}/{self.werk_id}"
+        r = requests.get(
+            self.ep,
+            auth=(self.user, self.pw),
+            headers={
+                'Cookie': self.cookie
+            }
+        )
+        status_code = r.status_code
+        result = r.json()
+        return result
+
+    def get_manifestations(self):
+        man_col = []
+        url = f"{self.manifestation_ep}?filter[field_werk.id]={self.werk_id}&fields[node--manifestation]=id,title"
+        next_page = True
+        while next_page:
+            print(url)
+            response = None
+            result = None
+            x = None
+            response = requests.get(
+                url,
+                auth=(self.user, self.pw),
+                headers={
+                    'Cookie': self.cookie
+                }
+            )
+            result = response.json()
+            links = result['links']
+            if links.get('next', False):
+                url = links['next']['href']
+            else:
+                next_page = False
+            for x in result['data']:
+                item = {
+                    "man_id": x['id'],
+                    "man_title": x['attributes']['title']
+                }
+                man_col.append(item)
+        return man_col
+
+    def __init__(
+        self,
+        werk_id=None,
+        **kwargs
+    ):
+        super().__init__(**kwargs)
+        self.werk_id = werk_id
+        self.ep = f"{self.werk_ep}/{self.werk_id}"
+        self.werk = self.get_werk()
+        self.werk_attrib = self.werk['data']['attributes']
+        for x in self.werk_attrib.keys():
+            value = self.werk_attrib[x]
+            if isinstance(value, dict):
+                for y in value.keys():
+                    dict_key = f"{x}__{y}"
+                    setattr(self, f"md__{dict_key}", value[y])
+            else:
+                setattr(self, f"md__{x}", value)
+        self.meta_attributes = [x for x in dir(self) if x.startswith('md__')]
+        print("fetching related manifestations")
+        self.manifestations = self.get_manifestations()
+        self.manifestations_count = len(self.manifestations)
 
 
 class FrdManifestation(FrdClient):
@@ -169,7 +217,7 @@ class FrdManifestation(FrdClient):
         """ returns the manifest json as python dict
 
         :return: a Manifestation representation
-        :rtrype: dict
+        :rtype: dict
         """
         r = requests.get(
             self.manifestation_endpoint,
