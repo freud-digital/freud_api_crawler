@@ -28,6 +28,14 @@ freud\_api\_crawler.string\_utils module
     :undoc-members:
     :show-inheritance:
 
+freud\_api\_crawler.tei\_utils module
+-------------------------------------
+
+.. automodule:: freud_api_crawler.tei_utils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------
