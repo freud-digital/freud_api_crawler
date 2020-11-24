@@ -36,6 +36,7 @@ setup(
     entry_points={
         'console_scripts': [
             'freud_api_crawler=freud_api_crawler.cli:cli',
+            'save_test=freud_api_crawler.cli:save_test',
         ],
     },
     install_requires=requirements,

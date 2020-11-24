@@ -34,7 +34,7 @@ TEI_DUMMY = os.path.join(
     "tei_dummy.xml"
 )
 
-CUR_LOC = os.path.dirname(__file__)
+CUR_LOC = os.path.dirname(os.path.abspath(__file__))
 
 
 class FrdClient():
@@ -72,6 +72,7 @@ class FrdClient():
 
     def __init__(
         self,
+        out_dir=CUR_LOC,
         endpoint=FRD_API,
         user=FRD_USER,
         pw=FRD_PW,
@@ -121,6 +122,8 @@ class FrdClient():
             print("no user and password set")
             self.authenticated = False
         self.tei_dummy = self.tei_dummy()
+        self.out_dir = out_dir
+
 
 class FrdWerk(FrdClient):
     """class to deal with Werke
@@ -220,7 +223,7 @@ class FrdManifestation(FrdClient):
         :rtype: dict
         """
         r = requests.get(
-            self.manifestation_endpoint,
+            f"{self.manifestation_endpoint}?include=field_werk",
             auth=(self.user, self.pw),
             headers={
                 'Cookie': self.cookie
@@ -237,6 +240,23 @@ class FrdManifestation(FrdClient):
         else:
             result = r.json()
         return result
+
+    def get_manifestation_save_path(self):
+        werk_path = self.werk_folder
+        manifestation_path = self.md__path__alias
+        cur_werk_folder = werk_path.split('/')[:3]
+        cur_man_folder = manifestation_path.split('/')[2]
+        man_file_name = f"{manifestation_path.split('/')[-1]}.xml"
+        file_name = os.path.join(
+            self.save_dir, *cur_werk_folder, cur_man_folder, man_file_name
+        )
+        folder = os.path.join(
+            self.save_dir, *cur_werk_folder, cur_man_folder
+        )
+        return {
+            "full_file_name": file_name,
+            "folder": folder
+        }
 
     def get_pages(self):
         """ method returning related page-ids/urls
@@ -325,7 +345,7 @@ class FrdManifestation(FrdClient):
         }
         return result
 
-    def make_xml(self, save=False):
+    def make_xml(self, save=False, limit=True):
 
         """serializes a manifestation as XML/TEI document
 
@@ -342,9 +362,15 @@ class FrdManifestation(FrdClient):
         ] = f"manifestation__{self.manifestation_id}"
         title = doc.xpath('//tei:title[@type="manifestation"]', namespaces=self.nsmap)[0]
         title.text = f"{self.md__title}"
+        w_title = doc.xpath('//tei:title[@type="work"]', namespaces=self.nsmap)[0]
+        w_title.text = f"{self.werk['attributes']['title']}"
         body = doc.xpath('//tei:body', namespaces=self.nsmap)[0]
         pages = self.pages
-        for x in pages[:3]:
+        if limit:
+            actual_pages = pages[:2]
+        else:
+            actual_pages = pages
+        for x in actual_pages:
             page_json = self.get_page(x['id'])
             pp = self.process_page(page_json)
             div = ET.fromstring(pp['body'])
@@ -357,7 +383,11 @@ class FrdManifestation(FrdClient):
             cur_div.insert(0, pb_el)
             body.append(div)
         if save:
-            file = f"manifestation__{self.manifestation_id}.xml"
+            try:
+                os.makedirs(self.manifestation_save_location_folder)
+            except FileExistsError:
+                print(f"Overriding exsting file: {self.manifestation_save_location_folder}")
+            file = self.manifestation_save_location_file
             with open(file, 'wb') as f:
                 f.write(ET.tostring(doc, encoding="utf-8"))
         return doc
@@ -371,6 +401,9 @@ class FrdManifestation(FrdClient):
         self.manifestation_id = manifestation_id
         self.manifestation_endpoint = f"{self.endpoint}node/manifestation/{manifestation_id}"
         self.manifestation = self.get_manifest()
+        self.werk = self.manifestation['included'][0]
+        self.werk_folder = self.werk['attributes']['path']['alias']
+        # self.manifestation_folder = self.manifestation['attributes']['path']['alias']
         self.man_attrib = self.manifestation['data']['attributes']
         for x in self.man_attrib.keys():
             value = self.man_attrib[x]
@@ -383,3 +416,6 @@ class FrdManifestation(FrdClient):
         self.meta_attributes = [x for x in dir(self) if x.startswith('md__')]
         self.pages = self.get_pages()
         self.page_count = len(self.pages)
+        self.save_dir = os.path.join(self.out_dir)
+        self.manifestation_save_location_file = self.get_manifestation_save_path()['full_file_name']
+        self.manifestation_save_location_folder = self.get_manifestation_save_path()['folder']
