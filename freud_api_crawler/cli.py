@@ -35,22 +35,18 @@ def cli(user, pw, session, token, m):
 @click.argument('pw', envvar='FRD_PW')
 @click.argument('session', envvar='FRD_SESSION')
 @click.argument('token', envvar='FRD_TOKEN')
-@click.option('-m', default='a10e8c78-adad-4ca2-bfcb-b51bedcd7b58', show_default=True)
-@click.option('-s', default='/freud_data', show_default=True)
-def save_test(user, pw, session, token, m, s):
+@click.option('-w', default='9d035a03-28d7-4013-adaf-63337d78ece4', show_default=True)
+@click.option('-s', default='/home/csae8092/freud_data_cli', show_default=True)
+def download_work(user, pw, session, token, w, s):
     """Console script for freud_api_crawler."""
-    # frd_manifestation = frd.FrdManifestation(
-    #     user=user,
-    #     pw=pw,
-    #     session=session,
-    #     token=token,
-    #     manifestation_id=m,
-    # )
-    cur_loc = os.path.dirname(os.path.abspath(__file__))
-    # xml = frd_manifestation.make_xml(save=True)
+    werk_obj = frd.FrdWerk(werk_id=w)
+    rel_manifestations = werk_obj.manifestations
+    for x in rel_manifestations:
+        frd_man = frd.FrdManifestation(out_dir=s, manifestation_id=x['man_id'])
+        frd_man.make_xml(save=True, limit=True)
     click.echo(
-        f"cur_loc: {cur_loc}"
-    )
-    click.echo(
-        f"save_dir: {s}"
+        click.style(
+            f"finished download\n{werk_obj.manifestations_count} Manifestations for {werk_obj.md__title} into {s}",
+            fg='green'
+        )
     )
