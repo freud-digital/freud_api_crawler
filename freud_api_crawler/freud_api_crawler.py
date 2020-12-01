@@ -14,8 +14,29 @@ from freud_api_crawler.tei_utils import make_pb
 FRD_API = os.environ.get('FRD_API', 'https://www.freud-edition.net/jsonapi/')
 FRD_USER = os.environ.get('FRD_USER', False)
 FRD_PW = os.environ.get('FRD_PW', False)
-FRD_SESSION = os.environ.get('FRD_SESSION', False)
-FRD_TOKEN = os.environ.get('FRD_TOKEN', False)
+
+
+def get_auth_items(username, password):
+    url = "https://www.freud-edition.net/user/login?_format=json"
+    payload = {
+        "name": username,
+        "pass": password
+    }
+    headers = {
+      'Content-Type': 'application/json',
+    }
+    r = requests.request(
+        "POST", url, headers=headers, data=json.dumps(payload)
+    )
+    auth_items = {
+        'cookie': r.cookies,
+    }
+    for key, value in r.json().items():
+        auth_items[key] = value
+    return auth_items
+
+
+AUTH_ITEMS = get_auth_items(FRD_USER, FRD_PW)
 
 SAMPLE_MANIFESTATION = os.path.join(
     os.path.dirname(__file__),
@@ -52,10 +73,7 @@ class FrdClient():
         if self.authenticated:
             r = requests.get(
                 self.endpoint,
-                auth=(self.user, self.pw),
-                headers={
-                    'Cookie': self.cookie
-                }
+                cookies=self.cookie
             )
             result = r.json()
             d = defaultdict(list)
@@ -67,17 +85,13 @@ class FrdClient():
         else:
             return {}
 
-    def get_cookie(self):
-        return f"{self.session}={self.token}"
-
     def __init__(
         self,
         out_dir=CUR_LOC,
         endpoint=FRD_API,
         user=FRD_USER,
         pw=FRD_PW,
-        session=FRD_SESSION,
-        token=FRD_TOKEN,
+        cookie=AUTH_ITEMS['cookie'],
         page_size=10,
         limit=10,
         sleep=0.5
@@ -104,9 +118,7 @@ class FrdClient():
         self.endpoint = endpoint
         self.user = user
         self.pw = pw
-        self.session = session
-        self.token = token
-        self.cookie = self.get_cookie()
+        self.cookie = cookie
         self.page_size = page_size
         self.limit = limit
         self.sleep = sleep
@@ -143,10 +155,7 @@ class FrdWerk(FrdClient):
         url = f"{self.werk_ep}/{self.werk_id}"
         r = requests.get(
             self.ep,
-            auth=(self.user, self.pw),
-            headers={
-                'Cookie': self.cookie
-            }
+            cookies=self.cookie
         )
         status_code = r.status_code
         result = r.json()
@@ -163,10 +172,7 @@ class FrdWerk(FrdClient):
             x = None
             response = requests.get(
                 url,
-                auth=(self.user, self.pw),
-                headers={
-                    'Cookie': self.cookie
-                }
+                cookies=self.cookie
             )
             result = response.json()
             links = result['links']
@@ -224,10 +230,7 @@ class FrdManifestation(FrdClient):
         """
         r = requests.get(
             f"{self.manifestation_endpoint}?include=field_werk",
-            auth=(self.user, self.pw),
-            headers={
-                'Cookie': self.cookie
-            }
+            cookies=self.cookie
         )
         status_code = r.status_code
         if status_code != 200:
@@ -293,10 +296,7 @@ class FrdManifestation(FrdClient):
 
         r = requests.get(
             f"{url}?include=field_faksimile",
-            auth=(self.user, self.pw),
-            headers={
-                'Cookie': self.cookie
-            }
+            cookies=self.cookie
         )
 
         status_code = r.status_code
