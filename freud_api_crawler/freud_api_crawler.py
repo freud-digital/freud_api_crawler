@@ -17,6 +17,17 @@ FRD_PW = os.environ.get('FRD_PW', False)
 
 
 def get_auth_items(username, password):
+    """ helper function to fetch auth-cookie
+
+    :param username: Drupal-User Username
+    :type username: str
+    :param password: Drupal-User Password
+    :type password: str
+
+    :return: A dict with auth-items `'cookie', 'current_user', 'csrf_token', 'logout_token'`
+    :rtype: dict
+    """
+
     url = "https://www.freud-edition.net/user/login?_format=json"
     payload = {
         "name": username,
@@ -70,28 +81,24 @@ class FrdClient():
         """ returns a list of existing API-Endpoints
         :return: A PyLobidPerson instance
         """
-        if self.authenticated:
-            r = requests.get(
-                self.endpoint,
-                cookies=self.cookie
-            )
-            result = r.json()
-            d = defaultdict(list)
-            for key, value in result['links'].items():
-                url = value['href']
-                node_type = url.split('/')[-2]
-                d[node_type].append(url)
-            return d
-        else:
-            return {}
+
+        r = requests.get(
+            self.endpoint,
+            cookies=self.cookie
+        )
+        result = r.json()
+        d = defaultdict(list)
+        for key, value in result['links'].items():
+            url = value['href']
+            node_type = url.split('/')[-2]
+            d[node_type].append(url)
+        return d
 
     def __init__(
         self,
         out_dir=CUR_LOC,
         endpoint=FRD_API,
-        user=FRD_USER,
-        pw=FRD_PW,
-        cookie=AUTH_ITEMS['cookie'],
+        auth_items={},
         page_size=10,
         limit=10,
         sleep=0.5
@@ -116,9 +123,8 @@ class FrdClient():
         """
         super().__init__()
         self.endpoint = endpoint
-        self.user = user
-        self.pw = pw
-        self.cookie = cookie
+        self.auth_items = auth_items
+        self.cookie = self.auth_items['cookie']
         self.page_size = page_size
         self.limit = limit
         self.sleep = sleep
@@ -128,11 +134,6 @@ class FrdClient():
             "tei": "http://www.tei-c.org/ns/1.0",
             "xml": "http://www.w3.org/XML/1998/namespace",
         }
-        if self.pw and self.user or self.session and self.token:
-            self.authenticated = True
-        else:
-            print("no user and password set")
-            self.authenticated = False
         self.tei_dummy = self.tei_dummy()
         self.out_dir = out_dir
 

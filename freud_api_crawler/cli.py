@@ -9,16 +9,13 @@ from . import freud_api_crawler as frd
 @click.command()
 @click.argument('user', envvar='FRD_USER')
 @click.argument('pw', envvar='FRD_PW')
-@click.argument('session', envvar='FRD_SESSION')
-@click.argument('token', envvar='FRD_TOKEN')
 @click.option('-m', default='a10e8c78-adad-4ca2-bfcb-b51bedcd7b58', show_default=True)
-def cli(user, pw, session, token, m):
+def cli(user, pw, m):
     """Console script for freud_api_crawler."""
+
+    auth_items = frd.get_auth_items(user, pw)
     frd_manifestation = frd.FrdManifestation(
-        user=user,
-        pw=pw,
-        session=session,
-        token=token,
+        auth_items=auth_items,
         manifestation_id=m
     )
     xml = frd_manifestation.make_xml(save=True)
@@ -33,16 +30,21 @@ def cli(user, pw, session, token, m):
 @click.command()
 @click.argument('user', envvar='FRD_USER')
 @click.argument('pw', envvar='FRD_PW')
-@click.argument('session', envvar='FRD_SESSION')
-@click.argument('token', envvar='FRD_TOKEN')
 @click.option('-w', default='9d035a03-28d7-4013-adaf-63337d78ece4', show_default=True)
 @click.option('-s', default='/home/csae8092/freud_data_cli', show_default=True)
-def download_work(user, pw, session, token, w, s):
+def download_work(user, pw, w, s):
     """Console script for freud_api_crawler."""
-    werk_obj = frd.FrdWerk(werk_id=w)
+    auth_items = frd.get_auth_items(user, pw)
+    werk_obj = frd.FrdWerk(
+        auth_items=auth_items, werk_id=w
+    )
     rel_manifestations = werk_obj.manifestations
     for x in rel_manifestations:
-        frd_man = frd.FrdManifestation(out_dir=s, manifestation_id=x['man_id'])
+        frd_man = frd.FrdManifestation(
+            out_dir=s,
+            manifestation_id=x['man_id'],
+            auth_items=auth_items
+        )
         frd_man.make_xml(save=True, limit=True)
     click.echo(
         click.style(

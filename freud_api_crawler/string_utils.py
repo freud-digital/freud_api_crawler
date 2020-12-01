@@ -10,7 +10,7 @@ CLEAN_UP_PATTERNS = [
 def clean_markup(source, patterns=CLEAN_UP_PATTERNS):
     """ applies search and replace
     :param source: A string to clean
-    :type source: string
+    :type source: str
     :param patterns: a list of tuples `[('-<br />', '<lb break="no"/>'),`]
     :type patterns: list
 
@@ -30,7 +30,7 @@ def extract_page_nr(some_string):
     :type some_string: string
 
     :return: The page number e.g. `21`
-    :rtype: string
+    :rtype: str
     """
 
     page_nr = re.findall(r'\d+', some_string)

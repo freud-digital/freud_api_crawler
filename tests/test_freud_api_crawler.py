@@ -20,9 +20,11 @@ MANIFESTATION_PAGE_ID = "5126755a-eeae-4f53-82f9-aaa3a6fd81a9"
 MANIFESTATION_PAGE_URL = "https://www.freud-edition.net/jsonapi/node/manifestation_\
 seite/5126755a-eeae-4f53-82f9-aaa3a6fd81a9"
 
-
-FRD_WERK = frd.FrdWerk(werk_id=WERK_ID)
-FRD_MANIFESTATION = frd.FrdManifestation(manifestation_id=MANIFESTATION_ID)
+FRD_WERK = frd.FrdWerk(auth_items=frd.AUTH_ITEMS, werk_id=WERK_ID)
+FRD_MANIFESTATION = frd.FrdManifestation(
+    auth_items=frd.AUTH_ITEMS,
+    manifestation_id=MANIFESTATION_ID
+)
 
 
 class TestFrdWerk(unittest.TestCase):
@@ -55,26 +57,12 @@ class TestFreud_api_crawler(unittest.TestCase):
     def tearDown(self):
         """Tear down test fixtures, if any."""
 
-    def test_000_not_authenticated(self):
-        """Test if os-envs are set"""
-        frd_obj = frd.FrdClient()
-        if frd.FRD_PW and frd.FRD_PW:
-            self.assertTrue(frd_obj.authenticated)
-        else:
-            self.assertFalse(frd_obj.authenticated)
-
     def test_002_endpoints_with_auth(self):
         """Test of endpoints-method"""
-        frd_obj = frd.FrdClient()
+        frd_obj = frd.FrdClient(auth_items=frd.AUTH_ITEMS)
         endpoints = frd_obj.list_endpoints()
         self.assertTrue(endpoints)
         self.assertTrue('node' in endpoints.keys())
-
-    def test_003_endpoints_no_auth(self):
-        """check if not authenticated condition works"""
-        frd_obj = frd.FrdClient(user=False, pw=False, session=False, token=False)
-        endpoints = frd_obj.list_endpoints()
-        self.assertFalse(endpoints)
 
     def test_004_FrdManifestation_init_test(self):
         """check for correct id"""
