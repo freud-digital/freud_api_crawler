@@ -45,7 +45,7 @@ def download_work(user, pw, w, s):
             manifestation_id=x['man_id'],
             auth_items=auth_items
         )
-        frd_man.make_xml(save=True, limit=True)
+        frd_man.make_xml(save=True, limit=False)
     click.echo(
         click.style(
             f"finished download\n{werk_obj.manifestations_count} Manifestations for {werk_obj.md__title} into {s}",

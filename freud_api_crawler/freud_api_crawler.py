@@ -6,7 +6,7 @@ from collections import defaultdict
 import requests
 import lxml.etree as ET
 
-from freud_api_crawler.string_utils import clean_markup, extract_page_nr
+from freud_api_crawler.string_utils import clean_markup, extract_page_nr, always_https
 
 from freud_api_crawler.tei_utils import make_pb
 
@@ -49,17 +49,6 @@ def get_auth_items(username, password):
 
 AUTH_ITEMS = get_auth_items(FRD_USER, FRD_PW)
 
-SAMPLE_MANIFESTATION = os.path.join(
-    os.path.dirname(__file__),
-    "fixtures",
-    "manifestation.json"
-)
-SAMPLE_MANIFESTATION_PAGE = os.path.join(
-    os.path.dirname(__file__),
-    "fixtures",
-    "manifestation_seite.json"
-)
-
 TEI_DUMMY = os.path.join(
     os.path.dirname(__file__),
     "fixtures",
@@ -84,7 +73,8 @@ class FrdClient():
 
         r = requests.get(
             self.endpoint,
-            cookies=self.cookie
+            cookies=self.cookie,
+            allow_redirects=True
         )
         result = r.json()
         d = defaultdict(list)
@@ -156,7 +146,8 @@ class FrdWerk(FrdClient):
         url = f"{self.werk_ep}/{self.werk_id}"
         r = requests.get(
             self.ep,
-            cookies=self.cookie
+            cookies=self.cookie,
+            allow_redirects=True
         )
         status_code = r.status_code
         result = r.json()
@@ -173,12 +164,14 @@ class FrdWerk(FrdClient):
             x = None
             response = requests.get(
                 url,
-                cookies=self.cookie
+                cookies=self.cookie,
+                allow_redirects=True
             )
             result = response.json()
             links = result['links']
             if links.get('next', False):
-                url = links['next']['href']
+                orig_url = links['next']['href']
+                url = always_https(orig_url)
             else:
                 next_page = False
             for x in result['data']:
@@ -231,18 +224,11 @@ class FrdManifestation(FrdClient):
         """
         r = requests.get(
             f"{self.manifestation_endpoint}?include=field_werk",
-            cookies=self.cookie
+            cookies=self.cookie,
+            allow_redirects=True
         )
         status_code = r.status_code
-        if status_code != 200:
-            print(
-                f"could not access {self.manifestation_endpoint} because\
-                of {status_code}, using local sample"
-            )
-            with open(SAMPLE_MANIFESTATION) as json_file:
-                result = json.load(json_file)
-        else:
-            result = r.json()
+        result = r.json()
         return result
 
     def get_manifestation_save_path(self):
@@ -297,18 +283,12 @@ class FrdManifestation(FrdClient):
 
         r = requests.get(
             f"{url}?include=field_faksimile",
-            cookies=self.cookie
+            cookies=self.cookie,
+            allow_redirects=True
         )
 
         status_code = r.status_code
-        if status_code != 200:
-            print(
-                f" {url} -> {status_code} -> using local sample"
-            )
-            with open(SAMPLE_MANIFESTATION_PAGE) as json_file:
-                result = json.load(json_file)
-        else:
-            result = r.json()
+        result = r.json()
         return result
 
     def process_page(self, page_json):

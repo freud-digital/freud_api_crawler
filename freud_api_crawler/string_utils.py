@@ -15,7 +15,7 @@ def clean_markup(source, patterns=CLEAN_UP_PATTERNS):
     :type patterns: list
 
     :return: the cleaned string
-    :rtype: string
+    :rtype: str
 
     """
     for x in patterns:
@@ -27,7 +27,7 @@ def extract_page_nr(some_string):
     """ extracts the page number from a string like `Seite 21`
 
     :param some_string: e.g. `Seite 21`
-    :type some_string: string
+    :type some_string: str
 
     :return: The page number e.g. `21`
     :rtype: str
@@ -38,3 +38,23 @@ def extract_page_nr(some_string):
         return "-".join(page_nr)
     else:
         return some_string
+
+
+def always_https(url):
+    """ ensures that urls are always using HTTPS
+
+    :param url: An URL (as string)
+    :type url: str
+
+    :return: The passed in URL with HTTPS
+    :rtrype: str
+
+    """
+
+    if not url.startswith('http'):
+        return url
+    elif url.startswith('https'):
+        return url
+    else:
+        https_url = url.replace('http://', 'https://')
+        return https_url

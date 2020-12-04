@@ -169,6 +169,16 @@ class TestStringUtils(unittest.TestCase):
             page_nr = string_utils.extract_page_nr(x[0])
             self.assertEqual(page_nr, x[1])
 
+    def test_002_always_https(self):
+        samples = [
+            ('no_url', 'no_url'),
+            ('http://whatever.com', 'https://whatever.com'),
+            ('https://whatever.com', 'https://whatever.com')
+        ]
+        for x in samples:
+            new_url = string_utils.always_https(x[0])
+            self.assertEqual(new_url, x[1])
+
 
 class TestTeiUtils(unittest.TestCase):
     """Tests for `freud_api_crawler.tei_utils` module."""
