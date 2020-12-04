@@ -27,12 +27,12 @@ def cli(user, pw, m):
     )
 
 
-@click.command()
-@click.argument('user', envvar='FRD_USER')
-@click.argument('pw', envvar='FRD_PW')
-@click.option('-w', default='9d035a03-28d7-4013-adaf-63337d78ece4', show_default=True)
-@click.option('-s', default='/home/csae8092/freud_data_cli', show_default=True)
-def download_work(user, pw, w, s):
+@click.command()  # pragma: no cover
+@click.argument('user', envvar='FRD_USER')  # pragma: no cover
+@click.argument('pw', envvar='FRD_PW')  # pragma: no cover
+@click.option('-w', default='9d035a03-28d7-4013-adaf-63337d78ece4', show_default=True)  # pragma: no cover
+@click.option('-s', default='/home/csae8092/freud_data_cli', show_default=True)  # pragma: no cover
+def download_work(user, pw, w, s):  # pragma: no cover
     """Console script for freud_api_crawler."""
     auth_items = frd.get_auth_items(user, pw)
     werk_obj = frd.FrdWerk(
