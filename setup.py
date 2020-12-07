@@ -48,6 +48,14 @@ setup(
     keywords='freud_api_crawler',
     name='freud_api_crawler',
     packages=find_packages(include=['freud_api_crawler', 'freud_api_crawler.*']),
+    data_files=[
+        (
+            'freud_api_crawler/fixtures',
+            [
+                'freud_api_crawler/fixtures/tei_dummy.xml'
+            ]
+        ),
+    ],
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
