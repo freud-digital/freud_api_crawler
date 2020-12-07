@@ -12,6 +12,14 @@ freud\_api\_crawler.cli module
     :undoc-members:
     :show-inheritance:
 
+freud\_api\_crawler.file\_utils module
+--------------------------------------
+
+.. automodule:: freud_api_crawler.file_utils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 freud\_api\_crawler.freud\_api\_crawler module
 ----------------------------------------------
 

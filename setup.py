@@ -13,7 +13,8 @@ with open('HISTORY.rst') as history_file:
 requirements = [
     'requests==2.25.0',
     'Click>=7.0',
-    'lxml==4.6.1'
+    'lxml==4.6.1',
+    'tqdm==4.52.0'
 ]
 
 setup_requirements = []
@@ -37,6 +38,7 @@ setup(
         'console_scripts': [
             'freud_api_crawler=freud_api_crawler.cli:cli',
             'download_work=freud_api_crawler.cli:download_work',
+            'flatten_files=freud_api_crawler.cli:flatten_files',
         ],
     },
     install_requires=requirements,
