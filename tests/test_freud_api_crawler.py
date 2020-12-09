@@ -114,7 +114,7 @@ class TestFreud_api_crawler(unittest.TestCase):
         frd_obj = FRD_MANIFESTATION
         page = frd_obj.get_page(page_id=MANIFESTATION_PAGE_ID)
         body = page['data']['attributes']['body']['processed']
-        test_pattern = string_utils.CLEAN_UP_PATTERNS[0][0]
+        test_pattern = string_utils.CLEAN_UP_PATTERNS[1][0]
         cleaned_body = string_utils.clean_markup(body)
         self.assertTrue(test_pattern not in cleaned_body)
 

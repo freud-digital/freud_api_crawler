@@ -1,9 +1,10 @@
 import re
 
 CLEAN_UP_PATTERNS = [
-    ('-<br />', '<lb break="no"/>'),
-    ('<br />', '<lb />'),
     ('\n', ''),
+    ('-<br />', '<lb break="no"/>'),
+    ('<br />', '<lb />\n'),
+    ('</p>', '</p>\n'),
 ]
 
 

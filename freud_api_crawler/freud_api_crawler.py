@@ -49,6 +49,14 @@ def get_auth_items(username, password):
 
 AUTH_ITEMS = get_auth_items(FRD_USER, FRD_PW)
 
+XSLT_FILE = os.path.join(
+    os.path.dirname(__file__),
+    "fixtures",
+    "make_tei.xslt"
+)
+
+XSL_DOC = ET.parse(XSLT_FILE)
+
 TEI_DUMMY = os.path.join(
     os.path.dirname(__file__),
     "fixtures",
@@ -88,26 +96,23 @@ class FrdClient():
         self,
         out_dir=CUR_LOC,
         endpoint=FRD_API,
+        xsl_doc=XSL_DOC,
         auth_items={},
-        page_size=10,
         limit=10,
-        sleep=0.5
     ):
 
         """ initializes the class
 
+        :param out_dir: The directory to save processed Manifestations
+        :type out_dir: str
         :param endpoint: The API Endpoint
-        :type gnd_id: str
-        :param user: The API user name
-        :type user: str
-        :param pw: The user's password
-        :type pw: str
-        :param page_size: Default page size of api-return -> &page[limit]={self.limit}
-        :type pw: int
+        :type endpoint: str
+        :param xsl_doc: A `lxml.etree._ElementTree` object (i.e. a parsed XSL-Stylesheet)
+        :type xsl_doc: lxml.etree._ElementTree
+        :param auth_items: The result dict of a successfull drupal api login action
+        :type auth_items: dict
         :param limit: After how many next-loads the loop should stop
         :type pw: int
-        :param sleep: Time to pause crawling loop
-        :type pw: float
 
         :return: A FrdClient instance
         """
@@ -115,9 +120,7 @@ class FrdClient():
         self.endpoint = endpoint
         self.auth_items = auth_items
         self.cookie = self.auth_items['cookie']
-        self.page_size = page_size
         self.limit = limit
-        self.sleep = sleep
         self.werk_ep = f"{self.endpoint}node/werk"
         self.manifestation_ep = f"{self.endpoint}node/manifestation"
         self.nsmap = {
@@ -126,6 +129,7 @@ class FrdClient():
         }
         self.tei_dummy = self.tei_dummy()
         self.out_dir = out_dir
+        self.xsl_doc = xsl_doc
 
 
 class FrdWerk(FrdClient):
@@ -309,7 +313,7 @@ class FrdManifestation(FrdClient):
         page_attributes = page_json['data']['attributes']
         page_id = page_json['data']['id']
         body = page_attributes['body']['processed']
-        wrapped_body = f'<div xml:id="page__{page_id}">{body}</div>'
+        wrapped_body = f'<div xmlns="http://www.tei-c.org/ns/1.0" xml:id="page__{page_id}">{body}</div>'
         cleaned_body = clean_markup(wrapped_body)
         faks = page_json['included'][0]
         page_nr = extract_page_nr(page_attributes['title'])
@@ -360,9 +364,11 @@ class FrdManifestation(FrdClient):
                 pp['faks__url'],
                 pp['faks__id']
             )
-            cur_div = div.xpath('//div', namespaces=self.nsmap)[0]
+            cur_div = div.xpath('//tei:div', namespaces=self.nsmap)[0]
             cur_div.insert(0, pb_el)
             body.append(div)
+        transform = ET.XSLT(self.xsl_doc)
+        tei = transform(doc)
         if save:
             try:
                 os.makedirs(self.manifestation_save_location_folder)
@@ -370,8 +376,8 @@ class FrdManifestation(FrdClient):
                 print(f"Overriding exsting file: {self.manifestation_save_location_folder}")
             file = self.manifestation_save_location_file
             with open(file, 'wb') as f:
-                f.write(ET.tostring(doc, encoding="utf-8"))
-        return doc
+                f.write(ET.tostring(tei, pretty_print=True, encoding="utf-8"))
+        return tei
 
     def __init__(
         self,
