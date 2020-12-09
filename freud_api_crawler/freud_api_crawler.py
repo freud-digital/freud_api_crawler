@@ -236,20 +236,16 @@ class FrdManifestation(FrdClient):
         return result
 
     def get_manifestation_save_path(self):
-        werk_path = self.werk_folder
-        manifestation_path = self.md__path__alias
-        cur_werk_folder = werk_path.split('/')[:3]
-        cur_man_folder = manifestation_path.split('/')[2]
-        man_file_name = f"{manifestation_path.split('/')[-1]}.xml"
-        file_name = os.path.join(
-            self.save_dir, *cur_werk_folder, cur_man_folder, man_file_name
-        )
         folder = os.path.join(
-            self.save_dir, *cur_werk_folder, cur_man_folder
+            self.save_dir,
+            'werke',
+            self.werk_folder.split('/')[-1]
         )
+        file_name = f"{'__'.join(self.md__path__alias.split('/')[2:])}.xml"
         return {
-            "full_file_name": file_name,
-            "folder": folder
+            "full_file_name": os.path.join(folder, file_name),
+            "folder": folder,
+            "file_name": file_name
         }
 
     def get_pages(self):
