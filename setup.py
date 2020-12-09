@@ -53,7 +53,7 @@ setup(
             'freud_api_crawler/fixtures',
             [
                 'freud_api_crawler/fixtures/tei_dummy.xml',
-                'freud_api_crawler/fixtures/make_tei.xsl',
+                'freud_api_crawler/fixtures/make_tei.xslt',
             ]
         ),
     ],
