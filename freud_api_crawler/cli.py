@@ -41,12 +41,20 @@ def download_work(user, pw, w, s):  # pragma: no cover
     )
     rel_manifestations = werk_obj.manifestations
     for x in rel_manifestations:
-        frd_man = frd.FrdManifestation(
-            out_dir=s,
-            manifestation_id=x['man_id'],
-            auth_items=auth_items
-        )
-        frd_man.make_xml(save=True, limit=False)
+        try:
+            frd_man = frd.FrdManifestation(
+                out_dir=s,
+                manifestation_id=x['man_id'],
+                auth_items=auth_items
+            )
+            frd_man.make_xml(save=True, limit=False)
+        except Exception as e:
+            click.echo(
+                click.style(
+                    f"processing Manifestation {x} did not not work due to Error {e}",
+                    fg='red'
+                )
+            )
     click.echo(
         click.style(
             f"finished download\n{werk_obj.manifestations_count} Manifestations for {werk_obj.md__title} into {s}",
