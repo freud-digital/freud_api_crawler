@@ -159,7 +159,7 @@ class FrdWerk(FrdClient):
 
     def get_manifestations(self):
         man_col = []
-        url = f"{self.manifestation_ep}?filter[field_werk.id]={self.werk_id}&fields[node--manifestation]=id,title"
+        url = f"{self.manifestation_ep}{self.filtered_url}&fields[node--manifestation]=id,title"
         next_page = True
         while next_page:
             print(url)
@@ -189,6 +189,7 @@ class FrdWerk(FrdClient):
     def __init__(
         self,
         werk_id=None,
+        filter_finished=True,
         **kwargs
     ):
         super().__init__(**kwargs)
@@ -196,6 +197,11 @@ class FrdWerk(FrdClient):
         self.ep = f"{self.werk_ep}/{self.werk_id}"
         self.werk = self.get_werk()
         self.werk_attrib = self.werk['data']['attributes']
+        self.filter_finished = filter_finished
+        if filter_finished:
+            self.filtered_url = f"?filter[field_werk.id]={self.werk_id}&filter[field_umschrift]=1"
+        else:
+            self.filtered_url = f"?filter[field_werk.id]={self.werk_id}"
         for x in self.werk_attrib.keys():
             value = self.werk_attrib[x]
             if isinstance(value, dict):
@@ -227,7 +233,7 @@ class FrdManifestation(FrdClient):
         :rtype: dict
         """
         r = requests.get(
-            f"{self.manifestation_endpoint}?include=field_werk",
+            f"{self.manifestation_endpoint}?include=field_werk,field_publication",
             cookies=self.cookie,
             allow_redirects=True
         )
@@ -343,6 +349,8 @@ class FrdManifestation(FrdClient):
         ] = f"manifestation__{self.manifestation_id}"
         title = doc.xpath('//tei:title[@type="manifestation"]', namespaces=self.nsmap)[0]
         title.text = f"{self.md__title}"
+        p_title = doc.xpath('//tei:title[@type="publication"]', namespaces=self.nsmap)[0]
+        p_title.text = f"{self.publication['attributes']['title']}"
         w_title = doc.xpath('//tei:title[@type="work"]', namespaces=self.nsmap)[0]
         w_title.text = f"{self.werk['attributes']['title']}"
         body = doc.xpath('//tei:body', namespaces=self.nsmap)[0]
@@ -385,6 +393,7 @@ class FrdManifestation(FrdClient):
         self.manifestation_endpoint = f"{self.endpoint}node/manifestation/{manifestation_id}"
         self.manifestation = self.get_manifest()
         self.werk = self.manifestation['included'][0]
+        self.publication = self.manifestation['included'][1]
         self.werk_folder = self.werk['attributes']['path']['alias']
         # self.manifestation_folder = self.manifestation['attributes']['path']['alias']
         self.man_attrib = self.manifestation['data']['attributes']
