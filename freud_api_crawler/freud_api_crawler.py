@@ -314,7 +314,13 @@ class FrdManifestation(FrdClient):
         """
         page_attributes = page_json['data']['attributes']
         page_id = page_json['data']['id']
-        body = page_attributes['body']['processed']
+        try:
+            body = page_attributes['body']['processed']
+        except:
+            print("\n#####################")
+            print(f"no content for manifestation_seite/{page_id}")
+            print("#####################\n")
+            body = "<p>BLANK</p>"
         wrapped_body = f'<div xmlns="http://www.tei-c.org/ns/1.0" xml:id="page__{page_id}">{body}</div>'
         cleaned_body = clean_markup(wrapped_body)
         faks = page_json['included'][0]
