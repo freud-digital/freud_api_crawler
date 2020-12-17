@@ -356,9 +356,17 @@ class FrdManifestation(FrdClient):
         title = doc.xpath('//tei:title[@type="manifestation"]', namespaces=self.nsmap)[0]
         title.text = f"{self.md__title}"
         p_title = doc.xpath('//tei:title[@type="publication"]', namespaces=self.nsmap)[0]
-        p_title.text = f"{self.publication['attributes']['title']}"
+        p_rs = ET.Element("{http://www.tei-c.org/ns/1.0}rs")
+        p_rs.attrib["type"] = "bibl"
+        p_rs.attrib["ref"] = f"#bibl__{self.publication['id']}"
+        p_rs.text = f"{self.publication['attributes']['title']}"
+        p_title.append(p_rs)
         w_title = doc.xpath('//tei:title[@type="work"]', namespaces=self.nsmap)[0]
-        w_title.text = f"{self.werk['attributes']['title']}"
+        w_rs = ET.Element("{http://www.tei-c.org/ns/1.0}rs")
+        w_rs.attrib["type"] = "bibl"
+        w_rs.attrib["ref"] = f"#bibl__{self.werk['id']}"
+        w_title.append(w_rs)
+        w_rs.text = f"{self.werk['attributes']['title']}"
         body = doc.xpath('//tei:body', namespaces=self.nsmap)[0]
         pages = self.pages
         if limit:
