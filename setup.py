@@ -14,6 +14,7 @@ requirements = [
     'requests==2.25.0',
     'Click>=7.0',
     'lxml==4.6.1',
+    'python-slugify==4.0.1',
     'tqdm==4.52.0'
 ]
 
@@ -38,7 +39,7 @@ setup(
         'console_scripts': [
             'freud_api_crawler=freud_api_crawler.cli:cli',
             'download_work=freud_api_crawler.cli:download_work',
-            'flatten_files=freud_api_crawler.cli:flatten_files',
+            'merge_files=freud_api_crawler.cli:merge_files',
         ],
     },
     install_requires=requirements,

@@ -40,18 +40,17 @@ def make_div_list(glob_pattern):
     d = collections.defaultdict(list)
     for x in sorted_list:
         d[x['pub_id']].append(x)
-
     return d
 
 
 def create_united_files(glob_pattern):
-    xml_obj = XMLReader(TEI_DUMMY)
     output_dir = glob_pattern.replace("*.xml", 'merged')
     try:
         os.makedirs(output_dir)
     except Exception as e:
         pass
     d = make_div_list(glob_pattern)
+    xml_obj = XMLReader(TEI_DUMMY)
     for key, value in d.items():
         slug_name = slugify(f"{value[0]['pub_title']}")
         pub_id = f"{key[7:]}"
@@ -70,4 +69,4 @@ def create_united_files(glob_pattern):
             body.append(item['div'])
         with open(f'{save_path}', 'wb') as f:
             f.write(ET.tostring(doc, encoding="UTF-8"))
-    return output_dir
+    return (output_dir, d)

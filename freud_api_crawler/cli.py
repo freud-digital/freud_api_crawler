@@ -1,10 +1,11 @@
 """Console script for freud_api_crawler."""
 import os
+import glob
 import sys
 import click
 
 from . import freud_api_crawler as frd
-from . file_utils import flatten_files as flatten
+from . post_process import create_united_files
 
 
 @click.command()
@@ -65,12 +66,15 @@ def download_work(user, pw, w, s):  # pragma: no cover
 
 @click.command()  # pragma: no cover
 @click.option('-s', default='/home/csae8092/freud_data_cli/werke/drei-abhandlungen-zur-sexualtheorie', show_default=True)  # pragma: no cover
-def flatten_files(s):  # pragma: no cover
-    """Console script to flatten XML/TEI files of a work."""
-    flattend = flatten(s)
+def merge_files(s):  # pragma: no cover
+    """Console script merge splitted manifestaions into single files"""
+    glob_pattern = f"{s}/*.xml"
+    files = glob.glob(glob_pattern)
+    merged = create_united_files(glob_pattern)
     click.echo(
         click.style(
-            f"finished",
+            f"finished: merged {len(files)} Documents from {s}\n\
+            into {len(merged[1].keys())} Documents to {merged[0]}",
             fg='green'
         )
     )
