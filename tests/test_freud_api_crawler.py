@@ -93,7 +93,7 @@ class TestFreud_api_crawler(unittest.TestCase):
         """Count meta_attributes"""
         frd_obj = FRD_MANIFESTATION
         test_item = frd_obj.meta_attributes
-        self.assertEqual(len(test_item), 52)
+        self.assertEqual(len(test_item), 60)
 
     def test_009_FrdManifestation_title(self):
         """Check title"""
