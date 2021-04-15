@@ -13,7 +13,7 @@ with open('HISTORY.rst') as history_file:
 requirements = [
     'requests==2.25.0',
     'Click>=7.0',
-    'lxml==4.6.2',
+    'lxml==4.6.3',
     'python-slugify==4.0.1',
     'tqdm==4.52.0'
 ]
