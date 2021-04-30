@@ -25,6 +25,8 @@ def make_div_list(glob_pattern):
         )[0]
         pub_id = f'{doc.tree.xpath(".//tei:rs[1]/@ref", namespaces=doc.nsmap)[0]}'
         pub_title = doc.tree.xpath(".//tei:rs[1]/text()", namespaces=doc.nsmap)[0]
+        work_title = doc.tree.xpath(".//tei:title[@type='work']/tei:rs/text()", namespaces=doc.nsmap)[0]
+        work_id = doc.tree.xpath(".//tei:title[@type='work']/tei:rs/@ref", namespaces=doc.nsmap)[0]
         for div in doc.tree.xpath(".//tei:div", namespaces=doc.nsmap):
             first_page = div.xpath(".//tei:pb[@n]/@n", namespaces=doc.nsmap)[0]
             item = {
@@ -32,7 +34,9 @@ def make_div_list(glob_pattern):
                 "pub_id": pub_id,
                 "pub_title": pub_title,
                 "first_page": first_page,
-                "div": div
+                "div": div,
+                "work_title": work_title,
+                "work_id": work_id
             }
             divs.append(item)
 
@@ -61,9 +65,11 @@ def create_united_files(glob_pattern):
         root_el.attrib[
             "{http://www.w3.org/XML/1998/namespace}id"
         ] = f"manifestation__{pub_id}"
-        title = doc.xpath('//tei:title[@type="manifestation"]', namespaces=xml_obj.nsmap)[0]
         t_p = doc.xpath('//tei:title[@type="publication"]', namespaces=xml_obj.nsmap)[0]
         t_p.text = f"{value[0]['pub_title']}"
+        work_t_p = doc.xpath('//tei:title[@type="work"]', namespaces=xml_obj.nsmap)[0]
+        work_t_p.text = f"{value[0]['work_title']}"
+        work_t_p.attrib['ref'] = f"{value[0]['work_id']}"
         body = doc.xpath('//tei:body', namespaces=xml_obj.nsmap)[0]
         for item in value:
             body.append(item['div'])
