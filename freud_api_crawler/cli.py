@@ -1,7 +1,5 @@
 """Console script for freud_api_crawler."""
-import os
 import glob
-import sys
 import click
 
 from . import freud_api_crawler as frd
@@ -20,7 +18,7 @@ def cli(user, pw, m):
         auth_items=auth_items,
         manifestation_id=m
     )
-    xml = frd_manifestation.make_xml(save=True)
+    frd_manifestation.make_xml(save=True)
     click.echo(
         click.style(
             f"processed Manifestation\n###\n {frd_manifestation.md__title}\
@@ -35,7 +33,7 @@ def cli(user, pw, m):
 @click.option('-w', default='9d035a03-28d7-4013-adaf-63337d78ece4', show_default=True)  # pragma: no cover
 @click.option('-s', default='/home/csae8092/freud_data_cli', show_default=True)  # pragma: no cover
 def download_work(user, pw, w, s):  # pragma: no cover
-    """Console script to download all manifestations of a singel work."""
+    """Console script to download all manifestations of a single work."""
     auth_items = frd.get_auth_items(user, pw)
     werk_obj = frd.FrdWerk(
         auth_items=auth_items, werk_id=w

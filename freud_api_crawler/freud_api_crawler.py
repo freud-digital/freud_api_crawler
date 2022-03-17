@@ -1,6 +1,5 @@
 import os
 import json
-import time
 from collections import defaultdict
 
 import requests
@@ -147,13 +146,11 @@ class FrdWerk(FrdClient):
         :return: a Werk representation
         :rtrype: dict
         """
-        url = f"{self.werk_ep}/{self.werk_id}"
         r = requests.get(
             self.ep,
             cookies=self.cookie,
             allow_redirects=True
         )
-        status_code = r.status_code
         result = r.json()
         return result
 
@@ -233,11 +230,11 @@ class FrdManifestation(FrdClient):
         :rtype: dict
         """
         r = requests.get(
-            f"{self.manifestation_endpoint}?include=field_werk,field_publication",
+            f"{self.manifestation_endpoint}?include=field_werk,field_published_in",
             cookies=self.cookie,
             allow_redirects=True
         )
-        status_code = r.status_code
+        print(f"{self.manifestation_endpoint}?include=field_werk,field_published_in")
         result = r.json()
         return result
 
@@ -293,7 +290,6 @@ class FrdManifestation(FrdClient):
             allow_redirects=True
         )
 
-        status_code = r.status_code
         result = r.json()
         return result
 
@@ -349,7 +345,7 @@ class FrdManifestation(FrdClient):
         """
         doc = self.tei_dummy
         root_el = doc.xpath('//tei:TEI', namespaces=self.nsmap)[0]
-        root_el.attrib["{http://www.w3.org/XML/1998/namespace}base"] = f"https://whatever.com"
+        root_el.attrib["{http://www.w3.org/XML/1998/namespace}base"] = "https://whatever.com"
         root_el.attrib[
             "{http://www.w3.org/XML/1998/namespace}id"
         ] = f"manifestation__{self.manifestation_id}"
