@@ -14,9 +14,22 @@ A client to interact with freud-net API
 
 
 
-### example `env.secret`
+## example `env.secret`
 
 ```
 FRD_USER=username
 FRD_PW=password
 ```
+
+## api-utils
+
+### get work by title
+
+https://www.freud-edition.net/jsonapi/node/werk?filter[field_titel.value]=%C3%9Cber%20den%20Traum
+https://www.freud-edition.net/jsonapi/node/werk?filter[field_titel.value]=Über den Traum
+
+### get manifestaion by node id
+
+this ID can be taken from edit-url, e.g. https://www.freud-edition.net/node/51190/edit
+
+https://www.freud-edition.net/jsonapi/node/manifestation?filter[drupal_internal__nid]=51190

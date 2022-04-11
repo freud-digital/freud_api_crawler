@@ -196,7 +196,7 @@ class FrdWerk(FrdClient):
         self.werk_attrib = self.werk['data']['attributes']
         self.filter_finished = filter_finished
         if filter_finished:
-            self.filtered_url = f"?filter[field_werk.id]={self.werk_id}&filter[field_umschrift]=1"
+            self.filtered_url = f"?filter[field_werk.id]={self.werk_id}"
         else:
             self.filtered_url = f"?filter[field_werk.id]={self.werk_id}"
         for x in self.werk_attrib.keys():
@@ -230,11 +230,11 @@ class FrdManifestation(FrdClient):
         :rtype: dict
         """
         r = requests.get(
-            f"{self.manifestation_endpoint}?include=field_werk,field_published_in",
+            f"{self.manifestation_endpoint}?include=field_werk,field_chapters",
             cookies=self.cookie,
             allow_redirects=True
         )
-        print(f"{self.manifestation_endpoint}?include=field_werk,field_published_in")
+        print(f"{self.manifestation_endpoint}?include=field_werk,field_chapters")
         result = r.json()
         return result
 
@@ -258,13 +258,28 @@ class FrdManifestation(FrdClient):
         :rtype: list
         """
         page_list = []
-        for x in self.manifestation['data']['relationships']['field_seiten']['data']:
-            node_type = x['type'].split('--')[1]
-            page = {
-                'id': x['id'],
-                'url': f"{self.endpoint}node/{node_type}/{x['id']}"
-            }
-            page_list.append(page)
+        if self.manifestation['data']['relationships']['field_chapters']['data']:
+            print("looks like there are chapters")
+            for y in self.manifestation['included']:
+                try:
+                    pages = y['relationships']['field_seiten']['data']
+                except KeyError:
+                    continue
+                for x in pages:
+                    node_type = x['type'].split('--')[1]
+                    page = {
+                        'id': x['id'],
+                        'url': f"{self.endpoint}node/{node_type}/{x['id']}"
+                    }
+                    page_list.append(page)
+        else:
+            for x in self.manifestation['data']['relationships']['field_seiten']['data']:
+                node_type = x['type'].split('--')[1]
+                page = {
+                    'id': x['id'],
+                    'url': f"{self.endpoint}node/{node_type}/{x['id']}"
+                }
+                page_list.append(page)
         return page_list
 
     def get_page(self, page_id):
@@ -406,11 +421,11 @@ class FrdManifestation(FrdClient):
         self.manifestation_endpoint = f"{self.endpoint}node/manifestation/{manifestation_id}"
         self.manifestation = self.get_manifest()
         self.werk = self.manifestation['included'][0]
+        self.publication = {}
         try:
-            self.publication = self.manifestation['included'][1]
-        except:
-            self.publication = {}
             self.publication['id'] = self.manifestation['data']['attributes']['field_aufbewahrungsort_container']['value']
+        except TypeError:
+            self.publication['id'] = self.manifestation_id
         self.werk_folder = self.werk['attributes']['path']['alias']
         # self.manifestation_folder = self.manifestation['attributes']['path']['alias']
         self.man_attrib = self.manifestation['data']['attributes']

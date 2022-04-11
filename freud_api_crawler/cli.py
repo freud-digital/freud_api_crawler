@@ -31,7 +31,7 @@ def cli(user, pw, m):
 @click.argument('user', envvar='FRD_USER')  # pragma: no cover
 @click.argument('pw', envvar='FRD_PW')  # pragma: no cover
 @click.option('-w', default='9d035a03-28d7-4013-adaf-63337d78ece4', show_default=True)  # pragma: no cover
-@click.option('-s', default='/home/csae8092/freud_data_cli', show_default=True)  # pragma: no cover
+@click.option('-s', default='./freud_data_cli', show_default=True)  # pragma: no cover
 def download_work(user, pw, w, s):  # pragma: no cover
     """Console script to download all manifestations of a single work."""
     auth_items = frd.get_auth_items(user, pw)
