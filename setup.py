@@ -4,18 +4,15 @@
 
 from setuptools import setup, find_packages
 
-with open('README.rst') as readme_file:
+with open('README.md') as readme_file:
     readme = readme_file.read()
 
-with open('HISTORY.rst') as history_file:
-    history = history_file.read()
-
 requirements = [
-    'requests==2.25.0',
-    'Click>=7.0',
-    'lxml==4.6.3',
-    'python-slugify==4.0.1',
-    'tqdm==4.52.0'
+    'requests>=2.25.0,<3',
+    'click>=8.1<9',
+    'lxml>=4.8<5',
+    'python-slugify>=6.0.0,<7',
+    'tqdm>=4.63.0,<5'
 ]
 
 setup_requirements = []
@@ -44,7 +41,8 @@ setup(
     },
     install_requires=requirements,
     license="MIT license",
-    long_description=readme + '\n\n' + history,
+    long_description=readme,
+    long_description_content_type='text/markdown',
     include_package_data=True,
     keywords='freud_api_crawler',
     name='freud_api_crawler',

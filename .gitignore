@@ -118,3 +118,4 @@ export_env_variables.sh
 manifestation__*.xml
 hansi*
 */werke/*
+env.secret

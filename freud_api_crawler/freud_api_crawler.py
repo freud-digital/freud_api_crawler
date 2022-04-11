@@ -355,7 +355,10 @@ class FrdManifestation(FrdClient):
         p_rs = ET.Element("{http://www.tei-c.org/ns/1.0}rs")
         p_rs.attrib["type"] = "bibl"
         p_rs.attrib["ref"] = f"#bibl__{self.publication['id']}"
-        p_rs.text = f"{self.publication['attributes']['title']}"
+        try:
+            p_rs.text = f"{self.publication['attributes']['title']}"
+        except KeyError:
+            p_rs.text = f"{self.publication['id']}"
         p_title.append(p_rs)
         w_title = doc.xpath('//tei:title[@type="work"]', namespaces=self.nsmap)[0]
         w_rs = ET.Element("{http://www.tei-c.org/ns/1.0}rs")
@@ -403,7 +406,11 @@ class FrdManifestation(FrdClient):
         self.manifestation_endpoint = f"{self.endpoint}node/manifestation/{manifestation_id}"
         self.manifestation = self.get_manifest()
         self.werk = self.manifestation['included'][0]
-        self.publication = self.manifestation['included'][1]
+        try:
+            self.publication = self.manifestation['included'][1]
+        except:
+            self.publication = {}
+            self.publication['id'] = self.manifestation['data']['attributes']['field_aufbewahrungsort_container']['value']
         self.werk_folder = self.werk['attributes']['path']['alias']
         # self.manifestation_folder = self.manifestation['attributes']['path']['alias']
         self.man_attrib = self.manifestation['data']['attributes']
