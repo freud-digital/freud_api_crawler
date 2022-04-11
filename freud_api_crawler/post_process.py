@@ -7,6 +7,8 @@ from slugify import slugify
 from freud_api_crawler.xml import XMLReader
 from freud_api_crawler.freud_api_crawler import TEI_DUMMY
 
+# ToDO: Check if this code is still needed
+
 
 def make_div_list(glob_pattern):
     """defaultdict of tei:divs fetched from XML/TEI matching the past in glob pattern
