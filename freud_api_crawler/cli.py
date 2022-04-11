@@ -63,7 +63,7 @@ def download_work(user, pw, w, s):  # pragma: no cover
 
 
 @click.command()  # pragma: no cover
-@click.option('-s', default='/home/csae8092/freud_data_cli/werke/drei-abhandlungen-zur-sexualtheorie', show_default=True)  # pragma: no cover
+@click.option('-s', default='/home/csae8092/freud_data_cli/werke/drei-abhandlungen-zur-sexualtheorie', show_default=True)  # pragma: no cover # noqa: E501
 def merge_files(s):  # pragma: no cover
     """Console script merge splitted manifestaions into single files"""
     glob_pattern = f"{s}/*.xml"

@@ -21,7 +21,7 @@ def flatten_files(basic_root):  # pragma: no cover
     storage_location = os.path.join('/', *basic_root.split('/')[:-1])
     new_files = []
     for x in tqdm(files, total=len(files)):
-        unique_name = x[len(basic_root)-len(werk):]
+        unique_name = x[len(basic_root) - len(werk):]
         parts = unique_name.split('/')
         new_fn = "__".join(parts)
         target = os.path.join(storage_location, new_fn)

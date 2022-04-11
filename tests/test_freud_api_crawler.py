@@ -2,7 +2,6 @@
 
 """Tests for `freud_api_crawler` package."""
 
-import os
 import unittest
 from click.testing import CliRunner
 
@@ -123,7 +122,7 @@ class TestFreud_api_crawler(unittest.TestCase):
         frd_obj = FRD_MANIFESTATION
         page = frd_obj.get_page(page_id=MANIFESTATION_PAGE_ID)
         result = frd_obj.process_page(page)
-        self.assertEqual(result['id'],  MANIFESTATION_PAGE_ID)
+        self.assertEqual(result['id'], MANIFESTATION_PAGE_ID)
         self.assertTrue('body' in result.keys())
 
     def test_013_check_dummy_tei(self):
@@ -197,5 +196,5 @@ class TestTeiUtils(unittest.TestCase):
         pb_str = ET.tostring(pb_el).decode('utf-8')
         self.assertEqual(
             pb_str,
-            '<ns0:pb xmlns:ns0="http://www.tei-c.org/ns/1.0" n="1" facs="https://whatever.com" xml:id="faks__1234sieben"/>'
+            '<ns0:pb xmlns:ns0="http://www.tei-c.org/ns/1.0" n="1" facs="https://whatever.com" xml:id="faks__1234sieben"/>'  # noqa: E501
         )

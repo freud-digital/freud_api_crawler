@@ -38,21 +38,21 @@ class XMLReader():
         self.file = xml
         try:
             self.original = ET.parse(self.file)
-        except Exception as e:
+        except Exception as e:  # noqa: F841
             try:
                 self.original = ET.fromstring(self.file.encode('utf8'))
-            except Exception as e:
+            except Exception as e:  # noqa: F841
                 r = requests.get(self.file)
                 self.original = ET.fromstring(r.text)
         try:
             self.tree = ET.parse(self.file)
-        except Exception as e:
+        except Exception as e:  # noqa: F841
             try:
                 self.tree = ET.fromstring(self.file.encode('utf8'))
-            except Exception as e:
+            except Exception as e:  # noqa: F841
                 r = requests.get(self.file)
                 self.tree = ET.fromstring(r.text)
-        except Exception as e:
+        except Exception as e:  # noqa: F841
             self.parsed_file = "parsing didn't work"
 
     def return_byte_like_object(self):

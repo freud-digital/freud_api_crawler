@@ -53,7 +53,7 @@ def create_united_files(glob_pattern):
     output_dir = glob_pattern.replace("*.xml", 'merged')
     try:
         os.makedirs(output_dir)
-    except Exception as e:
+    except Exception as e:  # noqa: F841
         pass
     d = make_div_list(glob_pattern)
     xml_obj = XMLReader(TEI_DUMMY)
@@ -63,7 +63,7 @@ def create_united_files(glob_pattern):
         doc = ET.parse(TEI_DUMMY)
         save_path = os.path.join(output_dir, f"{slug_name}.xml")
         root_el = doc.xpath('//tei:TEI', namespaces=xml_obj.nsmap)[0]
-        root_el.attrib["{http://www.w3.org/XML/1998/namespace}base"] = f"https://whatever.com"
+        root_el.attrib["{http://www.w3.org/XML/1998/namespace}base"] = "https://whatever.com"
         root_el.attrib[
             "{http://www.w3.org/XML/1998/namespace}id"
         ] = f"{value[0]['man_id']}"

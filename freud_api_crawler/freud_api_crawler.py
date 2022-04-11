@@ -33,7 +33,7 @@ def get_auth_items(username, password):
         "pass": password
     }
     headers = {
-      'Content-Type': 'application/json',
+        'Content-Type': 'application/json',
     }
     r = requests.request(
         "POST", url, headers=headers, data=json.dumps(payload)
@@ -327,7 +327,7 @@ class FrdManifestation(FrdClient):
         page_id = page_json['data']['id']
         try:
             body = page_attributes['body']['processed']
-        except:
+        except:  # noqa: E722
             print("\n#####################")
             print(f"no content for manifestation_seite/{page_id}")
             print("#####################\n")
@@ -423,7 +423,7 @@ class FrdManifestation(FrdClient):
         self.werk = self.manifestation['included'][0]
         self.publication = {}
         try:
-            self.publication['id'] = self.manifestation['data']['attributes']['field_aufbewahrungsort_container']['value']
+            self.publication['id'] = self.manifestation['data']['attributes']['field_aufbewahrungsort_container']['value']  # noqa: E501
         except TypeError:
             self.publication['id'] = self.manifestation_id
         self.werk_folder = self.werk['attributes']['path']['alias']
