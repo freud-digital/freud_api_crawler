@@ -4,7 +4,7 @@ import collections
 import lxml.etree as ET
 from slugify import slugify
 
-from freud_api_crawler.xml import XMLReader
+from acdh_xml_pyutils.xml import XMLReader
 from freud_api_crawler.freud_api_crawler import TEI_DUMMY
 
 # ToDO: Check if this code is still needed

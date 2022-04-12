@@ -8,6 +8,7 @@ with open('README.md') as readme_file:
     readme = readme_file.read()
 
 requirements = [
+    'acdh-xml-pyutils',
     'requests>=2.25.0,<3',
     'click>=7.1<9',
     'lxml>=4.8<5',
