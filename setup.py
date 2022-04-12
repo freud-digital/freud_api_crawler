@@ -9,7 +9,7 @@ with open('README.md') as readme_file:
 
 requirements = [
     'requests>=2.25.0,<3',
-    'click>=8.1<9',
+    'click>=7.1<9',
     'lxml>=4.8<5',
     'python-slugify>=6.0.0,<7',
     'tqdm>=4.63.0,<5'
