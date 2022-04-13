@@ -19,6 +19,14 @@ FRD_USER=username
 FRD_PW=password
 ```
 
+## usage
+
+### Download a Work
+
+* `download_work -s . -w 2da622da-de12-46e4-bb1d-c9c4a7ae877e` 
+* `-s` path to save the created files into; `.` will write the files into `./werke/...`
+* `-w` the Drupal-API-ID of the Werk to process (see below on how to get those IDs)
+
 ## dev
 
 * clone the repo

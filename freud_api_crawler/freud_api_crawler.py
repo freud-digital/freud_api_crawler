@@ -5,7 +5,7 @@ from collections import defaultdict
 import requests
 import lxml.etree as ET
 
-from freud_api_crawler.string_utils import clean_markup, extract_page_nr, always_https
+from freud_api_crawler.string_utils import clean_markup, extract_page_nr, always_https, normalize_white_space
 
 from freud_api_crawler.tei_utils import make_pb
 
@@ -334,6 +334,7 @@ class FrdManifestation(FrdClient):
             body = "<p>BLANK</p>"
         wrapped_body = f'<div xmlns="http://www.tei-c.org/ns/1.0" xml:id="page__{page_id}">{body}</div>'
         cleaned_body = clean_markup(wrapped_body)
+        cleaned_body = normalize_white_space(cleaned_body)
         faks = page_json['included'][0]
         page_nr = extract_page_nr(page_attributes['title'])
         result = {

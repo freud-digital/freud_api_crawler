@@ -24,6 +24,19 @@ def clean_markup(source, patterns=CLEAN_UP_PATTERNS):
     return source
 
 
+def normalize_white_space(source):
+    """ removes all superfluos whitespaces
+    :param source: A string to clean
+    :type source: str
+
+    :return: the cleaned string
+    :rtype: str
+
+    """
+    source = ' '.join(source.split())
+    return source
+
+
 def extract_page_nr(some_string):
     """ extracts the page number from a string like `Seite 21`
 
