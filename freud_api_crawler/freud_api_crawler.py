@@ -11,6 +11,7 @@ from freud_api_crawler.tei_utils import make_pb
 
 
 FRD_API = os.environ.get('FRD_API', 'https://www.freud-edition.net/jsonapi/')
+FRD_WORK_LIST = "https://www.freud-edition.net/jsonapi/node/werk?filter[field_status_umschrift]=2"
 FRD_USER = os.environ.get('FRD_USER', False)
 FRD_PW = os.environ.get('FRD_PW', False)
 
@@ -444,3 +445,34 @@ class FrdManifestation(FrdClient):
         self.save_dir = os.path.join(self.out_dir)
         self.manifestation_save_location_file = self.get_manifestation_save_path()['full_file_name']
         self.manifestation_save_location_folder = self.get_manifestation_save_path()['folder']
+
+
+def yield_works(url):
+    """ yields basic metadata from works"""
+    next_page = True
+    while next_page:
+        print(url)
+        response = None
+        result = None
+        x = None
+        response = requests.get(
+            url,
+            cookies=AUTH_ITEMS['cookie'],
+            allow_redirects=True
+        )
+        result = response.json()
+        links = result['links']
+        if links.get('next', False):
+            orig_url = links['next']['href']
+            url = always_https(orig_url)
+        else:
+            next_page = False
+        for x in result['data']:
+            item = {}
+            item['id'] = x['id']
+            item['title'] = x['attributes']['title']
+            item['nid'] = x['attributes']['drupal_internal__nid']
+            item['vid'] = x['attributes']['drupal_internal__vid']
+            item['path'] = x['attributes']['path']['alias']
+            item['umschrift'] = x['attributes']['field_status_umschrift']
+            yield(item)
