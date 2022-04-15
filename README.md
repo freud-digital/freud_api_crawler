@@ -1,4 +1,4 @@
-[![flake8 Lint](https://github.com/acdh-oeaw/freud_api_crawler/actions/workflows/lint.yml/badge.svg)](https://github.com/acdh-oeaw/freud_api_crawler/actions/workflows/lint.yml) [![codecov](https://codecov.io/gh/acdh-oeaw/freud_api_crawler/branch/master/graph/badge.svg?token=7OBAOGEFTY)](https://codecov.io/gh/acdh-oeaw/freud_api_crawler)
+[![codecov](https://codecov.io/gh/acdh-oeaw/freud_api_crawler/branch/master/graph/badge.svg?token=7OBAOGEFTY)](https://codecov.io/gh/acdh-oeaw/freud_api_crawler)
 
 # Freud API Crawler
 
