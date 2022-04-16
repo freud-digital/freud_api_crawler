@@ -3,6 +3,7 @@
 """Tests for `freud_api_crawler` package."""
 
 import unittest
+import types
 from click.testing import CliRunner
 
 import lxml.etree as ET
@@ -139,6 +140,10 @@ class TestFreud_api_crawler(unittest.TestCase):
         xml_str = ET.tostring(xml).decode('utf-8')
         print(type(xml), type(xml_str))
         self.assertTrue(frd_obj.manifestation_id in xml_str)
+
+    def test_015_yiel_works(self):
+        yielder = frd.yield_works(frd.FRD_WORK_LIST)
+        self.assertIsInstance(yielder, types.GeneratorType)
 
     def test_command_line_interface(self):
         """Test the CLI."""

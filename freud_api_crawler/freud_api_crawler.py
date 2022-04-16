@@ -447,8 +447,17 @@ class FrdManifestation(FrdClient):
         self.manifestation_save_location_folder = self.get_manifestation_save_path()['folder']
 
 
-def yield_works(url):
-    """ yields basic metadata from works"""
+def yield_works(url, simple=True):
+    """ yields basic metadata from works
+
+        :param url: The API-endpoint
+        :param type: string
+
+        :param simple: If True a processed dict is returned, otherwise the full data object
+        :param type: bool
+
+        :return: Yields a dict
+        """
     next_page = True
     while next_page:
         print(url)
@@ -468,11 +477,14 @@ def yield_works(url):
         else:
             next_page = False
         for x in result['data']:
-            item = {}
-            item['id'] = x['id']
-            item['title'] = x['attributes']['title']
-            item['nid'] = x['attributes']['drupal_internal__nid']
-            item['vid'] = x['attributes']['drupal_internal__vid']
-            item['path'] = x['attributes']['path']['alias']
-            item['umschrift'] = x['attributes']['field_status_umschrift']
-            yield(item)
+            if simple:
+                yield x
+            else:
+                item = {}
+                item['id'] = x['id']
+                item['title'] = x['attributes']['title']
+                item['nid'] = x['attributes']['drupal_internal__nid']
+                item['vid'] = x['attributes']['drupal_internal__vid']
+                item['path'] = x['attributes']['path']['alias']
+                item['umschrift'] = x['attributes']['field_status_umschrift']
+                yield item
