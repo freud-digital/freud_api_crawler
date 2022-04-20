@@ -1,4 +1,5 @@
 [![PyPI version](https://badge.fury.io/py/freud-api-crawler.svg)](https://badge.fury.io/py/freud-api-crawler)
+[![codecov](https://codecov.io/gh/freud-digital/freud_api_crawler/branch/master/graph/badge.svg?token=miLq3rRrcq)](https://codecov.io/gh/freud-digital/freud_api_crawler)
 
 # Freud API Crawler
 
