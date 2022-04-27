@@ -4,14 +4,12 @@
 
 import unittest
 import types
-from click.testing import CliRunner
 
 import lxml.etree as ET
 
 from freud_api_crawler import freud_api_crawler as frd
 from freud_api_crawler import string_utils
 from freud_api_crawler import tei_utils
-from freud_api_crawler import cli
 
 
 WERK_ID = "9d035a03-28d7-4013-adaf-63337d78ece4"
@@ -150,13 +148,6 @@ class TestFreud_api_crawler(unittest.TestCase):
         all_man = werk.get_manifestations()
         full_man = werk.get_manifestations(field_doc_component=frd.FULL_MANIFEST)
         self.assertTrue(len(all_man) > len(full_man))
-
-    def test_command_line_interface(self):
-        """Test the CLI."""
-        runner = CliRunner()
-        result = runner.invoke(cli.cli)
-        assert result.exit_code == 0
-        assert "processed Manifestation" in result.output
 
 
 class TestStringUtils(unittest.TestCase):

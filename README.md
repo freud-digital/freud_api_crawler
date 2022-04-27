@@ -22,11 +22,7 @@ FRD_PW=password
 
 ## usage
 
-### Download a Work
-
-* `download_work -s . -w 2da622da-de12-46e4-bb1d-c9c4a7ae877e` 
-* `-s` path to save the created files into; `.` will write the files into `./werke/...`
-* `-w` the Drupal-API-ID of the Werk to process (see below on how to get those IDs)
+for how to use this package have a look into `./tests/test_freud_api_crawler.py` or check out the [frd-data-repo](https://github.com/freud-digital/frd-data)
 
 ## dev
 
