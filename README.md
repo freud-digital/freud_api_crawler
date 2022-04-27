@@ -50,3 +50,6 @@ https://www.freud-edition.net/jsonapi/node/werk?filter[field_titel.value]=Über 
 this ID can be taken from edit-url, e.g. https://www.freud-edition.net/node/51190/edit
 
 https://www.freud-edition.net/jsonapi/node/manifestation?filter[drupal_internal__nid]=51190
+
+https://www.freud-edition.net/jsonapi/node/manifestation?filter[drupal_internal__nid]=38946
+https://www.freud-edition.net/node/38946/edit

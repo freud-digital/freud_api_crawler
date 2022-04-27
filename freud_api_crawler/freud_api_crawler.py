@@ -14,6 +14,7 @@ FRD_API = os.environ.get('FRD_API', 'https://www.freud-edition.net/jsonapi/')
 FRD_WORK_LIST = "https://www.freud-edition.net/jsonapi/node/werk?filter[field_status_umschrift]=2"
 FRD_USER = os.environ.get('FRD_USER', False)
 FRD_PW = os.environ.get('FRD_PW', False)
+FULL_MANIFEST = "228361d0-4cda-4805-a2f8-a05ee58119b6"
 
 
 def get_auth_items(username, password):
@@ -145,7 +146,7 @@ class FrdWerk(FrdClient):
         """ returns the werk json as python dict
 
         :return: a Werk representation
-        :rtrype: dict
+        :rtype: dict
         """
         r = requests.get(
             self.ep,
@@ -155,9 +156,20 @@ class FrdWerk(FrdClient):
         result = r.json()
         return result
 
-    def get_manifestations(self):
+    def get_manifestations(self, field_doc_component=None):
+        """ retuns a list of dicts of related manifestation
+        :param field_doc_component: Either `None` or the id of the taxanomy-term id
+        :type werk_id: str/bool
+
+        :return: A list of dicts with ids and titles of the related manifestations
+        :rtype: list
+        """
         man_col = []
-        url = f"{self.manifestation_ep}{self.filtered_url}&fields[node--manifestation]=id,title"
+        fields_param = "fields[node--manifestation]=id,title"
+        if field_doc_component is not None:
+            url = f"{self.manifestation_ep}{self.filtered_url}&{fields_param}&filter[field_doc_component.id]={field_doc_component}"  # noqa: E501
+        else:
+            url = f"{self.manifestation_ep}{self.filtered_url}&{fields_param}"
         next_page = True
         while next_page:
             print(url)

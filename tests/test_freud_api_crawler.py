@@ -141,9 +141,15 @@ class TestFreud_api_crawler(unittest.TestCase):
         print(type(xml), type(xml_str))
         self.assertTrue(frd_obj.manifestation_id in xml_str)
 
-    def test_015_yiel_works(self):
+    def test_015_yield_works(self):
         yielder = frd.yield_works(frd.FRD_WORK_LIST)
         self.assertIsInstance(yielder, types.GeneratorType)
+
+    def test_016_filter_man_by_type(self):
+        werk = FRD_WERK
+        all_man = werk.get_manifestations()
+        full_man = werk.get_manifestations(field_doc_component=frd.FULL_MANIFEST)
+        self.assertTrue(len(all_man) > len(full_man))
 
     def test_command_line_interface(self):
         """Test the CLI."""
