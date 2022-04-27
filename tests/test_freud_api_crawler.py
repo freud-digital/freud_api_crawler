@@ -116,6 +116,12 @@ class TestFreud_api_crawler(unittest.TestCase):
         cleaned_body = string_utils.clean_markup(body)
         self.assertTrue(test_pattern not in cleaned_body)
 
+    def test_011a_str_cleaning(self):
+        some_string = "safljk ı sdfdsf ‚"
+        cleaned_string = string_utils.clean_markup(some_string)
+        self.assertTrue = ('ı' not in cleaned_string)
+        self.assertTrue = ('‚' not in cleaned_string)
+
     def test_012_str_cleaning(self):
         """test clean_markup function"""
         frd_obj = FRD_MANIFESTATION
@@ -146,7 +152,7 @@ class TestFreud_api_crawler(unittest.TestCase):
     def test_016_filter_man_by_type(self):
         werk = FRD_WERK
         all_man = werk.get_manifestations()
-        full_man = werk.get_manifestations(field_doc_component=frd.FULL_MANIFEST)
+        full_man = werk.get_manifestations(filters=frd.MANIFEST_DEFAULT_FILTER)
         self.assertTrue(len(all_man) > len(full_man))
 
 

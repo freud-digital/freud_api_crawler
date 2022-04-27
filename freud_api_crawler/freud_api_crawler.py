@@ -16,6 +16,11 @@ FRD_USER = os.environ.get('FRD_USER', False)
 FRD_PW = os.environ.get('FRD_PW', False)
 FULL_MANIFEST = "228361d0-4cda-4805-a2f8-a05ee58119b6"
 
+MANIFEST_DEFAULT_FILTER = {
+    "field_doc_component.id": FULL_MANIFEST,
+    "field_status_umschrift": 2
+}
+
 
 def get_auth_items(username, password):
     """ helper function to fetch auth-cookie
@@ -156,20 +161,23 @@ class FrdWerk(FrdClient):
         result = r.json()
         return result
 
-    def get_manifestations(self, field_doc_component=None):
+    def get_manifestations(
+        self,
+        filters={}
+    ):
         """ retuns a list of dicts of related manifestation
-        :param field_doc_component: Either `None` or the id of the taxanomy-term id
-        :type werk_id: str/bool
+        :param filters: a dictionary holding query filter params, see e.g. `MANIFEST_DEFAULT_FILTER`
+        :type werk_id: dict
 
         :return: A list of dicts with ids and titles of the related manifestations
         :rtype: list
         """
         man_col = []
         fields_param = "fields[node--manifestation]=id,title"
-        if field_doc_component is not None:
-            url = f"{self.manifestation_ep}{self.filtered_url}&{fields_param}&filter[field_doc_component.id]={field_doc_component}"  # noqa: E501
-        else:
-            url = f"{self.manifestation_ep}{self.filtered_url}&{fields_param}"
+        url = f"{self.manifestation_ep}{self.filtered_url}&{fields_param}"
+        for key, value in filters.items():
+            if value is not None:
+                url += f"&filter[{key}]={value}"
         next_page = True
         while next_page:
             print(url)
