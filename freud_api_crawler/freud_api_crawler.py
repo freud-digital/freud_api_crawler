@@ -9,8 +9,8 @@ from freud_api_crawler.string_utils import clean_markup, extract_page_nr, always
 
 from freud_api_crawler.tei_utils import make_pb
 
-
-FRD_API = os.environ.get('FRD_API', 'https://www.freud-edition.net/jsonapi/')
+FRD_BASE = "https://www.freud-edition.net"
+FRD_API = os.environ.get('FRD_API', f'{FRD_BASE}/jsonapi/')
 FRD_WORK_LIST = "https://www.freud-edition.net/jsonapi/node/werk?filter[field_status_umschrift]=2"
 FRD_USER = os.environ.get('FRD_USER', False)
 FRD_PW = os.environ.get('FRD_PW', False)
@@ -415,7 +415,7 @@ class FrdManifestation(FrdClient):
             div = ET.fromstring(pp['body'])
             pb_el = make_pb(
                 pp['page_nr'],
-                pp['faks__url'],
+                f"{FRD_BASE}{pp['faks__payload']}",
                 pp['faks__id']
             )
             cur_div = div.xpath('//tei:div', namespaces=self.nsmap)[0]
