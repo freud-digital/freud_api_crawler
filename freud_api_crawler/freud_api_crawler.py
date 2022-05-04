@@ -461,6 +461,7 @@ class FrdManifestation(FrdClient):
             self.save_dir, self.werk_signatur, self.file_name
         )
 
+
 def yield_works(url, simple=True):
     """ yields basic metadata from works
 
