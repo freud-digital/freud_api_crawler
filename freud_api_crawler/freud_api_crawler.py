@@ -15,9 +15,11 @@ FRD_WORK_LIST = "https://www.freud-edition.net/jsonapi/node/werk?filter[field_st
 FRD_USER = os.environ.get('FRD_USER', False)
 FRD_PW = os.environ.get('FRD_PW', False)
 FULL_MANIFEST = "228361d0-4cda-4805-a2f8-a05ee58119b6"
+HISTORISCHE_AUSGABE = "5b8d9c77-99d0-4a80-92d8-4a9de06ac7ca"
 
 MANIFEST_DEFAULT_FILTER = {
     "field_doc_component.id": FULL_MANIFEST,
+    "field_manifestation_typ.id": HISTORISCHE_AUSGABE,
     "field_status_umschrift": 2
 }
 
@@ -250,27 +252,20 @@ class FrdManifestation(FrdClient):
         :return: a Manifestation representation
         :rtype: dict
         """
+        fields_to_include = [
+            'field_werk',
+            'field_werk.field_signature_sfg',
+            'field_chapters'
+        ]
+        url = f"{self.manifestation_endpoint}?include={','.join(fields_to_include)}"
         r = requests.get(
-            f"{self.manifestation_endpoint}?include=field_werk,field_chapters",
+            url,
             cookies=self.cookie,
             allow_redirects=True
         )
-        print(f"{self.manifestation_endpoint}?include=field_werk,field_chapters")
+        print(url)
         result = r.json()
         return result
-
-    def get_manifestation_save_path(self):
-        folder = os.path.join(
-            self.save_dir,
-            'werke',
-            self.werk_folder.split('/')[-1]
-        )
-        file_name = f"{'__'.join(self.md__path__alias.split('/')[2:])}.xml"
-        return {
-            "full_file_name": os.path.join(folder, file_name),
-            "folder": folder,
-            "file_name": file_name
-        }
 
     def get_pages(self):
         """ method returning related page-ids/urls
@@ -375,7 +370,7 @@ class FrdManifestation(FrdClient):
 
         """serializes a manifestation as XML/TEI document
 
-        :param save: if set, a XML/TEI file `{self.manifestation_id}.xml` is saved
+        :param save: if set, a XML/TEI file `{self.save_path}` is saved
         :param type: bool
 
         :return: A lxml.etree
@@ -424,12 +419,8 @@ class FrdManifestation(FrdClient):
         transform = ET.XSLT(self.xsl_doc)
         tei = transform(doc)
         if save:
-            try:
-                os.makedirs(self.manifestation_save_location_folder)
-            except FileExistsError:
-                print(f"Overriding exsting file: {self.manifestation_save_location_folder}")
-            file = self.manifestation_save_location_file
-            with open(file, 'wb') as f:
+            os.makedirs(os.path.join(self.save_dir, self.werk_signatur), exist_ok=True)
+            with open(self.save_path, 'wb') as f:
                 f.write(ET.tostring(tei, pretty_print=True, encoding="utf-8"))
         return tei
 
@@ -463,9 +454,12 @@ class FrdManifestation(FrdClient):
         self.pages = self.get_pages()
         self.page_count = len(self.pages)
         self.save_dir = os.path.join(self.out_dir)
-        self.manifestation_save_location_file = self.get_manifestation_save_path()['full_file_name']
-        self.manifestation_save_location_folder = self.get_manifestation_save_path()['folder']
-
+        self.werk_signatur = self.manifestation['included'][1]['attributes']['name']
+        self.manifestation_signatur = f"{self.werk_signatur}{self.man_attrib['field_signatur_sfe_type']}"
+        self.file_name = f"sfe-{self.manifestation_signatur.replace('/', '__').replace('.', '_')}.xml"
+        self.save_path = os.path.join(
+            self.save_dir, self.werk_signatur, self.file_name
+        )
 
 def yield_works(url, simple=True):
     """ yields basic metadata from works
