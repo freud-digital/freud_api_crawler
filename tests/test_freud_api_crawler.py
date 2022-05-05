@@ -10,6 +10,7 @@ import lxml.etree as ET
 from freud_api_crawler import freud_api_crawler as frd
 from freud_api_crawler import string_utils
 from freud_api_crawler import tei_utils
+from freud_api_crawler.entities import FrdPerson
 
 
 WERK_ID = "9d035a03-28d7-4013-adaf-63337d78ece4"
@@ -54,6 +55,11 @@ class TestFreud_api_crawler(unittest.TestCase):
 
     def tearDown(self):
         """Tear down test fixtures, if any."""
+
+    def test_001__persons(self):
+        persons = FrdPerson(auth_items=frd.AUTH_ITEMS)
+        first_person = persons.yield_persons().__next__()
+        self.assertTrue(first_person['id'][-1] == '1')
 
     def test_002_endpoints_with_auth(self):
         """Test of endpoints-method"""
