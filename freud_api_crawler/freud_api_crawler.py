@@ -1,5 +1,6 @@
 import os
 import json
+import time
 from collections import defaultdict
 
 import requests
@@ -87,6 +88,7 @@ class FrdClient():
         :return: A PyLobidPerson instance
         """
 
+        time.sleep(2)
         r = requests.get(
             self.endpoint,
             cookies=self.cookie,
@@ -155,6 +157,7 @@ class FrdWerk(FrdClient):
         :return: a Werk representation
         :rtype: dict
         """
+        time.sleep(2)
         r = requests.get(
             self.ep,
             cookies=self.cookie,
@@ -186,6 +189,7 @@ class FrdWerk(FrdClient):
             response = None
             result = None
             x = None
+            time.sleep(2)
             response = requests.get(
                 url,
                 cookies=self.cookie,
@@ -258,6 +262,7 @@ class FrdManifestation(FrdClient):
             'field_chapters'
         ]
         url = f"{self.manifestation_endpoint}?include={','.join(fields_to_include)}"
+        time.sleep(2)
         r = requests.get(
             url,
             cookies=self.cookie,
@@ -315,6 +320,7 @@ class FrdManifestation(FrdClient):
 
         print(url)
 
+        time.sleep(2)
         r = requests.get(
             f"{url}?include=field_faksimile",
             cookies=self.cookie,
@@ -479,6 +485,7 @@ def yield_works(url, simple=True):
         response = None
         result = None
         x = None
+        time.sleep(2)
         response = requests.get(
             url,
             cookies=AUTH_ITEMS['cookie'],

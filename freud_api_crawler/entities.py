@@ -1,3 +1,4 @@
+import time
 import requests
 import freud_api_crawler.freud_api_crawler as frd
 from freud_api_crawler.string_utils import always_https
@@ -21,6 +22,7 @@ class FrdPerson(frd.FrdClient):
             response = None
             result = None
             x = None
+            time.sleep(2)
             response = requests.get(
                 url,
                 cookies=self.cookie,
