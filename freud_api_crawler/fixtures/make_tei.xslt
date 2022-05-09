@@ -67,7 +67,7 @@
 
     <!--no applied templates because inside tei:hi something like tei:sup must not occure-->
     <xsl:template match="tei:span[@class='smallcaps']">
-        <hi><xsl:attribute name="rendition"><xsl:value-of select="concat('#', ./@class)"/></xsl:attribute><xsl:value-of select="."/></hi>
+        <hi><xsl:attribute name="rendition"><xsl:value-of select="concat('#', ./@class)"/></xsl:attribute><xsl:apply-templates/></hi>
     </xsl:template>
     <xsl:template match="tei:span[@class='footnote-index']">
         <hi><xsl:attribute name="rendition"><xsl:value-of select="concat('#', ./@class)"/></xsl:attribute><xsl:value-of select="."/></hi>
