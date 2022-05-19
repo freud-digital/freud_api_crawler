@@ -461,7 +461,6 @@ class FrdManifestation(FrdClient):
         self.manifestation_endpoint = f"{self.endpoint}node/manifestation/{manifestation_id}"
         self.manifestation = self.get_manifest()
         self.werk = self.manifestation['included'][0]
-        print(self.werk)
         self.publication = {}
         try:
             self.publication['id'] = self.manifestation['data']['attributes']['field_aufbewahrungsort_container']['value']  # noqa: E501
