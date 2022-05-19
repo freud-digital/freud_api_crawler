@@ -12,7 +12,8 @@ from freud_api_crawler.tei_utils import make_pb
 
 FRD_BASE = "https://www.freud-edition.net"
 FRD_API = os.environ.get('FRD_API', f'{FRD_BASE}/jsonapi/')
-FRD_WORK_LIST = "https://www.freud-edition.net/jsonapi/node/werk?filter[field_status_umschrift]=2"
+FRD_WORK_LIST = f"{FRD_API}node/werk?filter[field_status_umschrift]=2"
+FRD_WORK_SIGNATUR_EP = f"{FRD_API}taxonomy_term/signatur_fe/"
 FRD_USER = os.environ.get('FRD_USER', False)
 FRD_PW = os.environ.get('FRD_PW', False)
 FULL_MANIFEST = "228361d0-4cda-4805-a2f8-a05ee58119b6"
@@ -88,7 +89,7 @@ class FrdClient():
         :return: A PyLobidPerson instance
         """
 
-        time.sleep(2)
+        time.sleep(1)
         r = requests.get(
             self.endpoint,
             cookies=self.cookie,
@@ -157,7 +158,7 @@ class FrdWerk(FrdClient):
         :return: a Werk representation
         :rtype: dict
         """
-        time.sleep(2)
+        time.sleep(1)
         r = requests.get(
             self.ep,
             cookies=self.cookie,
@@ -189,7 +190,7 @@ class FrdWerk(FrdClient):
             response = None
             result = None
             x = None
-            time.sleep(2)
+            time.sleep(1)
             response = requests.get(
                 url,
                 cookies=self.cookie,
@@ -210,6 +211,15 @@ class FrdWerk(FrdClient):
                 man_col.append(item)
         return man_col
 
+    def get_fe_signatur(self):
+        r = requests.get(
+            f"{FRD_WORK_SIGNATUR_EP}{self.signatur_hash}",
+            cookies=self.cookie,
+            allow_redirects=True
+        )
+        result = r.json()
+        return result['data']['attributes']['name']
+
     def __init__(
         self,
         werk_id=None,
@@ -220,6 +230,8 @@ class FrdWerk(FrdClient):
         self.werk_id = werk_id
         self.ep = f"{self.werk_ep}/{self.werk_id}"
         self.werk = self.get_werk()
+        self.signatur_hash = self.werk['data']['relationships']['field_signatur_sfe']['data']['id']
+        self.signatur = self.get_fe_signatur()
         self.werk_attrib = self.werk['data']['attributes']
         self.filter_finished = filter_finished
         if filter_finished:
@@ -262,7 +274,7 @@ class FrdManifestation(FrdClient):
             'field_chapters'
         ]
         url = f"{self.manifestation_endpoint}?include={','.join(fields_to_include)}"
-        time.sleep(2)
+        time.sleep(1)
         r = requests.get(
             url,
             cookies=self.cookie,
@@ -320,7 +332,7 @@ class FrdManifestation(FrdClient):
 
         print(url)
 
-        time.sleep(2)
+        time.sleep(1)
         r = requests.get(
             f"{url}?include=field_faksimile",
             cookies=self.cookie,
@@ -430,6 +442,15 @@ class FrdManifestation(FrdClient):
                 f.write(ET.tostring(tei, pretty_print=True, encoding="utf-8"))
         return tei
 
+    def get_fe_werk_signatur(self):
+        r = requests.get(
+            f"{FRD_WORK_SIGNATUR_EP}{self.werk_signatur_hash}",
+            cookies=self.cookie,
+            allow_redirects=True
+        )
+        result = r.json()
+        return result['data']['attributes']['name']
+
     def __init__(
         self,
         manifestation_id=None,
@@ -440,6 +461,7 @@ class FrdManifestation(FrdClient):
         self.manifestation_endpoint = f"{self.endpoint}node/manifestation/{manifestation_id}"
         self.manifestation = self.get_manifest()
         self.werk = self.manifestation['included'][0]
+        print(self.werk)
         self.publication = {}
         try:
             self.publication['id'] = self.manifestation['data']['attributes']['field_aufbewahrungsort_container']['value']  # noqa: E501
@@ -460,7 +482,8 @@ class FrdManifestation(FrdClient):
         self.pages = self.get_pages()
         self.page_count = len(self.pages)
         self.save_dir = os.path.join(self.out_dir)
-        self.werk_signatur = self.manifestation['included'][1]['attributes']['name']
+        self.werk_signatur_hash = self.werk['relationships']['field_signatur_sfe']['data']['id']
+        self.werk_signatur = self.get_fe_werk_signatur()
         self.manifestation_signatur = f"{self.werk_signatur}{self.man_attrib['field_signatur_sfe_type']}"
         self.file_name = f"sfe-{self.manifestation_signatur.replace('/', '__').replace('.', '_')}.xml"
         self.save_path = os.path.join(
@@ -485,7 +508,7 @@ def yield_works(url, simple=True):
         response = None
         result = None
         x = None
-        time.sleep(2)
+        time.sleep(1)
         response = requests.get(
             url,
             cookies=AUTH_ITEMS['cookie'],

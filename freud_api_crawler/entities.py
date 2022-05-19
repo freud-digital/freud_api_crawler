@@ -22,7 +22,7 @@ class FrdPerson(frd.FrdClient):
             response = None
             result = None
             x = None
-            time.sleep(2)
+            time.sleep(1)
             response = requests.get(
                 url,
                 cookies=self.cookie,
