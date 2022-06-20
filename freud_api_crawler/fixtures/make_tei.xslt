@@ -23,8 +23,51 @@
         ####################
 -->
 
+    <xsl:template match="tei:body">   
+        <body>
+            <div>
+                <xsl:apply-templates/>
+            </div>
+        </body>        
+    </xsl:template>
+    <xsl:template match="tei:div">   
+        <xsl:apply-templates/>
+    </xsl:template>
+    <xsl:template match="tei:div/tei:p[position() = last()]">   
+        <xsl:copy>
+            <xsl:apply-templates/>
+            <xsl:choose>                
+                <xsl:when test="parent::tei:div/following-sibling::tei:div[1]/child::tei:p[@class='ff']">
+                    <xsl:copy-of select="parent::tei:div/following-sibling::tei:div[1]/child::tei:pb"/>
+                    <fw type="pageNum">
+                        <xsl:value-of select="parent::tei:div/following-sibling::tei:div[1]/child::tei:p[./tei:span[@class='pagenumber']]/tei:span[@class='pagenumber']"/>
+                    </fw>
+                    <!--<xsl:copy-of select="parent::tei:div/following-sibling::tei:div[1]/child::tei:p[./tei:span[@class='pagenumber']]/tei:span[@class='pagenumber']"/>-->
+                    <xsl:for-each select="parent::tei:div/following-sibling::tei:div[1]/child::tei:p[@class='ff']">
+                        <xsl:apply-templates/>
+                    </xsl:for-each>
+                </xsl:when>
+            </xsl:choose>                                    
+        </xsl:copy>
+    </xsl:template>
+    <xsl:template match="tei:pb[following-sibling::tei:p[@class='ff']]">   
+        
+    </xsl:template>
+    <xsl:template match="tei:p[@class='ff']">   
+        
+    </xsl:template>
+    <xsl:template match="tei:space">   
+        <xsl:text>&#x00A0;</xsl:text>
+    </xsl:template>
     <xsl:template match="tei:p[./tei:span[@class='pagenumber']]">
-        <fw type="pageNum"><xsl:value-of select=".//text()"/></fw>
+        <xsl:choose>
+            <xsl:when test="following-sibling::tei:p[@class='ff']">
+                
+            </xsl:when>
+            <xsl:otherwise>
+                <fw type="pageNum"><xsl:value-of select=".//text()"/></fw>
+            </xsl:otherwise>
+        </xsl:choose>        
     </xsl:template>
     <xsl:template match="tei:p[@class='marginalie_place']">
         <p rendition="#marginalie_place"><xsl:apply-templates/></p>
@@ -35,9 +78,9 @@
     <xsl:template match="tei:p[@class='footnote footnote-ff']">
         <note type="footnote" prev="true"><xsl:apply-templates/></note>
     </xsl:template>
-    <xsl:template match="tei:p[@class='ff']">
+    <!-- <xsl:template match="tei:p[@class='ff']">
         <p prev="true"><xsl:apply-templates/></p>
-    </xsl:template>
+    </xsl:template> -->
 
     <!--
         ####################
