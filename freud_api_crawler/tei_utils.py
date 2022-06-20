@@ -1,7 +1,7 @@
 import lxml.etree as ET
 
 
-def make_pb(n, faks_url, faks_id):
+def make_pb(n, faks_url, faks_id, page_id):
     """ returns a tei:pb
     """
     pb_el = ET.Element("{http://www.tei-c.org/ns/1.0}pb")
@@ -10,5 +10,6 @@ def make_pb(n, faks_url, faks_id):
     pb_el.attrib[
         "{http://www.w3.org/XML/1998/namespace}id"
     ] = f"faks__{faks_id}"
+    pb_el.attrib['next'] = f"{page_id}"
 
     return pb_el
