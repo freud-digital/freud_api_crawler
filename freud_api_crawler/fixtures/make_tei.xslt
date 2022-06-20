@@ -56,6 +56,9 @@
     <xsl:template match="tei:p[@class='ff']">   
         
     </xsl:template>
+    <xsl:template match="tei:space">   
+        <xsl:text>&#x00A0;</xsl:text>
+    </xsl:template>
     <xsl:template match="tei:p[./tei:span[@class='pagenumber']]">
         <xsl:choose>
             <xsl:when test="following-sibling::tei:p[@class='ff']">

@@ -426,12 +426,7 @@ class FrdManifestation(FrdClient):
             page_json = self.get_page(x['id'])
             pp = self.process_page(page_json)
             div = ET.fromstring(pp['body'])
-            pb_el = make_pb(
-                pp['page_nr'],
-                f"{FRD_BASE}{pp['faks__payload']}",
-                pp['faks__id'],
-                f"page__{pp['id']}"
-            )
+            pb_el = make_pb(pp)
             cur_div = div.xpath('//tei:div', namespaces=self.nsmap)[0]
             cur_div.insert(0, pb_el)
             body.append(div)
