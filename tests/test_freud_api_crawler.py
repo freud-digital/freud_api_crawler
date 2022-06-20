@@ -205,10 +205,13 @@ class TestTeiUtils(unittest.TestCase):
     def test_001_make_pg(self):
         """ Test make_pb"""
         pb_el = tei_utils.make_pb(
-            1, 'https://whatever.com', "1234sieben"
+            {
+                "page_nr": 1,
+                "id": "xyz"
+            }
         )
         pb_str = ET.tostring(pb_el).decode('utf-8')
         self.assertEqual(
             pb_str,
-            '<ns0:pb xmlns:ns0="http://www.tei-c.org/ns/1.0" n="1" facs="https://whatever.com" xml:id="faks__1234sieben"/>'  # noqa: E501
+            '<ns0:pb xmlns:ns0="http://www.tei-c.org/ns/1.0" n="1" xml:id="page__xyz"/>'  # noqa: E501
         )
