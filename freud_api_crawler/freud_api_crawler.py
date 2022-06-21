@@ -404,11 +404,14 @@ class FrdManifestation(FrdClient):
         p_title = doc.xpath('//tei:title[@type="publication"]', namespaces=self.nsmap)[0]
         p_rs = ET.Element("{http://www.tei-c.org/ns/1.0}rs")
         p_rs.attrib["type"] = "bibl"
-        p_rs.attrib["ref"] = f"#bibl__{self.publication['id']}"
         try:
-            p_rs.text = f"{self.publication['attributes']['title']}"
-        except KeyError:
-            p_rs.text = f"{self.publication['id']}"
+            p_rs.attrib["ref"] = f"#bibl__{self.publication['data']['id']}"
+        except TypeError or KeyError:
+            p_rs.attrib["ref"] = f"#bibl__{self.publication}"
+        try:
+            p_rs.text = f"{self.publication['data']['attributes']['title']}"
+        except TypeError or KeyError:
+            p_rs.text = f"{self.publication}"
         p_title.append(p_rs)
         w_title = doc.xpath('//tei:title[@type="work"]', namespaces=self.nsmap)[0]
         w_rs = ET.Element("{http://www.tei-c.org/ns/1.0}rs")
@@ -416,6 +419,170 @@ class FrdManifestation(FrdClient):
         w_rs.attrib["ref"] = f"#bibl__{self.werk['id']}"
         w_title.append(w_rs)
         w_rs.text = f"{self.werk['attributes']['title']}"
+        titleStmt = doc.xpath('//tei:titleStmt', namespaces=self.nsmap)[0]
+        author = ET.Element("{http://www.tei-c.org/ns/1.0}author")
+        try:
+            author.text = f"{self.author['data']['attributes']['name']}"
+        except TypeError or KeyError:
+            author.text = f"{self.author}"
+        titleStmt.insert(4, author)
+        editor = """
+                    <editor xmlns="http://www.tei-c.org/ns/1.0">
+                        <name>Diercks, Christine</name>
+                        <name>Rohrwasser, Michael</name>
+                    </editor>
+                """
+        editor = ET.fromstring(editor)
+        titleStmt.append(editor)
+        funder = """
+                    <funder xmlns="http://www.tei-c.org/ns/1.0">
+                        <name>FWF Austrian Science Fund</name>
+                        <address>
+                            <street>Sensengasse 1</street>
+                            <postCode>1090 Vienna</postCode>
+                            <placeName>
+                                <country>A</country>
+                                <settlement>Vienna</settlement>
+                            </placeName>
+                        </address>
+                    </funder>
+                """
+        funder = ET.fromstring(funder)
+        titleStmt.append(funder)
+        fileDesc = doc.xpath('//tei:fileDesc', namespaces=self.nsmap)[0]
+        editionStmt = """
+                    <editionStmt xmlns="http://www.tei-c.org/ns/1.0">
+                        <edition>Sigmund Freud Edition: Digitale Historisch-Kritische Gesamtausgabe</edition>
+                        <respStmt>
+                            <resp>Konzept für die Edition und die Datenbank, Richtlinien, Quellenforschung,
+                                Signaturen, Referenzsystem</resp>
+                            <name>Diercks, Christine</name>
+                        </respStmt>
+                        <respStmt>
+                            <resp>Quellenforschung, Digitalisierung der Datenquellen, Bildbearbeitung,
+                                Faksimile-Ausgabe, Bibliografie</resp>
+                            <name>Blatow, Arkadi</name>
+                        </respStmt>
+                        <respStmt>
+                            <resp>Diplomatische Umschrift, Lektorat</resp>
+                            <name>Blatow, Arkadi</name>
+                            <name>Diercks, Christine</name>
+                            <name>Huber, Christian</name>
+                            <name>Kaufmann, Kira</name>
+                            <name>Rohrwasser, Michael</name>
+                        </respStmt>
+                        <respStmt>
+                            <resp>Technische Umsetzung der Datenbank und der digitalen Instrumente</resp>
+                            <name>Roedelius, Julian</name>
+                        </respStmt>
+                        <respStmt>
+                            <resp>Datenexport aus Drupal und TEI Serialisierung</resp>
+                            <name>Andorfer, Peter</name>
+                            <name>Stoxreiter, Daniel</name>
+                        </respStmt>
+                    </editionStmt>
+                """
+        editionStmt = ET.fromstring(editionStmt)
+        fileDesc.insert(1, editionStmt)
+        publicationStmt = """
+            <publicationStmt xmlns="http://www.tei-c.org/ns/1.0">
+                <publisher>Austrian Centre for Digital Humanities and Cultural Heritage</publisher>
+                <pubPlace>Vienna</pubPlace>
+                <date when="2022">2022</date>
+                <availability>
+                    <licence target="https://creativecommons.org/licenses/by/4.0">
+                        <p>You are free to: Share — copy and redistribute the material in any
+                        medium or format; adapt — remix, transform, and build upon the material
+                        for any purpose, even commercially.</p>
+                        <p>The licensor cannot revoke these freedoms as long as you follow the license terms.
+                        Under the following terms:</p>
+                        <p>Attribution — You must give appropriate credit, provide a link to the license,
+                        and indicate if changes were made. You may do so in any reasonable manner,
+                        but not in any way that suggests the licensor endorses you or your use.
+                        No additional restrictions — You may not apply legal terms or technological measures
+                        that legally restrict others from doing anything the license permits.</p>
+                        <p>Notices:</p>
+                        <p>You do not have to comply with the license for elements of the material in the public domain
+                        or where your use is permitted by an applicable exception or limitation.
+                        No warranties are given.
+                        The license may not give you all of the permissions necessary for your intended use.
+                        For example, other rights such as publicity, privacy,
+                        or moral rights may limit how you use the material.</p>
+                    </licence>
+                </availability>
+            </publicationStmt>
+        """
+        publicationStmt = ET.fromstring(publicationStmt)
+        fileDesc.insert(2, publicationStmt)
+        seriesStmt = """
+            <seriesStmt xmlns="http://www.tei-c.org/ns/1.0">
+                <p>Maschinenlesbare Transkription der Publikationen von Sigmund Freud.</p>
+            </seriesStmt>
+        """
+        seriesStmt = ET.fromstring(seriesStmt)
+        fileDesc.insert(3, seriesStmt)
+        sourceDesc = ET.Element("{http://www.tei-c.org/ns/1.0}sourceDesc")
+        bibl = ET.Element("{http://www.tei-c.org/ns/1.0}bibl")
+        try:
+            bibl.attrib["{http://www.w3.org/XML/1998/namespace}id"] = f"bibl__{self.publication['data']['id']}"
+        except KeyError or TypeError:
+            return
+        try:
+            bibl_title = ET.Element("{http://www.tei-c.org/ns/1.0}title")
+            bibl_title.attrib['level'] = "a"
+            bibl_title.text = f"{self.publication['data']['attributes']['title']}"
+            bibl.append(bibl_title)
+        except KeyError or TypeError:
+            return
+        try:
+            bibl_title = ET.Element("{http://www.tei-c.org/ns/1.0}title")
+            bibl_title.attrib['level'] = "b"
+            bibl_title.text = f"{self.publication['data']['attributes']['field_titel']['value']}"
+            bibl.append(bibl_title)
+        except KeyError or TypeError:
+            return
+        try:
+            bibl_publisher = ET.Element("{http://www.tei-c.org/ns/1.0}publisher")
+            bibl_publisher.text = self.publisher['data']['attributes']['name']
+            bibl.append(bibl_publisher)
+        except KeyError or TypeError:
+            return
+        try:
+            if type(self.herausgeber) is list:
+                for x in self.herausgeber:
+                    bibl_author = ET.Element("{http://www.tei-c.org/ns/1.0}author")
+                    bibl_author.text = x['data']['attributes']['name']
+                    bibl.append(bibl_author)
+            else:
+                bibl_author = ET.Element("{http://www.tei-c.org/ns/1.0}author")
+                bibl_author.text = self.herausgeber['data']['attributes']['name']
+                bibl.append(bibl_author)
+        except KeyError or TypeError:
+            return
+        try:
+            places = self.publication['data']['attributes']['field_publication_place']
+            for x in places:
+                place = x["value"]
+                bibl_place = ET.Element("{http://www.tei-c.org/ns/1.0}pubPlace")
+                bibl_place.text = place
+                bibl.append(bibl_place)
+        except KeyError or TypeError:
+            return
+        try:
+            bibl_date = ET.Element("{http://www.tei-c.org/ns/1.0}date")
+            bibl_date.attrib['when'] = f"{self.publication['data']['attributes']['field_publication_year']}"
+            bibl_date.text = f"{self.publication['data']['attributes']['field_publication_year']}"
+            bibl.append(bibl_date)
+        except KeyError or TypeError:
+            return
+        try:
+            bibl_scope = ET.Element("{http://www.tei-c.org/ns/1.0}biblScope")
+            bibl_scope.text = f"{self.publication['data']['attributes']['field_band']['value']}"
+            bibl.append(bibl_scope)
+        except KeyError or TypeError:
+            return
+        sourceDesc.append(bibl)
+        fileDesc.insert(4, sourceDesc)
         body = doc.xpath('//tei:body', namespaces=self.nsmap)[0]
         pages = self.pages
         if limit:
@@ -454,23 +621,62 @@ class FrdManifestation(FrdClient):
 
         :return: json
         """
-        if self.manifestation['data']['relationships'][field_type]['data'] is not None:
+        if self.manifestation['data']['relationships'][field_type]['data']:
             try:
                 item = self.manifestation['data']['relationships'][field_type]['data']
-            except KeyError:
+                item_id = item['id']
+                node_type = item['type'].split('--')[1]
+                taxonomy = item['type'].split('--')[0]
+                url = f"{self.endpoint}{taxonomy}/{node_type}/{item_id}"
+                r = requests.get(
+                    url,
+                    cookies=self.cookie,
+                    allow_redirects=True
+                )
+                result = r.json()
+                return result
+            except KeyError or TypeError:
                 print(f"{field_type} is null")
-            item_id = item['id']
-            node_type = item['type'].split('--')[1]
-            taxonomy = item['type'].split('--')[0]
-            url = f"{self.endpoint}{taxonomy}/{node_type}/{item_id}"
-            r = requests.get(
-                url,
-                cookies=self.cookie,
-                allow_redirects=True
-            )
-            result = r.json()
+
+    def get_fields_any_any(self, field_type, get_fields):
+        """requests manifestation 'relationships' fields
+
+        :param field_type: takes a string refering to the correct field e.g. 'field_published_in'
+
+        :return: json
+        """
+        try:
+            field_any = get_fields
+            item = field_any['data']['relationships'][field_type]['data']
+            print(item)
+            print(type(item))
+            if type(item) is list:
+                result = []
+                for x in item:
+                    item_id = x['id']
+                    node_type = x['type'].split('--')[1]
+                    taxonomy = x['type'].split('--')[0]
+                    url = f"{self.endpoint}{taxonomy}/{node_type}/{item_id}"
+                    r = requests.get(
+                        url,
+                        cookies=self.cookie,
+                        allow_redirects=True
+                    )
+                    res = r.json()
+                    result.append(res)
+            else:
+                item_id = item['id']
+                node_type = item['type'].split('--')[1]
+                taxonomy = item['type'].split('--')[0]
+                url = f"{self.endpoint}{taxonomy}/{node_type}/{item_id}"
+                r = requests.get(
+                    url,
+                    cookies=self.cookie,
+                    allow_redirects=True
+                )
+                result = r.json()
             return result
-        else:
+        except KeyError or TypeError:
             print(f"{field_type} is null")
 
     def __init__(
@@ -483,11 +689,22 @@ class FrdManifestation(FrdClient):
         self.manifestation_endpoint = f"{self.endpoint}node/manifestation/{manifestation_id}"
         self.manifestation = self.get_manifest()
         self.werk = self.manifestation['included'][0]
-        self.publication = {}
         try:
-            self.publication['id'] = self.manifestation['data']['attributes']['field_aufbewahrungsort_container']['value']  # noqa: E501
-        except TypeError:
-            self.publication['id'] = self.manifestation_id
+            self.publication = self.get_fields_any('field_published_in')
+        except TypeError or KeyError:
+            self.publication = self.manifestation_id
+        try:
+            self.author = self.get_fields_any('field_authors')
+        except TypeError or KeyError:
+            self.author = "Freud, Sigmund"
+        try:
+            self.publisher = self.get_fields_any_any('field_publisher', self.publication)
+        except TypeError or KeyError:
+            self.publisher = ""
+        try:
+            self.herausgeber = self.get_fields_any_any('field_herausgeber', self.publication)
+        except TypeError or KeyError:
+            self.herausgeber = ""
         self.werk_folder = self.werk['attributes']['path']['alias']
         # self.manifestation_folder = self.manifestation['attributes']['path']['alias']
         self.man_attrib = self.manifestation['data']['attributes']
