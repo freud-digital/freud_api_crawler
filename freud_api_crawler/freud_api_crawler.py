@@ -447,6 +447,32 @@ class FrdManifestation(FrdClient):
         result = r.json()
         return result['data']['attributes']['name']
 
+    def get_fields_any(self, field_type):
+        """requests manifestation 'relationships' fields
+
+        :param field_type: takes a string refering to the correct field e.g. 'field_published_in'
+
+        :return: json
+        """
+        if self.manifestation['data']['relationships'][field_type]['data'] is not None:
+            try:
+                item = self.manifestation['data']['relationships'][field_type]['data']
+            except KeyError:
+                print(f"{field_type} is null")
+            item_id = item['id']
+            node_type = item['type'].split('--')[1]
+            taxonomy = item['type'].split('--')[0]
+            url = f"{self.endpoint}{taxonomy}/{node_type}/{item_id}"
+            r = requests.get(
+                url,
+                cookies=self.cookie,
+                allow_redirects=True
+            )
+            result = r.json()
+            return result
+        else:
+            print(f"{field_type} is null")
+
     def __init__(
         self,
         manifestation_id=None,

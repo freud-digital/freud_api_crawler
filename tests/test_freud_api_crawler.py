@@ -161,6 +161,14 @@ class TestFreud_api_crawler(unittest.TestCase):
         full_man = werk.get_manifestations(filters=frd.MANIFEST_DEFAULT_FILTER)
         self.assertTrue(len(all_man) > len(full_man))
 
+    def test_017_relationships_fields(self):
+        frd_obj = FRD_MANIFESTATION
+        data = frd_obj.get_manifest()
+        item = frd_obj.get_fields_any('field_aufbewahrungsort')
+        item_id = item['data']['id']
+        frd_obj_field_id = data['data']['relationships']['field_aufbewahrungsort']['data']['id']
+        self.assertTrue(item_id == frd_obj_field_id)
+
 
 class TestStringUtils(unittest.TestCase):
     """Tests for `freud_api_crawler` package."""
