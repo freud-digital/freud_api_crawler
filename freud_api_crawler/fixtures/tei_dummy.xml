@@ -3,6 +3,7 @@
       <fileDesc>
          <titleStmt>
             <title type="manifestation"></title>
+            <title type="manifestation_short"></title>
             <title type="publication"></title>
             <title type="work"></title>
             <editor>
@@ -51,7 +52,7 @@
          </editionStmt>
          <publicationStmt>
             <publisher>Austrian Centre for Digital Humanities and Cultural Heritage</publisher>
-            <pubPlace>Vienna</pubPlace>
+            <pubPlace>Wien</pubPlace>
             <date when="2022">2022</date>
             <availability>
                <licence target="https://creativecommons.org/licenses/by/4.0">

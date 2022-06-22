@@ -400,7 +400,10 @@ class FrdManifestation(FrdClient):
             "{http://www.w3.org/XML/1998/namespace}id"
         ] = f"manifestation__{self.manifestation_id}"
         title = doc.xpath('//tei:title[@type="manifestation"]', namespaces=self.nsmap)[0]
-        title.text = f"{self.md__title}"
+        title.text = f"{self.md__title} ({self.manifestation_signatur})"
+        if self.manifestation['data']['attributes']['field_shorttitle']:
+            s_title = doc.xpath('//tei:title[@type="manifestation_short"]', namespaces=self.nsmap)[0]
+            s_title.text = f"{self.manifestation['data']['attributes']['field_shorttitle']['value']}"
         p_title = doc.xpath('//tei:title[@type="publication"]', namespaces=self.nsmap)[0]
         p_rs = ET.Element("{http://www.tei-c.org/ns/1.0}rs")
         p_rs.attrib["type"] = "bibl"
@@ -434,25 +437,26 @@ class FrdManifestation(FrdClient):
                 bibl.attrib["{http://www.w3.org/XML/1998/namespace}id"] = f"bibl__{self.publication['data']['id']}"
             except KeyError or TypeError:
                 return
-            # try:
-            #     bibl_title = ET.Element("{http://www.tei-c.org/ns/1.0}title")
-            #     bibl_title.attrib['type'] = ""
-            #     bibl_title.text = f"{self.publication['data']['attributes']['title']}"
-            #     bibl.append(bibl_title)
-            # except KeyError or TypeError:
-            #     return
+            try:
+                if self.publication['data']['attributes']['field_secondary_title']:
+                    bibl_title = ET.Element("{http://www.tei-c.org/ns/1.0}title")
+                    bibl_title.attrib['type'] = "sub"
+                    bibl_title.text = f"{self.publication['data']['attributes']['field_secondary_title']['value']}"
+                    bibl.append(bibl_title)
+            except KeyError or TypeError:
+                return
+            try:
+                bibl_title = ET.Element("{http://www.tei-c.org/ns/1.0}title")
+                bibl_title.attrib['type'] = "short"
+                bibl_title.text = f"{self.publication['data']['attributes']['field_shorttitle']['value']}"
+                bibl.append(bibl_title)
+            except KeyError or TypeError:
+                return
             try:
                 bibl_title = ET.Element("{http://www.tei-c.org/ns/1.0}title")
                 bibl_title.attrib['type'] = "main"
                 bibl_title.text = f"{self.publication['data']['attributes']['field_titel']['value']}"
                 bibl.append(bibl_title)
-            except KeyError or TypeError:
-                return
-        if self.publication is not None:
-            try:
-                bibl_publisher = ET.Element("{http://www.tei-c.org/ns/1.0}publisher")
-                bibl_publisher.text = self.publisher['data']['attributes']['name']
-                bibl.append(bibl_publisher)
             except KeyError or TypeError:
                 return
             try:
@@ -472,24 +476,45 @@ class FrdManifestation(FrdClient):
             except KeyError or TypeError:
                 return
             try:
-                bibl_scope = ET.Element("{http://www.tei-c.org/ns/1.0}biblScope")
-                bibl_scope.text = f"{self.publication['data']['attributes']['field_band']['value']}"
-                bibl.append(bibl_scope)
+                if self.publication['data']['attributes']['field_band'] is not None:
+                    bibl_scope = ET.Element("{http://www.tei-c.org/ns/1.0}biblScope")
+                    bibl_scope.text = f"{self.publication['data']['attributes']['field_band']['value']}"
+                    bibl.append(bibl_scope)
             except KeyError or TypeError:
                 return
-        if self.herausgeber is not None:
-            try:
-                if type(self.herausgeber) is list:
-                    for x in self.herausgeber:
+            if self.publisher is not None:
+                try:
+                    bibl_publisher = ET.Element("{http://www.tei-c.org/ns/1.0}publisher")
+                    bibl_publisher.text = self.publisher['data']['attributes']['name']
+                    bibl.append(bibl_publisher)
+                except KeyError or TypeError:
+                    return
+            if self.herausgeber is not None:
+                try:
+                    if type(self.herausgeber) is list:
+                        for x in self.herausgeber:
+                            bibl_publisher = ET.Element("{http://www.tei-c.org/ns/1.0}publisher")
+                            bibl_publisher.text = x['data']['attributes']['name']
+                            bibl.append(bibl_publisher)
+                    else:
+                        bibl_publisher = ET.Element("{http://www.tei-c.org/ns/1.0}author")
+                        bibl_publisher.text = self.herausgeber['data']['attributes']['name']
+                        bibl.append(bibl_publisher)
+                except KeyError or TypeError:
+                    return
+            if self.pub_author is not None:
+                try:
+                    if type(self.pub_author) is list:
+                        for x in self.pub_author:
+                            bibl_author = ET.Element("{http://www.tei-c.org/ns/1.0}author")
+                            bibl_author.text = x['data']['attributes']['name']
+                            bibl.append(bibl_author)
+                    else:
                         bibl_author = ET.Element("{http://www.tei-c.org/ns/1.0}author")
-                        bibl_author.text = x['data']['attributes']['name']
+                        bibl_author.text = self.pub_author['data']['attributes']['name']
                         bibl.append(bibl_author)
-                else:
-                    bibl_author = ET.Element("{http://www.tei-c.org/ns/1.0}author")
-                    bibl_author.text = self.herausgeber['data']['attributes']['name']
-                    bibl.append(bibl_author)
-            except KeyError or TypeError:
-                return
+                except KeyError or TypeError:
+                    return
         sourceDesc.append(bibl)
         fileDesc.insert(4, sourceDesc)
         body = doc.xpath('//tei:body', namespaces=self.nsmap)[0]
@@ -560,8 +585,6 @@ class FrdManifestation(FrdClient):
             try:
                 field_any = get_fields
                 item = field_any['data']['relationships'][field_type]['data']
-                print(item)
-                print(type(item))
                 if type(item) is list:
                     result = []
                     for x in item:
@@ -614,11 +637,15 @@ class FrdManifestation(FrdClient):
         try:
             self.publisher = self.get_fields_any_any('field_publisher', self.publication)
         except TypeError or KeyError:
-            self.publisher = ""
+            self.publisher = None
         try:
             self.herausgeber = self.get_fields_any_any('field_herausgeber', self.publication)
         except TypeError or KeyError:
-            self.herausgeber = ""
+            self.herausgeber = None
+        try:
+            self.pub_author = self.get_fields_any_any('field_authors', self.publication)
+        except TypeError or KeyError:
+            self.pub_author = None
         self.werk_folder = self.werk['attributes']['path']['alias']
         # self.manifestation_folder = self.manifestation['attributes']['path']['alias']
         self.man_attrib = self.manifestation['data']['attributes']
