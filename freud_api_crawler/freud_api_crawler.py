@@ -446,17 +446,19 @@ class FrdManifestation(FrdClient):
             except KeyError or TypeError:
                 return
             try:
-                bibl_title = ET.Element("{http://www.tei-c.org/ns/1.0}title")
-                bibl_title.attrib['type'] = "short"
-                bibl_title.text = f"{self.publication['data']['attributes']['field_shorttitle']['value']}"
-                bibl.append(bibl_title)
+                if self.publication['data']['attributes']['field_shorttitle'] is not None:
+                    bibl_title = ET.Element("{http://www.tei-c.org/ns/1.0}title")
+                    bibl_title.attrib['type'] = "short"
+                    bibl_title.text = f"{self.publication['data']['attributes']['field_shorttitle']['value']}"
+                    bibl.append(bibl_title)
             except KeyError or TypeError:
                 return
             try:
-                bibl_title = ET.Element("{http://www.tei-c.org/ns/1.0}title")
-                bibl_title.attrib['type'] = "main"
-                bibl_title.text = f"{self.publication['data']['attributes']['field_titel']['value']}"
-                bibl.append(bibl_title)
+                if self.publication['data']['attributes']['field_titel'] is not None:
+                    bibl_title = ET.Element("{http://www.tei-c.org/ns/1.0}title")
+                    bibl_title.attrib['type'] = "main"
+                    bibl_title.text = f"{self.publication['data']['attributes']['field_titel']['value']}"
+                    bibl.append(bibl_title)
             except KeyError or TypeError:
                 return
             try:
@@ -469,10 +471,11 @@ class FrdManifestation(FrdClient):
             except KeyError or TypeError:
                 return
             try:
-                bibl_date = ET.Element("{http://www.tei-c.org/ns/1.0}date")
-                bibl_date.attrib['when'] = f"{self.publication['data']['attributes']['field_publication_year']}"
-                bibl_date.text = f"{self.publication['data']['attributes']['field_publication_year']}"
-                bibl.append(bibl_date)
+                if self.publication['data']['attributes']['field_publication_year'] is not None:
+                    bibl_date = ET.Element("{http://www.tei-c.org/ns/1.0}date")
+                    bibl_date.attrib['when'] = f"{self.publication['data']['attributes']['field_publication_year']}"
+                    bibl_date.text = f"{self.publication['data']['attributes']['field_publication_year']}"
+                    bibl.append(bibl_date)
             except KeyError or TypeError:
                 return
             try:
