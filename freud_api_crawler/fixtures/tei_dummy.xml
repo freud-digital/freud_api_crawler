@@ -5,8 +5,86 @@
             <title type="manifestation"></title>
             <title type="publication"></title>
             <title type="work"></title>
-            <title type="sub"></title>
+            <editor>
+               <name>Diercks, Christine</name>
+               <name>Rohrwasser, Michael</name>
+            </editor>
+            <funder xmlns="http://www.tei-c.org/ns/1.0">
+               <name>FWF Der Wissenschaftsfond.</name>
+               <address>
+                     <street>Sensengasse 1</street>
+                     <postCode>1090 Wien</postCode>
+                     <placeName>
+                        <country>Österreich</country>
+                        <settlement>Wien</settlement>
+                     </placeName>
+               </address>
+            </funder>
          </titleStmt>
+         <editionStmt>
+            <edition>Sigmund Freud Edition: Digitale Historisch-Kritische Gesamtausgabe</edition>
+            <respStmt>
+               <resp>Konzept für die Edition und die Datenbank, Richtlinien, Quellenforschung, Signaturen, Referenzsystem</resp>
+               <name>Diercks, Christine</name>
+            </respStmt>
+            <respStmt>
+               <resp>Quellenforschung, Digitalisierung der Datenquellen, Bildbearbeitung,
+                           Faksimile-Ausgabe, Bibliografie</resp>
+               <name>Blatow, Arkadi</name>
+            </respStmt>
+            <respStmt>
+               <resp>Diplomatische Umschrift, Lektorat</resp>
+               <name>Blatow, Arkadi</name>
+               <name>Diercks, Christine</name>
+               <name>Huber, Christian</name>
+               <name>Kaufmann, Kira</name>
+               <name>Rohrwasser, Michael</name>
+            </respStmt>
+            <respStmt>
+               <resp>Technische Umsetzung der Datenbank und der digitalen Instrumente</resp>
+               <name>Roedelius, Julian</name>
+            </respStmt>
+            <respStmt>
+               <resp>Datenexport aus Drupal und TEI Serialisierung</resp>
+               <name>Andorfer, Peter</name>
+               <name>Stoxreiter, Daniel</name>
+            </respStmt>
+         </editionStmt>
+         <publicationStmt>
+            <publisher>Austrian Centre for Digital Humanities and Cultural Heritage</publisher>
+            <pubPlace>Vienna</pubPlace>
+            <date when="2022">2022</date>
+            <availability>
+               <licence target="https://creativecommons.org/licenses/by/4.0">
+                  <p>
+                     You are free to: Share — copy and redistribute the material in any
+                     medium or format; adapt — remix, transform, and build upon the material
+                     for any purpose, even commercially.
+                  </p>
+                  <p>
+                     The licensor cannot revoke these freedoms as long as you follow the license terms.
+                     Under the following terms:
+                  </p>
+                  <p>
+                     Attribution — You must give appropriate credit, provide a link to the license,
+                     and indicate if changes were made. You may do so in any reasonable manner,
+                     but not in any way that suggests the licensor endorses you or your use.
+                     No additional restrictions — You may not apply legal terms or technological measures
+                     that legally restrict others from doing anything the license permits.
+                  </p>
+                  <p>Notices:</p>
+                  <p>
+                     You do not have to comply with the license for elements of the material in the public domain
+                     or where your use is permitted by an applicable exception or limitation. No warranties are given.
+                     The license may not give you all of the permissions necessary for your intended use.
+                     For example, other rights such as publicity, privacy, or moral rights may limit how you use the material.
+                  </p>
+               </licence>
+            </availability>
+         </publicationStmt>
+         <seriesStmt>
+            <p>Maschinenlesbare Transkription der Publikationen von Sigmund Freud.</p>
+         </seriesStmt>
       </fileDesc>
    </teiHeader>
    <text>
