@@ -428,7 +428,7 @@ class FrdManifestation(FrdClient):
         titleStmt.insert(3, author)
         fileDesc = doc.xpath('//tei:fileDesc', namespaces=self.nsmap)[0]
         sourceDesc = ET.Element("{http://www.tei-c.org/ns/1.0}sourceDesc")
-        bibl = ET.Element("{http://www.tei-c.org/ns/1.0}bibl")     
+        bibl = ET.Element("{http://www.tei-c.org/ns/1.0}bibl")
         if self.publication is not None:
             try:
                 bibl.attrib["{http://www.w3.org/XML/1998/namespace}id"] = f"bibl__{self.publication['data']['id']}"
