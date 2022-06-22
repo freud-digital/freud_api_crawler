@@ -169,6 +169,18 @@ class TestFreud_api_crawler(unittest.TestCase):
         frd_obj_field_id = data['data']['relationships']['field_aufbewahrungsort']['data']['id']
         self.assertTrue(item_id == frd_obj_field_id)
 
+    def test_018_relationships_sub_fields(self):
+        frd_obj = FRD_MANIFESTATION
+        data = frd_obj.get_manifest()
+        item = frd_obj.get_fields_any('field_aufbewahrungsort')
+        item_id = item['data']['id']
+        frd_obj_field_id = data['data']['relationships']['field_aufbewahrungsort']['data']['id']
+        self.assertTrue(item_id == frd_obj_field_id)
+        item2 = frd_obj.get_fields_any_any('vid', item)
+        item2_id = item2['data']['id']
+        frd_obj_sub_field_id = item['data']['relationships']['vid']['data']['id']
+        self.assertTrue(item2_id == frd_obj_sub_field_id)
+
 
 class TestStringUtils(unittest.TestCase):
     """Tests for `freud_api_crawler` package."""
