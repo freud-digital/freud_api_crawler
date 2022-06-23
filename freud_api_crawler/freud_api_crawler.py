@@ -384,7 +384,7 @@ class FrdManifestation(FrdClient):
         }
         return result
 
-    def make_xml(self, save=False, limit=True):
+    def make_xml(self, save=False, limit=True, dump=False):
 
         """serializes a manifestation as XML/TEI document
 
@@ -393,6 +393,7 @@ class FrdManifestation(FrdClient):
 
         :return: A lxml.etree
         """
+        json_dump = {}
         doc = self.tei_dummy
         root_el = doc.xpath('//tei:TEI', namespaces=self.nsmap)[0]
         root_el.attrib["{http://www.w3.org/XML/1998/namespace}base"] = "https://whatever.com"
@@ -401,20 +402,31 @@ class FrdManifestation(FrdClient):
         ] = f"manifestation__{self.manifestation_id}"
         title = doc.xpath('//tei:title[@type="manifestation"]', namespaces=self.nsmap)[0]
         title.text = f"{self.md__title} ({self.manifestation_signatur})"
-        if self.manifestation['data']['attributes']['field_shorttitle']:
+        json_dump['man_title'] = f"{self.md__title} ({self.manifestation_signatur})"
+        try:
+            s_title_t = self.manifestation['data']['attributes']['field_shorttitle']
             s_title = doc.xpath('//tei:title[@type="manifestation_short"]', namespaces=self.nsmap)[0]
-            s_title.text = f"{self.manifestation['data']['attributes']['field_shorttitle']['value']}"
+            s_title.text = s_title_t['value']
+            json_dump['man_shorttitle'] = s_title_t['value']
+        except (KeyError, TypeError):
+            print("No short title found!")
         p_title = doc.xpath('//tei:title[@type="publication"]', namespaces=self.nsmap)[0]
         p_rs = ET.Element("{http://www.tei-c.org/ns/1.0}rs")
         p_rs.attrib["type"] = "bibl"
+        json_dump["publication"] = {}
         try:
             p_rs.attrib["ref"] = f"#bibl__{self.publication['data']['id']}"
-        except TypeError or KeyError:
-            p_rs.attrib["ref"] = f"#bibl__{self.publication}"
+            json_dump["publication"]["id"] = f"bibl__{self.publication['data']['id']}"
+        except (KeyError, TypeError):
+            p_rs.attrib["ref"] = f"#bibl__{self.manifestation_id}"
+            json_dump["publication"]["id"] = f"bibl__{self.manifestation_id}"
         try:
-            p_rs.text = f"{self.publication['data']['attributes']['title']}"
-        except TypeError or KeyError:
-            p_rs.text = f"{self.publication}"
+            p_rs.text = self.publication['data']['attributes']['title']
+            json_dump["publication"]["title"] = self.publication['data']['attributes']['title']
+        except (KeyError, TypeError):
+            p_rs.text = self.manifestation_id
+            json_dump["publication"]["title"] = self.manifestation_id
+        print(json_dump)
         p_title.append(p_rs)
         w_title = doc.xpath('//tei:title[@type="work"]', namespaces=self.nsmap)[0]
         w_rs = ET.Element("{http://www.tei-c.org/ns/1.0}rs")
@@ -425,100 +437,185 @@ class FrdManifestation(FrdClient):
         titleStmt = doc.xpath('//tei:titleStmt', namespaces=self.nsmap)[0]
         author = ET.Element("{http://www.tei-c.org/ns/1.0}author")
         try:
-            author.text = f"{self.author['data']['attributes']['name']}"
-        except TypeError or KeyError:
-            author.text = f"{self.author}"
-        titleStmt.insert(3, author)
+            author.text = self.author['data']['attributes']['name']
+        except (KeyError, TypeError):
+            author.text = "Freud, Sigmund"
+        titleStmt.insert(4, author)
         fileDesc = doc.xpath('//tei:fileDesc', namespaces=self.nsmap)[0]
         sourceDesc = ET.Element("{http://www.tei-c.org/ns/1.0}sourceDesc")
         bibl = ET.Element("{http://www.tei-c.org/ns/1.0}bibl")
-        if self.publication is not None:
-            try:
-                bibl.attrib["{http://www.w3.org/XML/1998/namespace}id"] = f"bibl__{self.publication['data']['id']}"
-            except KeyError or TypeError:
-                return
-            try:
-                if self.publication['data']['attributes']['field_secondary_title']:
-                    bibl_title = ET.Element("{http://www.tei-c.org/ns/1.0}title")
-                    bibl_title.attrib['type'] = "sub"
-                    bibl_title.text = f"{self.publication['data']['attributes']['field_secondary_title']['value']}"
-                    bibl.append(bibl_title)
-            except KeyError or TypeError:
-                return
-            try:
-                if self.publication['data']['attributes']['field_shorttitle'] is not None:
-                    bibl_title = ET.Element("{http://www.tei-c.org/ns/1.0}title")
-                    bibl_title.attrib['type'] = "short"
-                    bibl_title.text = f"{self.publication['data']['attributes']['field_shorttitle']['value']}"
-                    bibl.append(bibl_title)
-            except KeyError or TypeError:
-                return
-            try:
-                if self.publication['data']['attributes']['field_titel'] is not None:
-                    bibl_title = ET.Element("{http://www.tei-c.org/ns/1.0}title")
-                    bibl_title.attrib['type'] = "main"
-                    bibl_title.text = f"{self.publication['data']['attributes']['field_titel']['value']}"
-                    bibl.append(bibl_title)
-            except KeyError or TypeError:
-                return
-            try:
-                places = self.publication['data']['attributes']['field_publication_place']
-                for x in places:
-                    place = x["value"]
-                    bibl_place = ET.Element("{http://www.tei-c.org/ns/1.0}pubPlace")
-                    bibl_place.text = place
-                    bibl.append(bibl_place)
-            except KeyError or TypeError:
-                return
-            try:
-                if self.publication['data']['attributes']['field_publication_year'] is not None:
-                    bibl_date = ET.Element("{http://www.tei-c.org/ns/1.0}date")
-                    bibl_date.attrib['when'] = f"{self.publication['data']['attributes']['field_publication_year']}"
-                    bibl_date.text = f"{self.publication['data']['attributes']['field_publication_year']}"
-                    bibl.append(bibl_date)
-            except KeyError or TypeError:
-                return
-            try:
-                if self.publication['data']['attributes']['field_band'] is not None:
-                    bibl_scope = ET.Element("{http://www.tei-c.org/ns/1.0}biblScope")
-                    bibl_scope.text = f"{self.publication['data']['attributes']['field_band']['value']}"
-                    bibl.append(bibl_scope)
-            except KeyError or TypeError:
-                return
-            if self.publisher is not None:
-                try:
+        try:
+            bibl_type = self.publication['data']['type'].replace('--', '/')
+            bibl.attrib["{http://www.w3.org/XML/1998/namespace}id"] = f"{bibl_type}/{self.publication['data']['id']}"
+        except (KeyError, TypeError):
+            print("No publication ID found!")
+        msContents = ET.Element("{http://www.tei-c.org/ns/1.0}msContents")
+        msItem = ET.Element("{http://www.tei-c.org/ns/1.0}msItem")
+        try:
+            bibl_title = ET.Element("{http://www.tei-c.org/ns/1.0}title")
+            bibl_title.attrib['type'] = "main"
+            bibl_title_obj = self.publication['data']['attributes']['field_titel']
+            bibl_title.text = bibl_title_obj['value']
+            bibl.append(bibl_title)
+            msTitle = ET.Element("{http://www.tei-c.org/ns/1.0}title")
+            msTitle.attrib['type'] = "main"
+            msTitle.text = bibl_title_obj['value']
+            msItem.append(msTitle)
+        except (KeyError, TypeError):
+            print("No publication main title found!")
+        try:
+            bibl_title = ET.Element("{http://www.tei-c.org/ns/1.0}title")
+            bibl_title.attrib['type'] = "sub"
+            bibl_title_obj = self.publication['data']['attributes']['field_secondary_title']
+            bibl_title.text = bibl_title_obj['value']
+            bibl.append(bibl_title)
+            msTitle = ET.Element("{http://www.tei-c.org/ns/1.0}title")
+            msTitle.attrib['type'] = "sub"
+            msTitle.text = bibl_title_obj['value']
+            msItem.append(msTitle)
+        except (KeyError, TypeError):
+            print("No publication secodnary title found!")
+        try:
+            bibl_title = ET.Element("{http://www.tei-c.org/ns/1.0}title")
+            bibl_title.attrib['type'] = "short"
+            bibl_title_obj = self.publication['data']['attributes']['field_shorttitle']
+            bibl_title.text = bibl_title_obj['value']
+            bibl.append(bibl_title)
+            msTitle = ET.Element("{http://www.tei-c.org/ns/1.0}title")
+            msTitle.attrib['type'] = "short"
+            msTitle.text = bibl_title_obj['value']
+            msItem.append(msTitle)
+        except (KeyError, TypeError):
+            print("No publication short title found!")
+        try:
+            places = self.publication['data']['attributes']['field_publication_place']
+            for x in places:
+                place = x["value"]
+                bibl_place = ET.Element("{http://www.tei-c.org/ns/1.0}pubPlace")
+                bibl_place.text = place
+                bibl.append(bibl_place)
+        except (KeyError, TypeError):
+            print("No publication place(s) found!")
+        try:
+            bibl_date = ET.Element("{http://www.tei-c.org/ns/1.0}date")
+            bibl_date_obj = self.publication['data']['attributes']['field_publication_year']
+            bibl_date.attrib['when-iso'] = bibl_date_obj
+            bibl_date.text = bibl_date_obj[:4]
+            bibl.append(bibl_date)
+        except (KeyError, TypeError):
+            print("No publication year found!")
+        try:
+            bibl_scope = ET.Element("{http://www.tei-c.org/ns/1.0}biblScope")
+            bibl_scope_obj = self.publication['data']['attributes']['field_band']
+            bibl_scope.text = bibl_scope_obj['value']
+            bibl.append(bibl_scope)
+        except (KeyError, TypeError):
+            print("No publication field band found!")
+        try:
+            if type(self.publisher) is list:
+                for x in self.publisher:
                     bibl_publisher = ET.Element("{http://www.tei-c.org/ns/1.0}publisher")
-                    bibl_publisher.text = self.publisher['data']['attributes']['name']
+                    pub_type = x['data']['type'].replace('--', '/')
+                    bibl_publisher.attrib['key'] = f"{pub_type}/{x['data']['id']}"
+                    bibl_publisher.text = f"{x['data']['attributes']['name']} (field_publisher)"
                     bibl.append(bibl_publisher)
-                except KeyError or TypeError:
-                    return
-            if self.herausgeber is not None:
-                try:
-                    if type(self.herausgeber) is list:
-                        for x in self.herausgeber:
-                            bibl_publisher = ET.Element("{http://www.tei-c.org/ns/1.0}publisher")
-                            bibl_publisher.text = x['data']['attributes']['name']
-                            bibl.append(bibl_publisher)
-                    else:
-                        bibl_publisher = ET.Element("{http://www.tei-c.org/ns/1.0}author")
-                        bibl_publisher.text = self.herausgeber['data']['attributes']['name']
-                        bibl.append(bibl_publisher)
-                except KeyError or TypeError:
-                    return
-            if self.pub_author is not None:
-                try:
-                    if type(self.pub_author) is list:
-                        for x in self.pub_author:
-                            bibl_author = ET.Element("{http://www.tei-c.org/ns/1.0}author")
-                            bibl_author.text = x['data']['attributes']['name']
-                            bibl.append(bibl_author)
-                    else:
-                        bibl_author = ET.Element("{http://www.tei-c.org/ns/1.0}author")
-                        bibl_author.text = self.pub_author['data']['attributes']['name']
-                        bibl.append(bibl_author)
-                except KeyError or TypeError:
-                    return
+            else:
+                bibl_publisher = ET.Element("{http://www.tei-c.org/ns/1.0}publisher")
+                pub_type = self.publisher['data']['type'].replace('--', '/')
+                bibl_publisher.attrib['key'] = f"{pub_type}/{self.publisher['data']['id']}"
+                bibl_publisher.text = f"{self.publisher['data']['attributes']['name']} (field_publisher)"
+                bibl.append(bibl_publisher)
+        except (KeyError, TypeError):
+            print("No publication publisher found!")
+        try:
+            if type(self.herausgeber) is list:
+                for x in self.herausgeber:
+                    bibl_herausgeber = ET.Element("{http://www.tei-c.org/ns/1.0}editor")
+                    pub_type = x['data']['type'].replace('--', '/')
+                    bibl_herausgeber.attrib['key'] = f"{pub_type}/{x['data']['id']}"
+                    bibl_herausgeber.text = f"{x['data']['attributes']['name']} (field_herausgeber)"
+                    bibl.append(bibl_herausgeber)
+                    msAuthor = ET.Element("{http://www.tei-c.org/ns/1.0}author")
+                    msAuthor.attrib['key'] = f"{pub_type}/{x['data']['id']}"
+                    msAuthor.text = f"{x['data']['attributes']['name']} (field_herausgeber)"
+                    msItem.append(msAuthor)
+            else:
+                bibl_herausgeber = ET.Element("{http://www.tei-c.org/ns/1.0}editor")
+                pub_type = self.herausgeber['data']['type'].replace('--', '/')
+                bibl_herausgeber.attrib['key'] = f"{pub_type}/{self.herausgeber['data']['id']}"
+                bibl_herausgeber.text = f"{self.herausgeber['data']['attributes']['name']} (field_herausgeber)"
+                bibl.append(bibl_herausgeber)
+                msAuthor = ET.Element("{http://www.tei-c.org/ns/1.0}author")
+                msAuthor.attrib['key'] = f"{pub_type}/{self.herausgeber['data']['id']}"
+                msAuthor.text = f"{self.herausgeber['data']['attributes']['name']} (field_herausgeber)"
+                msItem.append(msAuthor)
+        except (KeyError, TypeError):
+            print("No publication herausgeber found!")
+        try:
+            if type(self.pub_author) is list:
+                for x in self.pub_author:
+                    pub_author = ET.Element("{http://www.tei-c.org/ns/1.0}author")
+                    pub_type = x['data']['type'].replace('--', '/')
+                    pub_author.attrib['key'] = f"{pub_type}/{x['data']['id']}"
+                    pub_author.text = f"{x['data']['attributes']['name']} (field_authors)"
+                    bibl.append(pub_author)
+                    msAuthor = ET.Element("{http://www.tei-c.org/ns/1.0}author")
+                    msAuthor.attrib['key'] = f"{pub_type}/{x['data']['id']}"
+                    msAuthor.text = f"{x['data']['attributes']['name']} (field_authors)"
+                    msItem.append(msAuthor)
+            else:
+                pub_author = ET.Element("{http://www.tei-c.org/ns/1.0}author")
+                pub_type = self.pub_author['data']['type'].replace('--', '/')
+                pub_author.attrib['key'] = f"{pub_type}/{self.pub_author['data']['id']}"
+                pub_author.text = f"{self.pub_author['data']['attributes']['name']} (field_authors)"
+                bibl.append(pub_author)
+                msAuthor = ET.Element("{http://www.tei-c.org/ns/1.0}author")
+                msAuthor.attrib['key'] = f"{pub_type}/{self.pub_author['data']['id']}"
+                msAuthor.text = f"{self.pub_author['data']['attributes']['name']} (field_authors)"
+                msItem.append(msAuthor)
+        except (KeyError, TypeError):
+            print("No publication author(s) found!")
+        try:
+            if type(self.pub_editors) is list:
+                for x in self.pub_editors:
+                    pub_editors = ET.Element("{http://www.tei-c.org/ns/1.0}editor")
+                    pub_type = x['data']['type'].replace('--', '/')
+                    pub_editors.attrib['key'] = f"{pub_type}/{x['data']['id']}"
+                    pub_editors.text = f"{x['data']['attributes']['name']} (field_editors)"
+                    bibl.append(pub_editors)
+                    msEditor = ET.Element("{http://www.tei-c.org/ns/1.0}editor")
+                    msEditor.attrib['key'] = f"{pub_type}/{x['data']['id']}"
+                    msEditor.text = f"{x['data']['attributes']['name']} (field_editors)"
+                    msItem.append(msEditor)
+            else:
+                pub_editors = ET.Element("{http://www.tei-c.org/ns/1.0}editor")
+                pub_type = self.pub_editors['data']['type'].replace('--', '/')
+                pub_editors.attrib['key'] = f"{pub_type}/{self.pub_editors['data']['id']}"
+                pub_editors.text = f"{self.pub_editors['data']['attributes']['name']} (field_editors)"
+                bibl.append(pub_editors)
+                msEditor = ET.Element("{http://www.tei-c.org/ns/1.0}editor")
+                msEditor.attrib['key'] = f"{pub_type}/{pub_editors['data']['id']}"
+                msEditor.text = f"{pub_editors['data']['attributes']['name']} (field_editors)"
+                msItem.append(msEditor)
+        except (KeyError, TypeError):
+            print("No publication editor(s) found!")
+        msDesc = ET.Element("{http://www.tei-c.org/ns/1.0}msDesc")
+        try:
+            msIdentifier = ET.Element("{http://www.tei-c.org/ns/1.0}msIdentifier")
+            idno = ET.Element("{http://www.tei-c.org/ns/1.0}idno")
+            msType = self.repository['data']['type']
+            idno.text = f"{msType}__{self.repository['data']['id']}"
+            repository = ET.Element("{http://www.tei-c.org/ns/1.0}repository")
+            repository.text = self.repository['data']['attributes']['name']
+            msIdentifier.append(repository)
+            msIdentifier.append(idno)
+            msDesc.append(msIdentifier)
+        except (KeyError, TypeError):
+            print("It seems there is not 'filed_aufbewahrungsort'")
+        msContents.append(msItem)
+        msDesc.append(msContents)
         sourceDesc.append(bibl)
+        sourceDesc.append(msDesc)
         fileDesc.insert(4, sourceDesc)
         body = doc.xpath('//tei:body', namespaces=self.nsmap)[0]
         pages = self.pages
@@ -558,24 +655,26 @@ class FrdManifestation(FrdClient):
 
         :return: json
         """
-        if self.manifestation['data']['relationships'][field_type]['data'] is not None:
-            try:
-                item = self.manifestation['data']['relationships'][field_type]['data']
-                item_id = item['id']
-                node_type = item['type'].split('--')[1]
-                taxonomy = item['type'].split('--')[0]
-                url = f"{self.endpoint}{taxonomy}/{node_type}/{item_id}"
-                r = requests.get(
-                    url,
-                    cookies=self.cookie,
-                    allow_redirects=True
-                )
-                result = r.json()
-                return result
-            except KeyError or TypeError:
-                print(f"{field_type} is null")
-        else:
-            return
+        try:
+            item = self.manifestation['data']['relationships'][field_type]['data']
+        except (KeyError, TypeError):
+            print(f"looks like there is no {field_type}")
+            return {}
+        try:
+            item_id = item['id']
+        except (KeyError, TypeError):
+            print(f"looks like there is not ID for {field_type}")
+            return {}
+        node_type = item['type'].split('--')[1]
+        taxonomy = item['type'].split('--')[0]
+        url = f"{self.endpoint}{taxonomy}/{node_type}/{item_id}"
+        r = requests.get(
+            url,
+            cookies=self.cookie,
+            allow_redirects=True
+        )
+        result = r.json()
+        return result
 
     def get_fields_any_any(self, field_type, get_fields):
         """requests manifestation 'relationships' fields
@@ -584,40 +683,51 @@ class FrdManifestation(FrdClient):
 
         :return: json
         """
-        if get_fields is not None:
-            try:
-                field_any = get_fields
-                item = field_any['data']['relationships'][field_type]['data']
-                if type(item) is list:
-                    result = []
-                    for x in item:
-                        item_id = x['id']
-                        node_type = x['type'].split('--')[1]
-                        taxonomy = x['type'].split('--')[0]
-                        url = f"{self.endpoint}{taxonomy}/{node_type}/{item_id}"
-                        r = requests.get(
-                            url,
-                            cookies=self.cookie,
-                            allow_redirects=True
-                        )
-                        res = r.json()
-                        result.append(res)
-                else:
-                    item_id = item['id']
-                    node_type = item['type'].split('--')[1]
-                    taxonomy = item['type'].split('--')[0]
-                    url = f"{self.endpoint}{taxonomy}/{node_type}/{item_id}"
-                    r = requests.get(
-                        url,
-                        cookies=self.cookie,
-                        allow_redirects=True
-                    )
-                    result = r.json()
-                return result
-            except KeyError or TypeError:
-                print(f"{field_type} is null")
+        try:
+            get_fields['data']['id']
+        except (KeyError, TypeError):
+            print("looks like there is no ID for get_fields")
+            return {}
+        try:
+            item = get_fields['data']['relationships'][field_type]['data']
+        except (KeyError, TypeError):
+            print(f"looks like there is no {field_type}")
+            return {}
+        if type(item) is list:
+            result = []
+            for x in item:
+                try:
+                    item_id = x['id']
+                except (KeyError, TypeError):
+                    print(f"looks like there is not ID for {field_type}")
+                    return {}
+                node_type = x['type'].split('--')[1]
+                taxonomy = x['type'].split('--')[0]
+                url = f"{self.endpoint}{taxonomy}/{node_type}/{item_id}"
+                r = requests.get(
+                    url,
+                    cookies=self.cookie,
+                    allow_redirects=True
+                )
+                res = r.json()
+                result.append(res)
+            return result
         else:
-            return
+            try:
+                item_id = item['id']
+            except (KeyError, TypeError):
+                print(f"looks like there is not ID for {field_type}")
+                return {}
+            node_type = item['type'].split('--')[1]
+            taxonomy = item['type'].split('--')[0]
+            url = f"{self.endpoint}{taxonomy}/{node_type}/{item_id}"
+            r = requests.get(
+                url,
+                cookies=self.cookie,
+                allow_redirects=True
+            )
+            result = r.json()
+            return result
 
     def __init__(
         self,
@@ -629,26 +739,13 @@ class FrdManifestation(FrdClient):
         self.manifestation_endpoint = f"{self.endpoint}node/manifestation/{manifestation_id}"
         self.manifestation = self.get_manifest()
         self.werk = self.manifestation['included'][0]
-        try:
-            self.publication = self.get_fields_any('field_published_in')
-        except TypeError or KeyError:
-            self.publication = self.manifestation_id
-        try:
-            self.author = self.get_fields_any('field_authors')
-        except TypeError or KeyError:
-            self.author = "Freud, Sigmund"
-        try:
-            self.publisher = self.get_fields_any_any('field_publisher', self.publication)
-        except TypeError or KeyError:
-            self.publisher = None
-        try:
-            self.herausgeber = self.get_fields_any_any('field_herausgeber', self.publication)
-        except TypeError or KeyError:
-            self.herausgeber = None
-        try:
-            self.pub_author = self.get_fields_any_any('field_authors', self.publication)
-        except TypeError or KeyError:
-            self.pub_author = None
+        self.publication = self.get_fields_any('field_published_in')
+        self.author = self.get_fields_any('field_authors')
+        self.repository = self.get_fields_any('field_aufbewahrungsort')
+        self.publisher = self.get_fields_any_any('field_publisher', self.publication)
+        self.herausgeber = self.get_fields_any_any('field_herausgeber', self.publication)
+        self.pub_author = self.get_fields_any_any('field_authors', self.publication)
+        self.pub_editors = self.get_fields_any_any('field_editors', self.publication)
         self.werk_folder = self.werk['attributes']['path']['alias']
         # self.manifestation_folder = self.manifestation['attributes']['path']['alias']
         self.man_attrib = self.manifestation['data']['attributes']
