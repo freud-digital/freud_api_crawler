@@ -5,10 +5,11 @@ from collections import defaultdict
 
 import requests
 import lxml.etree as ET
+import jinja2
 
 from freud_api_crawler.string_utils import clean_markup, extract_page_nr, always_https, normalize_white_space
 
-from freud_api_crawler.tei_utils import make_pb
+# from freud_api_crawler.tei_utils import make_pb
 
 FRD_BASE = "https://www.freud-edition.net"
 FRD_API = os.environ.get('FRD_API', f'{FRD_BASE}/jsonapi/')
@@ -384,7 +385,7 @@ class FrdManifestation(FrdClient):
         }
         return result
 
-    def make_xml(self, save=False, limit=True, dump=False):
+    def make_xml(self, save=False, limit=True, dump=False, refresh=False):
 
         """serializes a manifestation as XML/TEI document
 
@@ -393,250 +394,191 @@ class FrdManifestation(FrdClient):
 
         :return: A lxml.etree
         """
-        json_dump = {}
-        doc = self.tei_dummy
-        root_el = doc.xpath('//tei:TEI', namespaces=self.nsmap)[0]
-        root_el.attrib["{http://www.w3.org/XML/1998/namespace}base"] = "https://whatever.com"
-        root_el.attrib[
-            "{http://www.w3.org/XML/1998/namespace}id"
-        ] = f"manifestation__{self.manifestation_id}"
-        title = doc.xpath('//tei:title[@type="manifestation"]', namespaces=self.nsmap)[0]
-        title.text = f"{self.md__title} ({self.manifestation_signatur})"
-        json_dump['man_title'] = f"{self.md__title} ({self.manifestation_signatur})"
-        try:
-            s_title_t = self.manifestation['data']['attributes']['field_shorttitle']
-            s_title = doc.xpath('//tei:title[@type="manifestation_short"]', namespaces=self.nsmap)[0]
-            s_title.text = s_title_t['value']
-            json_dump['man_shorttitle'] = s_title_t['value']
-        except (KeyError, TypeError):
-            print("No short title found!")
-        p_title = doc.xpath('//tei:title[@type="publication"]', namespaces=self.nsmap)[0]
-        p_rs = ET.Element("{http://www.tei-c.org/ns/1.0}rs")
-        p_rs.attrib["type"] = "bibl"
-        json_dump["publication"] = {}
-        try:
-            p_rs.attrib["ref"] = f"#bibl__{self.publication['data']['id']}"
-            json_dump["publication"]["id"] = f"bibl__{self.publication['data']['id']}"
-        except (KeyError, TypeError):
-            p_rs.attrib["ref"] = f"#bibl__{self.manifestation_id}"
-            json_dump["publication"]["id"] = f"bibl__{self.manifestation_id}"
-        try:
-            p_rs.text = self.publication['data']['attributes']['title']
-            json_dump["publication"]["title"] = self.publication['data']['attributes']['title']
-        except (KeyError, TypeError):
-            p_rs.text = self.manifestation_id
-            json_dump["publication"]["title"] = self.manifestation_id
-        print(json_dump)
-        p_title.append(p_rs)
-        w_title = doc.xpath('//tei:title[@type="work"]', namespaces=self.nsmap)[0]
-        w_rs = ET.Element("{http://www.tei-c.org/ns/1.0}rs")
-        w_rs.attrib["type"] = "bibl"
-        w_rs.attrib["ref"] = f"#bibl__{self.werk['id']}"
-        w_title.append(w_rs)
-        w_rs.text = f"{self.werk['attributes']['title']}"
-        titleStmt = doc.xpath('//tei:titleStmt', namespaces=self.nsmap)[0]
-        author = ET.Element("{http://www.tei-c.org/ns/1.0}author")
-        try:
-            author.text = self.author['data']['attributes']['name']
-        except (KeyError, TypeError):
-            author.text = "Freud, Sigmund"
-        titleStmt.insert(4, author)
-        fileDesc = doc.xpath('//tei:fileDesc', namespaces=self.nsmap)[0]
-        sourceDesc = ET.Element("{http://www.tei-c.org/ns/1.0}sourceDesc")
-        bibl = ET.Element("{http://www.tei-c.org/ns/1.0}bibl")
-        try:
-            bibl_type = self.publication['data']['type'].replace('--', '/')
-            bibl.attrib["{http://www.w3.org/XML/1998/namespace}id"] = f"{bibl_type}/{self.publication['data']['id']}"
-        except (KeyError, TypeError):
-            print("No publication ID found!")
-        msContents = ET.Element("{http://www.tei-c.org/ns/1.0}msContents")
-        msItem = ET.Element("{http://www.tei-c.org/ns/1.0}msItem")
-        try:
-            bibl_title = ET.Element("{http://www.tei-c.org/ns/1.0}title")
-            bibl_title.attrib['type'] = "main"
-            bibl_title_obj = self.publication['data']['attributes']['field_titel']
-            bibl_title.text = bibl_title_obj['value']
-            bibl.append(bibl_title)
-            msTitle = ET.Element("{http://www.tei-c.org/ns/1.0}title")
-            msTitle.attrib['type'] = "main"
-            msTitle.text = bibl_title_obj['value']
-            msItem.append(msTitle)
-        except (KeyError, TypeError):
-            print("No publication main title found!")
-        try:
-            bibl_title = ET.Element("{http://www.tei-c.org/ns/1.0}title")
-            bibl_title.attrib['type'] = "sub"
-            bibl_title_obj = self.publication['data']['attributes']['field_secondary_title']
-            bibl_title.text = bibl_title_obj['value']
-            bibl.append(bibl_title)
-            msTitle = ET.Element("{http://www.tei-c.org/ns/1.0}title")
-            msTitle.attrib['type'] = "sub"
-            msTitle.text = bibl_title_obj['value']
-            msItem.append(msTitle)
-        except (KeyError, TypeError):
-            print("No publication secodnary title found!")
-        try:
-            bibl_title = ET.Element("{http://www.tei-c.org/ns/1.0}title")
-            bibl_title.attrib['type'] = "short"
-            bibl_title_obj = self.publication['data']['attributes']['field_shorttitle']
-            bibl_title.text = bibl_title_obj['value']
-            bibl.append(bibl_title)
-            msTitle = ET.Element("{http://www.tei-c.org/ns/1.0}title")
-            msTitle.attrib['type'] = "short"
-            msTitle.text = bibl_title_obj['value']
-            msItem.append(msTitle)
-        except (KeyError, TypeError):
-            print("No publication short title found!")
-        try:
-            places = self.publication['data']['attributes']['field_publication_place']
-            for x in places:
-                place = x["value"]
-                bibl_place = ET.Element("{http://www.tei-c.org/ns/1.0}pubPlace")
-                bibl_place.text = place
-                bibl.append(bibl_place)
-        except (KeyError, TypeError):
-            print("No publication place(s) found!")
-        try:
-            bibl_date = ET.Element("{http://www.tei-c.org/ns/1.0}date")
-            bibl_date_obj = self.publication['data']['attributes']['field_publication_year']
-            bibl_date.attrib['when-iso'] = bibl_date_obj
-            bibl_date.text = bibl_date_obj[:4]
-            bibl.append(bibl_date)
-        except (KeyError, TypeError):
-            print("No publication year found!")
-        try:
-            bibl_scope = ET.Element("{http://www.tei-c.org/ns/1.0}biblScope")
-            bibl_scope_obj = self.publication['data']['attributes']['field_band']
-            bibl_scope.text = bibl_scope_obj['value']
-            bibl.append(bibl_scope)
-        except (KeyError, TypeError):
-            print("No publication field band found!")
-        try:
-            if type(self.publisher) is list:
-                for x in self.publisher:
-                    bibl_publisher = ET.Element("{http://www.tei-c.org/ns/1.0}publisher")
-                    pub_type = x['data']['type'].replace('--', '/')
-                    bibl_publisher.attrib['key'] = f"{pub_type}/{x['data']['id']}"
-                    bibl_publisher.text = f"{x['data']['attributes']['name']} (field_publisher)"
-                    bibl.append(bibl_publisher)
+        if dump:
+            json_dump = {}
+            json_dump["id"] = f"manifestation__{self.manifestation_id}"
+            json_dump['man_title'] = f"{self.md__title} ({self.manifestation_signatur})"
+            try:
+                s_title_t = self.manifestation['data']['attributes']['field_shorttitle']
+                json_dump['man_shorttitle'] = s_title_t['value']
+            except (KeyError, TypeError):
+                print("No short title found!")
+            json_dump["publication"] = {}
+            try:
+                json_dump["publication"]["id"] = f"bibl__{self.publication['data']['id']}"
+            except (KeyError, TypeError):
+                json_dump["publication"]["id"] = f"bibl__{self.manifestation_id}"
+            try:
+                json_dump["publication"]["title"] = self.publication['data']['attributes']['title']
+            except (KeyError, TypeError):
+                json_dump["publication"]["title"] = self.manifestation_id
+            json_dump["work"] = {}
+            json_dump["work"]["id"] = f"bibl__{self.werk['id']}"
+            json_dump["work"]["title"] = self.werk['attributes']['title']
+            try:
+                json_dump["author"] = self.author['data']['attributes']['name']
+            except (KeyError, TypeError):
+                json_dump["author"] = "Freud, Sigmund"
+            try:
+                bibl_type = self.publication['data']['type'].replace('--', '/')
+                json_dump["publication"]["id"] = f"{bibl_type}/{self.publication['data']['id']}"
+            except (KeyError, TypeError):
+                print("No publication ID found!")
+            try:
+                bibl_title_obj = self.publication['data']['attributes']['field_titel']
+                json_dump["publication"]["title_main"] = bibl_title_obj['value']
+            except (KeyError, TypeError):
+                print("No publication main title found!")
+            try:
+                bibl_title_obj = self.publication['data']['attributes']['field_secondary_title']
+                json_dump["publication"]["title_sub"] = bibl_title_obj['value']
+            except (KeyError, TypeError):
+                print("No publication secodnary title found!")
+            try:
+                bibl_title_obj = self.publication['data']['attributes']['field_shorttitle']
+                json_dump["publication"]["title_short"] = bibl_title_obj['value']
+            except (KeyError, TypeError):
+                print("No publication short title found!")
+            try:
+                places = self.publication['data']['attributes']['field_publication_place']
+                for x in places:
+                    place = x["value"]
+                    json_dump["publication"]["places"] = []
+                    json_dump["publication"]["places"].append({"name": place})
+            except (KeyError, TypeError):
+                print("No publication place(s) found!")
+            try:
+                bibl_date_obj = self.publication['data']['attributes']['field_publication_year']
+                json_dump["publication"]["date"] = bibl_date_obj
+            except (KeyError, TypeError):
+                print("No publication year found!")
+            try:
+                bibl_scope_obj = self.publication['data']['attributes']['field_band']
+                json_dump["publication"]["biblScope"] = bibl_scope_obj['value']
+            except (KeyError, TypeError):
+                print("No publication field band found!")
+            try:
+                if type(self.publisher) is list:
+                    for x in self.publisher:
+                        pub_type = x['data']['type'].replace('--', '/')
+                        json_dump["publication"]["publisher"] = []
+                        json_dump["publication"]["publisher"].append(
+                            {
+                                "id": f"{pub_type}/{x['data']['id']}",
+                                "name": f"{x['data']['attributes']['name']} (field_publisher)"
+                            }
+                        )
+                else:
+                    pub_type = self.publisher['data']['type'].replace('--', '/')
+                    json_dump["publication"]["publisher"] = []
+                    json_dump["publication"]["publisher"] = [
+                        {
+                            "id": f"{pub_type}/{self.publisher['data']['id']}",
+                            "name": f"{self.publisher['data']['attributes']['name']} (field_publisher)"
+                        }
+                    ]
+            except (KeyError, TypeError):
+                print("No publication publisher found!")
+            try:
+                if type(self.herausgeber) is list:
+                    for x in self.herausgeber:
+                        pub_type = x['data']['type'].replace('--', '/')
+                        json_dump["publication"]["herausgeber"] = []
+                        json_dump["publication"]["herausgeber"].append(
+                            {
+                                "id": f"{pub_type}/{x['data']['id']}",
+                                "name": f"{x['data']['attributes']['name']} (field_herausgeber)"
+                            }
+                        )
+                else:
+                    pub_type = self.herausgeber['data']['type'].replace('--', '/')
+                    json_dump["publication"]["herausgeber"] = []
+                    json_dump["publication"]["herausgeber"].append(
+                        {
+                            "id": f"{pub_type}/{self.herausgeber['data']['id']}",
+                            "name": f"{self.herausgeber['data']['attributes']['name']} (field_herausgeber)"
+                        }
+                    )
+            except (KeyError, TypeError):
+                print("No publication herausgeber found!")
+            try:
+                if type(self.pub_author) is list:
+                    for x in self.pub_author:
+                        pub_type = x['data']['type'].replace('--', '/')
+                        json_dump["publication"]["author"] = []
+                        json_dump["publication"]["author"].append(
+                            {
+                                "id": f"{pub_type}/{x['data']['id']}",
+                                "name": f"{x['data']['attributes']['name']} (field_authors)"
+                            }
+                        )
+                else:
+                    pub_type = self.pub_author['data']['type'].replace('--', '/')
+                    json_dump["publication"]["author"] = []
+                    json_dump["publication"]["author"].append(
+                        {
+                            "id": f"{pub_type}/{self.pub_author['data']['id']}",
+                            "name": f"{self.pub_author['data']['attributes']['name']} (field_authors)"
+                        }
+                    )
+            except (KeyError, TypeError):
+                print("No publication author(s) found!")
+            try:
+                if type(self.pub_editors) is list:
+                    for x in self.pub_editors:
+                        pub_type = x['data']['type'].replace('--', '/')
+                        json_dump["publication"]["editor"] = []
+                        json_dump["publication"]["editor"].append(
+                            {
+                                "id": f"{pub_type}/{x['data']['id']}",
+                                "name": f"{x['data']['attributes']['name']} (field_editors)"
+                            }
+                        )
+                else:
+                    pub_type = self.pub_editors['data']['type'].replace('--', '/')
+                    json_dump["publication"]["editor"] = []
+                    json_dump["publication"]["editor"].append(
+                        {
+                            "id": f"{pub_type}/{self.pub_editors['data']['id']}",
+                            "name": f"{self.pub_editors['data']['attributes']['name']} (field_editors)"
+                        }
+                    )
+            except (KeyError, TypeError):
+                print("No publication editor(s) found!")
+            try:
+                msType = self.repository['data']['type']
+                json_dump["repository"] = {
+                    "id": f"{msType}__{self.repository['data']['id']}",
+                    "name": self.repository['data']['attributes']['name']
+                }
+            except (KeyError, TypeError):
+                print("It seems there is not 'filed_aufbewahrungsort'")
+            json_dump["pages"] = []
+            pages = self.pages
+            if limit:
+                actual_pages = pages[:2]
             else:
-                bibl_publisher = ET.Element("{http://www.tei-c.org/ns/1.0}publisher")
-                pub_type = self.publisher['data']['type'].replace('--', '/')
-                bibl_publisher.attrib['key'] = f"{pub_type}/{self.publisher['data']['id']}"
-                bibl_publisher.text = f"{self.publisher['data']['attributes']['name']} (field_publisher)"
-                bibl.append(bibl_publisher)
-        except (KeyError, TypeError):
-            print("No publication publisher found!")
-        try:
-            if type(self.herausgeber) is list:
-                for x in self.herausgeber:
-                    bibl_herausgeber = ET.Element("{http://www.tei-c.org/ns/1.0}editor")
-                    pub_type = x['data']['type'].replace('--', '/')
-                    bibl_herausgeber.attrib['key'] = f"{pub_type}/{x['data']['id']}"
-                    bibl_herausgeber.text = f"{x['data']['attributes']['name']} (field_herausgeber)"
-                    bibl.append(bibl_herausgeber)
-                    msAuthor = ET.Element("{http://www.tei-c.org/ns/1.0}author")
-                    msAuthor.attrib['key'] = f"{pub_type}/{x['data']['id']}"
-                    msAuthor.text = f"{x['data']['attributes']['name']} (field_herausgeber)"
-                    msItem.append(msAuthor)
-            else:
-                bibl_herausgeber = ET.Element("{http://www.tei-c.org/ns/1.0}editor")
-                pub_type = self.herausgeber['data']['type'].replace('--', '/')
-                bibl_herausgeber.attrib['key'] = f"{pub_type}/{self.herausgeber['data']['id']}"
-                bibl_herausgeber.text = f"{self.herausgeber['data']['attributes']['name']} (field_herausgeber)"
-                bibl.append(bibl_herausgeber)
-                msAuthor = ET.Element("{http://www.tei-c.org/ns/1.0}author")
-                msAuthor.attrib['key'] = f"{pub_type}/{self.herausgeber['data']['id']}"
-                msAuthor.text = f"{self.herausgeber['data']['attributes']['name']} (field_herausgeber)"
-                msItem.append(msAuthor)
-        except (KeyError, TypeError):
-            print("No publication herausgeber found!")
-        try:
-            if type(self.pub_author) is list:
-                for x in self.pub_author:
-                    pub_author = ET.Element("{http://www.tei-c.org/ns/1.0}author")
-                    pub_type = x['data']['type'].replace('--', '/')
-                    pub_author.attrib['key'] = f"{pub_type}/{x['data']['id']}"
-                    pub_author.text = f"{x['data']['attributes']['name']} (field_authors)"
-                    bibl.append(pub_author)
-                    msAuthor = ET.Element("{http://www.tei-c.org/ns/1.0}author")
-                    msAuthor.attrib['key'] = f"{pub_type}/{x['data']['id']}"
-                    msAuthor.text = f"{x['data']['attributes']['name']} (field_authors)"
-                    msItem.append(msAuthor)
-            else:
-                pub_author = ET.Element("{http://www.tei-c.org/ns/1.0}author")
-                pub_type = self.pub_author['data']['type'].replace('--', '/')
-                pub_author.attrib['key'] = f"{pub_type}/{self.pub_author['data']['id']}"
-                pub_author.text = f"{self.pub_author['data']['attributes']['name']} (field_authors)"
-                bibl.append(pub_author)
-                msAuthor = ET.Element("{http://www.tei-c.org/ns/1.0}author")
-                msAuthor.attrib['key'] = f"{pub_type}/{self.pub_author['data']['id']}"
-                msAuthor.text = f"{self.pub_author['data']['attributes']['name']} (field_authors)"
-                msItem.append(msAuthor)
-        except (KeyError, TypeError):
-            print("No publication author(s) found!")
-        try:
-            if type(self.pub_editors) is list:
-                for x in self.pub_editors:
-                    pub_editors = ET.Element("{http://www.tei-c.org/ns/1.0}editor")
-                    pub_type = x['data']['type'].replace('--', '/')
-                    pub_editors.attrib['key'] = f"{pub_type}/{x['data']['id']}"
-                    pub_editors.text = f"{x['data']['attributes']['name']} (field_editors)"
-                    bibl.append(pub_editors)
-                    msEditor = ET.Element("{http://www.tei-c.org/ns/1.0}editor")
-                    msEditor.attrib['key'] = f"{pub_type}/{x['data']['id']}"
-                    msEditor.text = f"{x['data']['attributes']['name']} (field_editors)"
-                    msItem.append(msEditor)
-            else:
-                pub_editors = ET.Element("{http://www.tei-c.org/ns/1.0}editor")
-                pub_type = self.pub_editors['data']['type'].replace('--', '/')
-                pub_editors.attrib['key'] = f"{pub_type}/{self.pub_editors['data']['id']}"
-                pub_editors.text = f"{self.pub_editors['data']['attributes']['name']} (field_editors)"
-                bibl.append(pub_editors)
-                msEditor = ET.Element("{http://www.tei-c.org/ns/1.0}editor")
-                msEditor.attrib['key'] = f"{pub_type}/{pub_editors['data']['id']}"
-                msEditor.text = f"{pub_editors['data']['attributes']['name']} (field_editors)"
-                msItem.append(msEditor)
-        except (KeyError, TypeError):
-            print("No publication editor(s) found!")
-        msDesc = ET.Element("{http://www.tei-c.org/ns/1.0}msDesc")
-        try:
-            msIdentifier = ET.Element("{http://www.tei-c.org/ns/1.0}msIdentifier")
-            idno = ET.Element("{http://www.tei-c.org/ns/1.0}idno")
-            msType = self.repository['data']['type']
-            idno.text = f"{msType}__{self.repository['data']['id']}"
-            repository = ET.Element("{http://www.tei-c.org/ns/1.0}repository")
-            repository.text = self.repository['data']['attributes']['name']
-            msIdentifier.append(repository)
-            msIdentifier.append(idno)
-            msDesc.append(msIdentifier)
-        except (KeyError, TypeError):
-            print("It seems there is not 'filed_aufbewahrungsort'")
-        msContents.append(msItem)
-        msDesc.append(msContents)
-        sourceDesc.append(bibl)
-        sourceDesc.append(msDesc)
-        fileDesc.insert(4, sourceDesc)
-        body = doc.xpath('//tei:body', namespaces=self.nsmap)[0]
-        pages = self.pages
-        if limit:
-            actual_pages = pages[:2]
-        else:
-            actual_pages = pages
-        for x in actual_pages:
-            page_json = self.get_page(x['id'])
-            pp = self.process_page(page_json)
-            div = ET.fromstring(pp['body'])
-            pb_el = make_pb(pp)
-            cur_div = div.xpath('//tei:div', namespaces=self.nsmap)[0]
-            cur_div.insert(0, pb_el)
-            body.append(div)
-        transform = ET.XSLT(self.xsl_doc)
-        tei = transform(doc)
-        if save:
+                actual_pages = pages
+            for x in actual_pages:
+                page_json = self.get_page(x['id'])
+                pp = self.process_page(page_json)
+                json_dump["pages"].append(pp)
             os.makedirs(os.path.join(self.save_dir, self.werk_signatur), exist_ok=True)
+            with open(self.save_path_json, 'w', encoding='utf8') as f:
+                json.dump(json_dump, f)
+        else:
+            with open(self.save_path_json, 'r', encoding='utf8') as f:
+                json_dump = json.load(f)
+        templateLoader = jinja2.FileSystemLoader(searchpath="./freud_api_crawler")
+        templateEnv = jinja2.Environment(loader=templateLoader)
+        template = templateEnv.get_template('./templates/tei.xml')
+        tei = template.render({"objects": [json_dump]})
+        tei = ET.fromstring(tei)
+        transform = ET.XSLT(self.xsl_doc)
+        tei = transform(tei)
+        if save:
             with open(self.save_path, 'wb') as f:
-                f.write(ET.tostring(tei, pretty_print=True, encoding="utf-8"))
+                f.write(tei)
         return tei
 
     def get_fe_werk_signatur(self):
@@ -765,8 +707,12 @@ class FrdManifestation(FrdClient):
         self.werk_signatur = self.get_fe_werk_signatur()
         self.manifestation_signatur = f"{self.werk_signatur}{self.man_attrib['field_signatur_sfe_type']}"
         self.file_name = f"sfe-{self.manifestation_signatur.replace('/', '__').replace('.', '_')}.xml"
+        self.file_name_json = f"sfe-{self.manifestation_signatur.replace('/', '__').replace('.', '_')}.json"
         self.save_path = os.path.join(
             self.save_dir, self.werk_signatur, self.file_name
+        )
+        self.save_path_json = os.path.join(
+            self.save_dir, self.werk_signatur, self.file_name_json
         )
 
 
