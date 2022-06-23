@@ -57,11 +57,17 @@ setup(
                 'freud_api_crawler/fixtures/make_tei.xslt',
             ]
         ),
+        (
+            'freud_api_crawler/templates',
+            [
+                'freud_api_crawler/templates/tei.xml',
+            ]
+        ),
     ],
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/acdh-oeaw/freud_api_crawler',
-    version='1.9.0',
+    version='1.9.1',
     zip_safe=False,
 )
