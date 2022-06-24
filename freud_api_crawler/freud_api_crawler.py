@@ -589,7 +589,7 @@ class FrdManifestation(FrdClient):
                     json_dump = json.load(f)
             except FileNotFoundError:
                 print(f"file {self.save_path_json} not found, switching dump=True and restarting")
-                json_dump = self.get_man_json_dump(dmp=True)
+                json_dump = self.get_man_json_dump(lmt=lmt, dmp=True)
         return json_dump
 
     def get_fe_werk_signatur(self):

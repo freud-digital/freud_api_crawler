@@ -69,6 +69,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/acdh-oeaw/freud_api_crawler',
-    version='1.9.5',
+    version='1.9.6',
     zip_safe=False,
 )
