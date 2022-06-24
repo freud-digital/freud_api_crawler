@@ -6,7 +6,7 @@
             <title type="manifestation">{{ man.man_title }}</title>
             <title type="manifestation_short">{{ man.man_shorttitle }}</title>
             <title type="publication">
-               <rs type="bibl" ref="#{{ man.publication.id }}">
+               <rs type="bibl" ref="#{{ man.publication.id|replace('/', '__') }}">
                   {{ man.publication.title }}
                </rs>
             </title>               
@@ -88,7 +88,7 @@
             <p>Maschinenlesbare Transkription der Publikationen von Sigmund Freud.</p>
          </seriesStmt>
          <sourceDesc>
-            <bibl>
+            <bibl xml:id="{{ man.publication.id|replace('/', '__') }}">
                {% if man.publication.title_main %}<title type="main">{{ man.publication.title_main }}</title>{% endif %}
                {% if man.publication.title_sub %}<title type="sub">{{ man.publication.title_sub }}</title>{% endif %}
                {% if man.publication.title_short %}<title type="short">{{ man.publication.title_short }}</title>{% endif %}
@@ -118,7 +118,10 @@
    </teiHeader>
    <text>
       <body>
-         {% for page in man.pages %}{{ page.body }}{% endfor %}
+{% for page in man.pages %}<div>
+            <pb n="{{ page.page_nr }}" xml:id="page__{{ page.id }}"/>
+            {{ page.body }}
+         </div>{% endfor %}
       </body>
    </text>
 </TEI>

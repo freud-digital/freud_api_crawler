@@ -367,8 +367,8 @@ class FrdManifestation(FrdClient):
             print(f"no content for manifestation_seite/{page_id}")
             print("#####################\n")
             body = "<p>BLANK</p>"
-        wrapped_body = f'<div xmlns="http://www.tei-c.org/ns/1.0" xml:id="page__{page_id}">{body}</div>'
-        cleaned_body = clean_markup(wrapped_body)
+        # wrapped_body = f'<div xmlns="http://www.tei-c.org/ns/1.0" xml:id="page__{page_id}">{body}</div>'
+        cleaned_body = clean_markup(body)
         cleaned_body = normalize_white_space(cleaned_body)
         faks = page_json['included'][0]
         page_nr = extract_page_nr(page_attributes['title'])
@@ -385,7 +385,7 @@ class FrdManifestation(FrdClient):
         }
         return result
 
-    def make_xml(self, save=False, limit=True, dump=False, refresh=False):
+    def make_xml(self, save=False, limit=True, dump=False):
 
         """serializes a manifestation as XML/TEI document
 
@@ -569,13 +569,14 @@ class FrdManifestation(FrdClient):
         else:
             with open(self.save_path_json, 'r', encoding='utf8') as f:
                 json_dump = json.load(f)
-        templateLoader = jinja2.FileSystemLoader(searchpath="./freud_api_crawler")
+        templateLoader = jinja2.FileSystemLoader(searchpath=["./freud_api_crawler", "."])
         templateEnv = jinja2.Environment(loader=templateLoader)
         template = templateEnv.get_template('./templates/tei.xml')
         tei = template.render({"objects": [json_dump]})
         tei = ET.fromstring(tei)
         transform = ET.XSLT(self.xsl_doc)
         tei = transform(tei)
+        # tei = ET.tostring(tei)
         if save:
             with open(self.save_path, 'wb') as f:
                 f.write(tei)

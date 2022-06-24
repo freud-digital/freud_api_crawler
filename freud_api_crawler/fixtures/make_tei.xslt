@@ -23,12 +23,8 @@
         ####################
 -->
 
-    <xsl:template match="tei:body">   
-        <body>
-            <div>
-                <xsl:apply-templates/>
-            </div>
-        </body>        
+    <xsl:template match="tei:div">   
+        <xsl:apply-templates/>
     </xsl:template>
     <xsl:template match="tei:div">   
         <xsl:apply-templates/>

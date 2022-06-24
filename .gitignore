@@ -120,3 +120,5 @@ hansi*
 */werke/*
 env.secret
 werke/
+config.py
+download_work.py
