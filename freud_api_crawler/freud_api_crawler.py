@@ -394,7 +394,24 @@ class FrdManifestation(FrdClient):
 
         :return: A lxml.etree
         """
-        if dump:
+        json_dump = self.get_man_json_dump(lmt=limit, dmp=dump)
+        templateLoader = jinja2.PackageLoader(
+            "freud_api_crawler", "templates"
+        )
+        templateEnv = jinja2.Environment(loader=templateLoader)
+        template = templateEnv.get_template('./tei.xml')
+        tei = template.render({"objects": [json_dump]})
+        tei = ET.fromstring(tei)
+        transform = ET.XSLT(self.xsl_doc)
+        tei = transform(tei)
+        # tei = ET.tostring(tei)
+        if save:
+            with open(self.save_path, 'wb') as f:
+                f.write(tei)
+        return tei
+
+    def get_man_json_dump(self, lmt=True, dmp=False):
+        if dmp:
             json_dump = {}
             json_dump["id"] = f"manifestation__{self.manifestation_id}"
             json_dump['man_title'] = f"{self.md__title} ({self.manifestation_signatur})"
@@ -555,7 +572,7 @@ class FrdManifestation(FrdClient):
                 print("It seems there is not 'filed_aufbewahrungsort'")
             json_dump["pages"] = []
             pages = self.pages
-            if limit:
+            if lmt:
                 actual_pages = pages[:2]
             else:
                 actual_pages = pages
@@ -567,20 +584,13 @@ class FrdManifestation(FrdClient):
             with open(self.save_path_json, 'w', encoding='utf8') as f:
                 json.dump(json_dump, f)
         else:
-            with open(self.save_path_json, 'r', encoding='utf8') as f:
-                json_dump = json.load(f)
-        templateLoader = jinja2.FileSystemLoader(searchpath=["./freud_api_crawler", "."])
-        templateEnv = jinja2.Environment(loader=templateLoader)
-        template = templateEnv.get_template('./templates/tei.xml')
-        tei = template.render({"objects": [json_dump]})
-        tei = ET.fromstring(tei)
-        transform = ET.XSLT(self.xsl_doc)
-        tei = transform(tei)
-        # tei = ET.tostring(tei)
-        if save:
-            with open(self.save_path, 'wb') as f:
-                f.write(tei)
-        return tei
+            try:
+                with open(self.save_path_json, 'r', encoding='utf8') as f:
+                    json_dump = json.load(f)
+            except FileNotFoundError:
+                print(f"file {self.save_path_json} not found, switching dump=True and restarting")
+                json_dump = self.get_man_json_dump(dmp=True)
+        return json_dump
 
     def get_fe_werk_signatur(self):
         r = requests.get(
