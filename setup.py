@@ -14,7 +14,8 @@ requirements = [
     'lxml>=4.8<5',
     'ndjson',
     'python-slugify>=6.0.0,<7',
-    'tqdm>=4.63.0,<5'
+    'tqdm>=4.63.0,<5',
+    'Jinja2>=3.1.2',
 ]
 
 setup_requirements = []
@@ -22,7 +23,7 @@ setup_requirements = []
 test_requirements = []
 
 setup(
-    author="Peter Andorfer",
+    author="Peter Andorfer, Daniel Stoxreiter",
     author_email='peter.andorfer@oeaw.ac.at',
     python_requires='>=3.7',
     classifiers=[
