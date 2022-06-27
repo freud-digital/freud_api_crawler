@@ -23,13 +23,13 @@
         ####################
 -->
 
-    <xsl:template match="tei:div">   
-        <xsl:apply-templates/>
+    <xsl:template match="tei:body">   
+        <body><div><xsl:apply-templates/></div></body>
     </xsl:template>
     <xsl:template match="tei:div">   
         <xsl:apply-templates/>
     </xsl:template>
-    <xsl:template match="tei:div/tei:p[position() = last()]">   
+    <xsl:template match="tei:div/tei:p[not(@class)][position() = last()]">
         <xsl:copy>
             <xsl:apply-templates/>
             <xsl:choose>                

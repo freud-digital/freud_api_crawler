@@ -7,7 +7,9 @@ CLEAN_UP_PATTERNS = [
     ('</p>', '<lb break="paragraph"/></p>\n'),
     ('-<lb break="paragraph"/></p>', '<lb break="no"/></p>'),
     ('‚', ','),
-    ('ı', 'i')
+    ('ı', 'i'),
+    ('<strong>', '<hi rendition="#bold">'),
+    ('</strong>', '</hi>'),
 ]
 
 

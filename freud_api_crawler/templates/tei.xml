@@ -96,9 +96,9 @@
                {% if man.publication.date %}<date when="{{ man.publication.date }}">{{ man.publication.date[:4] }}</date>{% endif %}
                {% if man.publication.biblScope %}<biblScope>{{ man.publication.biblScope }}</biblScope>{% endif %}
                {% if man.publication.publisher %}{% for pub in man.publication.publisher %}<publisher key="{{ pub.id }}">{{ pub.name }}</publisher>{% endfor %}{% endif %}
-               {% if man.publication.author %}{% for pub in man.publication.author %}<publisher key="{{ pub.id }}">{{ pub.name }}</publisher>{% endfor %}{% endif %}
-               {% if man.publication.herausgeber %}{% for pub in man.publication.herausgeber %}<publisher key="{{ pub.id }}">{{ pub.name }}</publisher>{% endfor %}{% endif %}
-               {% if man.publication.editor %}{% for pub in man.publication.editor %}<publisher key="{{ pub.id }}">{{ pub.name }}</publisher>{% endfor %}{% endif %}
+               {% if man.publication.author %}{% for pub in man.publication.author %}<author key="{{ pub.id }}">{{ pub.name }}</author>{% endfor %}{% endif %}
+               {% if man.publication.herausgeber %}{% for pub in man.publication.herausgeber %}<editor key="{{ pub.id }}">{{ pub.name }}</editor>{% endfor %}{% endif %}
+               {% if man.publication.editor %}{% for pub in man.publication.editor %}<editor key="{{ pub.id }}">{{ pub.name }}</editor>{% endfor %}{% endif %}
             </bibl>
             <msDesc>
                {% if man.repository %}<msIdentifier>
