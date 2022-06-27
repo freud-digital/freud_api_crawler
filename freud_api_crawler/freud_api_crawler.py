@@ -7,7 +7,8 @@ import requests
 import lxml.etree as ET
 import jinja2
 
-from freud_api_crawler.string_utils import clean_markup, extract_page_nr, always_https, normalize_white_space
+from freud_api_crawler.string_utils import clean_markup, extract_page_nr, always_https, normalize_white_space, \
+    after_jinja_cleanup
 
 # from freud_api_crawler.tei_utils import make_pb
 
@@ -401,6 +402,7 @@ class FrdManifestation(FrdClient):
         templateEnv = jinja2.Environment(loader=templateLoader)
         template = templateEnv.get_template('./tei.xml')
         tei = template.render({"objects": [json_dump]})
+        tei = after_jinja_cleanup(tei)
         tei = ET.fromstring(tei)
         transform = ET.XSLT(self.xsl_doc)
         tei = transform(tei)
