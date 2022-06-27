@@ -404,10 +404,9 @@ class FrdManifestation(FrdClient):
         tei = ET.fromstring(tei)
         transform = ET.XSLT(self.xsl_doc)
         tei = transform(tei)
-        tei = ET.tostring(tei, pretty_print=True, encoding="utf-8")
         if save:
             with open(self.save_path, 'wb') as f:
-                f.write(tei)
+                f.write(ET.tostring(tei, pretty_print=True, encoding="utf-8"))
         return tei
 
     def get_man_json_dump(self, lmt=True, dmp=False):
