@@ -579,7 +579,7 @@ class FrdManifestation(FrdClient):
                 page_json = self.get_page(x['id'])
                 pp = self.process_page(page_json)
                 json_dump["pages"].append(pp)
-            os.makedirs(os.path.join(self.save_dir, self.werk_signatur), exist_ok=True)
+            os.makedirs(os.path.join(self.save_dir, self.werk_signatur, 'data'), exist_ok=True)
             with open(self.save_path_json, 'w', encoding='utf8') as f:
                 json.dump(json_dump, f)
         else:
@@ -722,7 +722,7 @@ class FrdManifestation(FrdClient):
             self.save_dir, self.werk_signatur, self.file_name
         )
         self.save_path_json = os.path.join(
-            self.save_dir, self.werk_signatur, self.file_name_json
+            self.save_dir, self.werk_signatur, "data", self.file_name_json
         )
 
 
