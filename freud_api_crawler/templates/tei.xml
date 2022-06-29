@@ -88,7 +88,7 @@
             <p>Maschinenlesbare Transkription der Publikationen von Sigmund Freud.</p>
          </seriesStmt>
          <sourceDesc>
-            <bibl xml:id="{{ man.publication.id|replace('/', '__') }}">
+            <bibl xml:id="{{ man.publication.id }}">
                {% if man.publication.title_main %}<title type="main">{{ man.publication.title_main }}</title>{% endif %}
                {% if man.publication.title_sub %}<title type="sub">{{ man.publication.title_sub }}</title>{% endif %}
                {% if man.publication.title_short %}<title type="short">{{ man.publication.title_short }}</title>{% endif %}
@@ -103,13 +103,14 @@
             <msDesc>
                {% if man.repository %}<msIdentifier>
                   <repository>{{ man.repository.name }}</repository>
-                  <idno>{{ man.repository.id }}</idno>
                </msIdentifier>{% endif %}
                <msContents>
                   <msItem>
                      <title>{{ man.man_title }}</title>
                      <author>{{ man.author }}</author>
-                     <idno>{{ man.id }}</idno>
+                     <idno type="edition">{{ man.url }}</idno>
+                     <idno type="endpoint">{{ man.repository.url }}</idno>
+                     {% if man.repository.arch_url %}<indo type="{{ man.repository.name }}">{{ man.repository.arch_url }}</idno>{% endif %}
                   </msItem>
                </msContents>
             </msDesc>

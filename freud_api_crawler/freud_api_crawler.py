@@ -7,8 +7,9 @@ import requests
 import lxml.etree as ET
 import jinja2
 
-from freud_api_crawler.string_utils import clean_markup, extract_page_nr, always_https, normalize_white_space, \
-    after_jinja_cleanup
+from freud_api_crawler.string_utils import clean_markup, extract_page_nr, always_https, normalize_white_space
+
+from xml.sax.saxutils import escape
 
 # from freud_api_crawler.tei_utils import make_pb
 
@@ -109,6 +110,7 @@ class FrdClient():
         self,
         out_dir=CUR_LOC,
         endpoint=FRD_API,
+        browser_endpoint=FRD_BASE,
         xsl_doc=XSL_DOC,
         auth_items={},
         limit=10,
@@ -131,6 +133,7 @@ class FrdClient():
         """
         super().__init__()
         self.endpoint = endpoint
+        self.browser = browser_endpoint
         self.auth_items = auth_items
         self.cookie = self.auth_items['cookie']
         self.limit = limit
@@ -402,7 +405,6 @@ class FrdManifestation(FrdClient):
         templateEnv = jinja2.Environment(loader=templateLoader)
         template = templateEnv.get_template('./tei.xml')
         tei = template.render({"objects": [json_dump]})
-        tei = after_jinja_cleanup(tei)
         tei = ET.fromstring(tei)
         transform = ET.XSLT(self.xsl_doc)
         tei = transform(tei)
@@ -415,106 +417,112 @@ class FrdManifestation(FrdClient):
         if dmp:
             json_dump = {}
             json_dump["id"] = f"manifestation__{self.manifestation_id}"
+            json_dump["url"] = f"{self.browser}{self.manifestation_folder}"
             json_dump['man_title'] = f"{self.md__title} ({self.manifestation_signatur})"
             try:
                 s_title_t = self.manifestation['data']['attributes']['field_shorttitle']
-                json_dump['man_shorttitle'] = s_title_t['value']
+                json_dump['man_shorttitle'] = escape(s_title_t['value'])
             except (KeyError, TypeError):
                 print("No short title found!")
             json_dump["publication"] = {}
             try:
-                json_dump["publication"]["id"] = f"bibl__{self.publication['data']['id']}"
+                json_dump["publication"]["id"] = f"bibl__{escape(self.publication['data']['id'])}"
             except (KeyError, TypeError):
                 json_dump["publication"]["id"] = f"bibl__{self.manifestation_id}"
             try:
-                json_dump["publication"]["title"] = self.publication['data']['attributes']['title']
+                json_dump["publication"]["title"] = escape(self.publication['data']['attributes']['title'])
             except (KeyError, TypeError):
                 json_dump["publication"]["title"] = self.manifestation_id
             json_dump["work"] = {}
             json_dump["work"]["id"] = f"bibl__{self.werk['id']}"
-            json_dump["work"]["title"] = self.werk['attributes']['title']
+            json_dump["work"]["title"] = escape(self.werk['attributes']['title'])
             try:
-                json_dump["author"] = self.author['data']['attributes']['name']
+                json_dump["author"] = escape(self.author['data']['attributes']['name'])
             except (KeyError, TypeError):
                 json_dump["author"] = "Freud, Sigmund"
             try:
                 bibl_type = self.publication['data']['type'].replace('--', '/')
-                json_dump["publication"]["id"] = f"{bibl_type}/{self.publication['data']['id']}"
+                json_dump["publication"]["id"] = f"bibl__{self.publication['data']['id']}"
+                json_dump["publication"]["url"] = f"{self.endpoint}/{bibl_type}/{self.publication['data']['id']}"
             except (KeyError, TypeError):
                 print("No publication ID found!")
             try:
                 bibl_title_obj = self.publication['data']['attributes']['field_titel']
-                json_dump["publication"]["title_main"] = bibl_title_obj['value']
+                json_dump["publication"]["title_main"] = escape(bibl_title_obj['value'])
             except (KeyError, TypeError):
                 print("No publication main title found!")
             try:
                 bibl_title_obj = self.publication['data']['attributes']['field_secondary_title']
-                json_dump["publication"]["title_sub"] = bibl_title_obj['value']
+                json_dump["publication"]["title_sub"] = escape(bibl_title_obj['value'])
             except (KeyError, TypeError):
                 print("No publication secodnary title found!")
             try:
                 bibl_title_obj = self.publication['data']['attributes']['field_shorttitle']
-                json_dump["publication"]["title_short"] = bibl_title_obj['value']
+                json_dump["publication"]["title_short"] = escape(bibl_title_obj['value'])
             except (KeyError, TypeError):
                 print("No publication short title found!")
             try:
                 places = self.publication['data']['attributes']['field_publication_place']
                 for x in places:
-                    place = x["value"]
+                    place = escape(x["value"])
                     json_dump["publication"]["places"] = []
                     json_dump["publication"]["places"].append({"name": place})
             except (KeyError, TypeError):
                 print("No publication place(s) found!")
             try:
                 bibl_date_obj = self.publication['data']['attributes']['field_publication_year']
-                json_dump["publication"]["date"] = bibl_date_obj
+                json_dump["publication"]["date"] = escape(bibl_date_obj)
             except (KeyError, TypeError):
                 print("No publication year found!")
             try:
                 bibl_scope_obj = self.publication['data']['attributes']['field_band']
-                json_dump["publication"]["biblScope"] = bibl_scope_obj['value']
+                json_dump["publication"]["biblScope"] = escape(bibl_scope_obj['value'])
             except (KeyError, TypeError):
                 print("No publication field band found!")
             try:
-                if type(self.publisher) is list:
-                    for x in self.publisher:
+                if type(self.pub_publisher) is list:
+                    for x in self.pub_publisher:
                         pub_type = x['data']['type'].replace('--', '/')
                         json_dump["publication"]["publisher"] = []
                         json_dump["publication"]["publisher"].append(
                             {
-                                "id": f"{pub_type}/{x['data']['id']}",
-                                "name": f"{x['data']['attributes']['name']} (field_publisher)"
+                                "id": f"pub__/{x['data']['id']}",
+                                "name": f"{escape(x['data']['attributes']['name'])} (field_publisher)",
+                                "url": f"{self.endpoint}/{pub_type}/{x['data']['id']}"
                             }
                         )
                 else:
-                    pub_type = self.publisher['data']['type'].replace('--', '/')
+                    pub_type = self.pub_publisher['data']['type'].replace('--', '/')
                     json_dump["publication"]["publisher"] = []
                     json_dump["publication"]["publisher"] = [
                         {
-                            "id": f"{pub_type}/{self.publisher['data']['id']}",
-                            "name": f"{self.publisher['data']['attributes']['name']} (field_publisher)"
+                            "id": f"pub__/{self.pub_publisher['data']['id']}",
+                            "name": f"{escape(self.pub_publisher['data']['attributes']['name'])} (field_publisher)",
+                            "url": f"{self.endpoint}/{pub_type}/{self.pub_publisher['data']['id']}"
                         }
                     ]
             except (KeyError, TypeError):
                 print("No publication publisher found!")
             try:
-                if type(self.herausgeber) is list:
-                    for x in self.herausgeber:
+                if type(self.pub_herausgeber) is list:
+                    for x in self.pub_herausgeber:
                         pub_type = x['data']['type'].replace('--', '/')
                         json_dump["publication"]["herausgeber"] = []
                         json_dump["publication"]["herausgeber"].append(
                             {
-                                "id": f"{pub_type}/{x['data']['id']}",
-                                "name": f"{x['data']['attributes']['name']} (field_herausgeber)"
+                                "id": f"hgs__/{x['data']['id']}",
+                                "name": f"{escape(x['data']['attributes']['name'])} (field_herausgeber)",
+                                "url": f"{self.endpoint}/{pub_type}/{x['data']['id']}"
                             }
                         )
                 else:
-                    pub_type = self.herausgeber['data']['type'].replace('--', '/')
+                    pub_type = self.pub_herausgeber['data']['type'].replace('--', '/')
                     json_dump["publication"]["herausgeber"] = []
                     json_dump["publication"]["herausgeber"].append(
                         {
-                            "id": f"{pub_type}/{self.herausgeber['data']['id']}",
-                            "name": f"{self.herausgeber['data']['attributes']['name']} (field_herausgeber)"
+                            "id": f"hgs__/{self.pub_herausgeber['data']['id']}",
+                            "name": f"{escape(self.pub_herausgeber['data']['attributes']['name'])} (field_herausgeber)",
+                            "url": f"{self.endpoint}/{pub_type}/{self.pub_herausgeber['data']['id']}"
                         }
                     )
             except (KeyError, TypeError):
@@ -526,8 +534,9 @@ class FrdManifestation(FrdClient):
                         json_dump["publication"]["author"] = []
                         json_dump["publication"]["author"].append(
                             {
-                                "id": f"{pub_type}/{x['data']['id']}",
-                                "name": f"{x['data']['attributes']['name']} (field_authors)"
+                                "id": f"aut__/{x['data']['id']}",
+                                "name": f"{escape(x['data']['attributes']['name'])} (field_authors)",
+                                "url": f"{self.endpoint}/{pub_type}/{x['data']['id']}"
                             }
                         )
                 else:
@@ -535,8 +544,9 @@ class FrdManifestation(FrdClient):
                     json_dump["publication"]["author"] = []
                     json_dump["publication"]["author"].append(
                         {
-                            "id": f"{pub_type}/{self.pub_author['data']['id']}",
-                            "name": f"{self.pub_author['data']['attributes']['name']} (field_authors)"
+                            "id": f"aut__/{self.pub_author['data']['id']}",
+                            "name": f"{escape(self.pub_author['data']['attributes']['name'])} (field_authors)",
+                            "url": f"{self.endpoint}/{pub_type}/{self.pub_author['data']['id']}"
                         }
                     )
             except (KeyError, TypeError):
@@ -548,8 +558,9 @@ class FrdManifestation(FrdClient):
                         json_dump["publication"]["editor"] = []
                         json_dump["publication"]["editor"].append(
                             {
-                                "id": f"{pub_type}/{x['data']['id']}",
-                                "name": f"{x['data']['attributes']['name']} (field_editors)"
+                                "id": f"edi__/{x['data']['id']}",
+                                "name": f"{escape(x['data']['attributes']['name'])} (field_editors)",
+                                "url": f"{self.endpoint}/{pub_type}/{x['data']['id']}"
                             }
                         )
                 else:
@@ -557,8 +568,9 @@ class FrdManifestation(FrdClient):
                     json_dump["publication"]["editor"] = []
                     json_dump["publication"]["editor"].append(
                         {
-                            "id": f"{pub_type}/{self.pub_editors['data']['id']}",
-                            "name": f"{self.pub_editors['data']['attributes']['name']} (field_editors)"
+                            "id": f"edi__/{self.pub_editors['data']['id']}",
+                            "name": f"{escape(self.pub_editors['data']['attributes']['name'])} (field_editors)",
+                            "url": f"{self.endpoint}/{pub_type}/{self.pub_editors['data']['id']}"
                         }
                     )
             except (KeyError, TypeError):
@@ -566,11 +578,17 @@ class FrdManifestation(FrdClient):
             try:
                 msType = self.repository['data']['type']
                 json_dump["repository"] = {
-                    "id": f"{msType}__{self.repository['data']['id']}",
-                    "name": self.repository['data']['attributes']['name']
+                    "id": f"rep__{self.repository['data']['id']}",
+                    "name": escape(self.repository['data']['attributes']['name']),
+                    "url": f"{self.endpoint}/{msType}/{self.repository['data']['id']}"
                 }
             except (KeyError, TypeError):
-                print("It seems there is not 'filed_aufbewahrungsort'")
+                print("It seems there is no 'filed_aufbewahrungsort'")
+            try:
+                repo_container = self.manifestation['data']['attributes']['field_aufbewahrungsort_container']
+                json_dump["repository"]["arch_url"] = repo_container['value']
+            except (KeyError, TypeError):
+                print("It seems there is no 'filed_aufbewahrungsort_container'")
             json_dump["pages"] = []
             pages = self.pages
             if lmt:
@@ -689,19 +707,43 @@ class FrdManifestation(FrdClient):
         **kwargs
     ):
         super().__init__(**kwargs)
+        # level manifestation
         self.manifestation_id = manifestation_id
         self.manifestation_endpoint = f"{self.endpoint}node/manifestation/{manifestation_id}"
         self.manifestation = self.get_manifest()
         self.werk = self.manifestation['included'][0]
-        self.publication = self.get_fields_any('field_published_in')
         self.author = self.get_fields_any('field_authors')
         self.repository = self.get_fields_any('field_aufbewahrungsort')
-        self.publisher = self.get_fields_any_any('field_publisher', self.publication)
-        self.herausgeber = self.get_fields_any_any('field_herausgeber', self.publication)
+        self.repository_orig = self.get_fields_any('field_archive_original')
+        self.advisors = self.get_fields_any('field_advisors')
+        self.editors = self.get_fields_any('field_editors')
+        self.herausgeber = self.get_fields_any('field_herausgeber')
+        # first level publication
+        self.publication = self.get_fields_any('field_published_in')
+        self.pub_publisher = self.get_fields_any_any('field_publisher', self.publication)
+        self.pub_herausgeber = self.get_fields_any_any('field_herausgeber', self.publication)
         self.pub_author = self.get_fields_any_any('field_authors', self.publication)
+        self.pub_edition = self.get_fields_any_any('field_edition', self.publication)
+        self.pub_advisors = self.get_fields_any_any('field_advisor', self.publication)
         self.pub_editors = self.get_fields_any_any('field_editors', self.publication)
+        # 2nd level publication
+        self.publication2 = self.get_fields_any_any('field_published_in', self.publication)
+        self.pub2_publisher = self.get_fields_any_any('field_publisher', self.publication2)
+        self.pub2_herausgeber = self.get_fields_any_any('field_herausgeber', self.publication2)
+        self.pub2_author = self.get_fields_any_any('field_authors', self.publication2)
+        self.pub2_edition = self.get_fields_any_any('field_edition', self.publication2)
+        self.pub2_advisors = self.get_fields_any_any('field_advisor', self.publication2)
+        self.pub2_editors = self.get_fields_any_any('field_editors', self.publication2)
+        # 3rd level publication
+        self.publication3 = self.get_fields_any_any('field_published_in', self.publication2)
+        self.pub3_publisher = self.get_fields_any_any('field_publisher', self.publication3)
+        self.pub3_herausgeber = self.get_fields_any_any('field_herausgeber', self.publication3)
+        self.pub3_author = self.get_fields_any_any('field_authors', self.publication3)
+        self.pub3_edition = self.get_fields_any_any('field_edition', self.publication3)
+        self.pub3_advisors = self.get_fields_any_any('field_advisor', self.publication3)
+        self.pub3_editors = self.get_fields_any_any('field_editors', self.publication3)
         self.werk_folder = self.werk['attributes']['path']['alias']
-        # self.manifestation_folder = self.manifestation['attributes']['path']['alias']
+        self.manifestation_folder = self.manifestation['attributes']['path']['alias']
         self.man_attrib = self.manifestation['data']['attributes']
         for x in self.man_attrib.keys():
             value = self.man_attrib[x]

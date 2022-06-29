@@ -83,7 +83,7 @@ def always_https(url):
         return https_url
 
 
-def after_jinja_cleanup(source, patterns=JINJA_CLEAN_UP_PATTERNS):
+def escape_string(source, patterns=JINJA_CLEAN_UP_PATTERNS):
     """ applies search and replace for specified pattners
     on string xml file created with jinja2
 
