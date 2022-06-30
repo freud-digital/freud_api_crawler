@@ -416,177 +416,162 @@ class FrdManifestation(FrdClient):
     def get_man_json_dump(self, lmt=True, dmp=False):
         if dmp:
             json_dump = {}
-            json_dump["id"] = f"manifestation__{self.manifestation_id}"
-            json_dump["url"] = f"{self.browser}{self.manifestation_folder}"
+            json_dump["id"] = f"man__{self.manifestation_id}"
+            json_dump["browser_url"] = f"{self.browser}{self.manifestation_folder}"
+            man_type = self.manifestation['data']['type'].replace('--', '/')
+            json_dump["url"] = f"{self.endpoint}{man_type}/{self.manifestation_id}"
             json_dump['man_title'] = f"{self.md__title} ({self.manifestation_signatur})"
             try:
                 s_title_t = self.manifestation['data']['attributes']['field_shorttitle']
                 json_dump['man_shorttitle'] = escape(s_title_t['value'])
             except (KeyError, TypeError):
                 print("No short title found!")
-            json_dump["publication"] = {}
             try:
-                json_dump["publication"]["id"] = f"bibl__{escape(self.publication['data']['id'])}"
-            except (KeyError, TypeError):
-                json_dump["publication"]["id"] = f"bibl__{self.manifestation_id}"
+                field_date = self.manifestation['data']['attributes']['field_datum']
+                json_dump['date'] = {
+                    "value": field_date['value'],
+                    "end_value": field_date['end_value']
+                }
+            except(KeyError, TypeError):
+                print("manifestation has no field_datum.")
             try:
-                json_dump["publication"]["title"] = escape(self.publication['data']['attributes']['title'])
+                field_reihe = self.manifestation['data']['attributes']['field_reihe']
+                field_reihe_no = self.manifestation['data']['attributes']['field_reihe_nummer']
+                json_dump['reihe'] = {
+                    "name": field_reihe,
+                    "number": field_reihe_no
+                }
+            except(KeyError, TypeError):
+                print("manifestation has no field_reihe")
+            try:
+                field_pages = self.manifestation['data']['attributes']['field_pages']
+                json_dump['page_num'] = []
+                for idx, x in enumerate(field_pages):
+                    page_num = x['value']
+                    if idx == 0:
+                        name = "start"
+                    else:
+                        name = "end"
+                    json_dump['page_num'] = {
+                        name: page_num
+                    }
             except (KeyError, TypeError):
-                json_dump["publication"]["title"] = self.manifestation_id
-            json_dump["work"] = {}
-            json_dump["work"]["id"] = f"bibl__{self.werk['id']}"
-            json_dump["work"]["title"] = escape(self.werk['attributes']['title'])
+                print("manifestation has no field_pages")
+            try:
+                man_art = self.art['data']['attributes']['name']
+                json_dump['man_type'] = man_art
+            except (KeyError, TypeError):
+                print("manifestation has no field_art")
+            try:
+                json_dump['man_font'] = []
+                for x in self.font:
+                    man_font = x['data']['attributes']['name']
+                    json_dump['man_font'].append({
+                        "name": man_font
+                    })
+            except (KeyError, TypeError):
+                print("manifestation has no field_font")
+            try:
+                man_format = self.format['data']['attributes']['name']
+                json_dump['man_format'] = man_format
+            except (KeyError, TypeError):
+                print("manifestation has no field_font")
+            try:
+                man_mediatype = self.mediatype['data']['attributes']['name']
+                json_dump['man_mediatype'] = man_mediatype
+            except (KeyError, TypeError):
+                print("manifestation has no field_mediatype")
+            try:
+                json_dump["type"] = escape(self.type['data']['attributes']['name'])
+            except (KeyError, TypeError):
+                print("Manifestation has no attribute field_publication_type.")
+            try:
+                man_sprache = self.sprache['data']['attributes']['name']
+                man_langcode = self.sprache['data']['attributes']['langcode']
+                json_dump['man_lang'] = {
+                    "name": man_sprache,
+                    "langcode": man_langcode
+                }
+            except (KeyError, TypeError):
+                print("manifestation has no field_sprache")
+            try:
+                man_edition = self.edition['data']['attributes']['name']
+                json_dump['man_edition'] = {
+                    "name": man_edition
+                }
+            except (KeyError, TypeError):
+                print("manifestation has no field_edition")
             try:
                 json_dump["author"] = escape(self.author['data']['attributes']['name'])
             except (KeyError, TypeError):
                 json_dump["author"] = "Freud, Sigmund"
+            # work level
+            json_dump["work"] = {}
+            json_dump["work"]["id"] = f"bibl__{self.werk['id']}"
+            json_dump["work"]["title"] = escape(self.werk['attributes']['title'])
+            json_dump["work"]["url"] = f"{self.endpoint}werk/{self.werk['id']}"
+            json_dump["work"]["browser_url"] = f"{self.browser}{self.werk_folder}"
+            # publication level 1
+            init_methods = {
+                "manifestation": self.manifestation_id,
+                "publication": self.publication,
+                "publisher": self.pub_publisher,
+                "pub_herausgeber": self.pub_herausgeber,
+                "pub_author": self.pub_author,
+                "pub_edition": self.pub_edition,
+                "pub_advisors": self.pub_advisors,
+                "pub_editors": self.pub_editors,
+                "pub_type": self.pub_type,
+                "endpoint": self.endpoint,
+                "browser": self.browser,
+            }
+            publication = self.get_publication_md(init_methods)
+            json_dump["publication"] = publication
+            # publication level 2
+            init_methods = {
+                "manifestation": self.manifestation_id,
+                "publication": self.publication2,
+                "publisher": self.pub2_publisher,
+                "pub_herausgeber": self.pub2_herausgeber,
+                "pub_author": self.pub2_author,
+                "pub_edition": self.pub2_edition,
+                "pub_advisors": self.pub2_advisors,
+                "pub_editors": self.pub2_editors,
+                "pub_type": self.pub2_type,
+                "endpoint": self.endpoint,
+                "browser": self.browser,
+            }
+            publication = self.get_publication_md(init_methods)
+            json_dump["publication"]["publication"] = publication
+            # publication level 3
+            init_methods = {
+                "manifestation": self.manifestation_id,
+                "publication": self.publication3,
+                "publisher": self.pub3_publisher,
+                "pub_herausgeber": self.pub3_herausgeber,
+                "pub_author": self.pub3_author,
+                "pub_edition": self.pub3_edition,
+                "pub_advisors": self.pub3_advisors,
+                "pub_editors": self.pub3_editors,
+                "pub_type": self.pub3_type,
+                "endpoint": self.endpoint,
+                "browser": self.browser,
+            }
+            publication = self.get_publication_md(init_methods)
+            json_dump["publication"]["publication"]["publication"] = publication
+            # repository
             try:
-                bibl_type = self.publication['data']['type'].replace('--', '/')
-                json_dump["publication"]["id"] = f"bibl__{self.publication['data']['id']}"
-                json_dump["publication"]["url"] = f"{self.endpoint}/{bibl_type}/{self.publication['data']['id']}"
-            except (KeyError, TypeError):
-                print("No publication ID found!")
-            try:
-                bibl_title_obj = self.publication['data']['attributes']['field_titel']
-                json_dump["publication"]["title_main"] = escape(bibl_title_obj['value'])
-            except (KeyError, TypeError):
-                print("No publication main title found!")
-            try:
-                bibl_title_obj = self.publication['data']['attributes']['field_secondary_title']
-                json_dump["publication"]["title_sub"] = escape(bibl_title_obj['value'])
-            except (KeyError, TypeError):
-                print("No publication secodnary title found!")
-            try:
-                bibl_title_obj = self.publication['data']['attributes']['field_shorttitle']
-                json_dump["publication"]["title_short"] = escape(bibl_title_obj['value'])
-            except (KeyError, TypeError):
-                print("No publication short title found!")
-            try:
-                places = self.publication['data']['attributes']['field_publication_place']
-                for x in places:
-                    place = escape(x["value"])
-                    json_dump["publication"]["places"] = []
-                    json_dump["publication"]["places"].append({"name": place})
-            except (KeyError, TypeError):
-                print("No publication place(s) found!")
-            try:
-                bibl_date_obj = self.publication['data']['attributes']['field_publication_year']
-                json_dump["publication"]["date"] = escape(bibl_date_obj)
-            except (KeyError, TypeError):
-                print("No publication year found!")
-            try:
-                bibl_scope_obj = self.publication['data']['attributes']['field_band']
-                json_dump["publication"]["biblScope"] = escape(bibl_scope_obj['value'])
-            except (KeyError, TypeError):
-                print("No publication field band found!")
-            try:
-                if type(self.pub_publisher) is list:
-                    for x in self.pub_publisher:
-                        pub_type = x['data']['type'].replace('--', '/')
-                        json_dump["publication"]["publisher"] = []
-                        json_dump["publication"]["publisher"].append(
-                            {
-                                "id": f"pub__/{x['data']['id']}",
-                                "name": f"{escape(x['data']['attributes']['name'])} (field_publisher)",
-                                "url": f"{self.endpoint}/{pub_type}/{x['data']['id']}"
-                            }
-                        )
-                else:
-                    pub_type = self.pub_publisher['data']['type'].replace('--', '/')
-                    json_dump["publication"]["publisher"] = []
-                    json_dump["publication"]["publisher"] = [
-                        {
-                            "id": f"pub__/{self.pub_publisher['data']['id']}",
-                            "name": f"{escape(self.pub_publisher['data']['attributes']['name'])} (field_publisher)",
-                            "url": f"{self.endpoint}/{pub_type}/{self.pub_publisher['data']['id']}"
-                        }
-                    ]
-            except (KeyError, TypeError):
-                print("No publication publisher found!")
-            try:
-                if type(self.pub_herausgeber) is list:
-                    for x in self.pub_herausgeber:
-                        pub_type = x['data']['type'].replace('--', '/')
-                        json_dump["publication"]["herausgeber"] = []
-                        json_dump["publication"]["herausgeber"].append(
-                            {
-                                "id": f"hgs__/{x['data']['id']}",
-                                "name": f"{escape(x['data']['attributes']['name'])} (field_herausgeber)",
-                                "url": f"{self.endpoint}/{pub_type}/{x['data']['id']}"
-                            }
-                        )
-                else:
-                    pub_type = self.pub_herausgeber['data']['type'].replace('--', '/')
-                    json_dump["publication"]["herausgeber"] = []
-                    json_dump["publication"]["herausgeber"].append(
-                        {
-                            "id": f"hgs__/{self.pub_herausgeber['data']['id']}",
-                            "name": f"{escape(self.pub_herausgeber['data']['attributes']['name'])} (field_herausgeber)",
-                            "url": f"{self.endpoint}/{pub_type}/{self.pub_herausgeber['data']['id']}"
-                        }
-                    )
-            except (KeyError, TypeError):
-                print("No publication herausgeber found!")
-            try:
-                if type(self.pub_author) is list:
-                    for x in self.pub_author:
-                        pub_type = x['data']['type'].replace('--', '/')
-                        json_dump["publication"]["author"] = []
-                        json_dump["publication"]["author"].append(
-                            {
-                                "id": f"aut__/{x['data']['id']}",
-                                "name": f"{escape(x['data']['attributes']['name'])} (field_authors)",
-                                "url": f"{self.endpoint}/{pub_type}/{x['data']['id']}"
-                            }
-                        )
-                else:
-                    pub_type = self.pub_author['data']['type'].replace('--', '/')
-                    json_dump["publication"]["author"] = []
-                    json_dump["publication"]["author"].append(
-                        {
-                            "id": f"aut__/{self.pub_author['data']['id']}",
-                            "name": f"{escape(self.pub_author['data']['attributes']['name'])} (field_authors)",
-                            "url": f"{self.endpoint}/{pub_type}/{self.pub_author['data']['id']}"
-                        }
-                    )
-            except (KeyError, TypeError):
-                print("No publication author(s) found!")
-            try:
-                if type(self.pub_editors) is list:
-                    for x in self.pub_editors:
-                        pub_type = x['data']['type'].replace('--', '/')
-                        json_dump["publication"]["editor"] = []
-                        json_dump["publication"]["editor"].append(
-                            {
-                                "id": f"edi__/{x['data']['id']}",
-                                "name": f"{escape(x['data']['attributes']['name'])} (field_editors)",
-                                "url": f"{self.endpoint}/{pub_type}/{x['data']['id']}"
-                            }
-                        )
-                else:
-                    pub_type = self.pub_editors['data']['type'].replace('--', '/')
-                    json_dump["publication"]["editor"] = []
-                    json_dump["publication"]["editor"].append(
-                        {
-                            "id": f"edi__/{self.pub_editors['data']['id']}",
-                            "name": f"{escape(self.pub_editors['data']['attributes']['name'])} (field_editors)",
-                            "url": f"{self.endpoint}/{pub_type}/{self.pub_editors['data']['id']}"
-                        }
-                    )
-            except (KeyError, TypeError):
-                print("No publication editor(s) found!")
-            try:
-                msType = self.repository['data']['type']
+                msType = self.repository['data']['type'].replace('--', '/')
                 json_dump["repository"] = {
                     "id": f"rep__{self.repository['data']['id']}",
                     "name": escape(self.repository['data']['attributes']['name']),
-                    "url": f"{self.endpoint}/{msType}/{self.repository['data']['id']}"
+                    "url": f"{self.endpoint}{msType}/{self.repository['data']['id']}"
                 }
             except (KeyError, TypeError):
                 print("It seems there is no 'filed_aufbewahrungsort'")
             try:
                 repo_container = self.manifestation['data']['attributes']['field_aufbewahrungsort_container']
-                json_dump["repository"]["arch_url"] = repo_container['value']
+                json_dump["repository"]["orig_archiv_id"] = repo_container['value']
             except (KeyError, TypeError):
                 print("It seems there is no 'filed_aufbewahrungsort_container'")
             json_dump["pages"] = []
@@ -632,20 +617,40 @@ class FrdManifestation(FrdClient):
         except (KeyError, TypeError):
             print(f"looks like there is no {field_type}")
             return {}
-        try:
-            item_id = item['id']
-        except (KeyError, TypeError):
-            print(f"looks like there is not ID for {field_type}")
-            return {}
-        node_type = item['type'].split('--')[1]
-        taxonomy = item['type'].split('--')[0]
-        url = f"{self.endpoint}{taxonomy}/{node_type}/{item_id}"
-        r = requests.get(
-            url,
-            cookies=self.cookie,
-            allow_redirects=True
-        )
-        result = r.json()
+        if type(item) is list:
+            result = []
+            for x in item:
+                try:
+                    item_id = x['id']
+                except (KeyError, TypeError):
+                    print(f"looks like there is no ID for {field_type}")
+                    return {}
+                node_type = x['type'].split('--')[1]
+                taxonomy = x['type'].split('--')[0]
+                url = f"{self.endpoint}{taxonomy}/{node_type}/{item_id}"
+                r = requests.get(
+                    url,
+                    cookies=self.cookie,
+                    allow_redirects=True
+                )
+                res = r.json()
+                result.append(res)
+            return result
+        else:
+            try:
+                item_id = item['id']
+            except (KeyError, TypeError):
+                print(f"looks like there is no ID for {field_type}")
+                return {}
+            node_type = item['type'].split('--')[1]
+            taxonomy = item['type'].split('--')[0]
+            url = f"{self.endpoint}{taxonomy}/{node_type}/{item_id}"
+            r = requests.get(
+                url,
+                cookies=self.cookie,
+                allow_redirects=True
+            )
+            result = r.json()
         return result
 
     def get_fields_any_any(self, field_type, get_fields):
@@ -671,7 +676,7 @@ class FrdManifestation(FrdClient):
                 try:
                     item_id = x['id']
                 except (KeyError, TypeError):
-                    print(f"looks like there is not ID for {field_type}")
+                    print(f"looks like there is no ID for {field_type}")
                     return {}
                 node_type = x['type'].split('--')[1]
                 taxonomy = x['type'].split('--')[0]
@@ -688,7 +693,7 @@ class FrdManifestation(FrdClient):
             try:
                 item_id = item['id']
             except (KeyError, TypeError):
-                print(f"looks like there is not ID for {field_type}")
+                print(f"looks like there is no ID for {field_type}")
                 return {}
             node_type = item['type'].split('--')[1]
             taxonomy = item['type'].split('--')[0]
@@ -700,6 +705,211 @@ class FrdManifestation(FrdClient):
             )
             result = r.json()
             return result
+
+    def get_publication_md(self, init_methods):
+        obj = {}
+        try:
+            obj["id"] = f"bibl__{init_methods['publication']['data']['id']}"
+        except (KeyError, TypeError):
+            obj["id"] = f"man__{init_methods['manifestation']}"
+        try:
+            obj["title"] = escape(init_methods['publication']['data']['attributes']['title'])
+        except (KeyError, TypeError):
+            obj["title"] = f"man__{init_methods['manifestation']}"
+        try:
+            obj["type"] = escape(init_methods['pub_type']['data']['attributes']['name'])
+        except (KeyError, TypeError):
+            print("Publication has no attribute field_publication_type.")
+        try:
+            field_reihe = init_methods['publication']['data']['attributes']['field_reihe']
+            field_reihe_no = init_methods['publication']['data']['attributes']['field_reihe_nummer']
+            obj['reihe'] = {
+                "name": field_reihe,
+                "number": field_reihe_no
+            }
+        except(KeyError, TypeError):
+            print("publication has no field_reihe")
+        try:
+            edition = init_methods['pub_edition']['data']['attributes']['name']
+            obj['edition'] = {
+                "name": edition
+            }
+        except (KeyError, TypeError):
+            print("publication has no field_edition")
+        try:
+            bibl_type = init_methods['publication']['data']['type'].replace('--', '/')
+            obj["id"] = f"bibl__{init_methods['publication']['data']['id']}"
+            obj["url"] = f"{init_methods['endpoint']}{bibl_type}/{init_methods['publication']['data']['id']}"
+        except (KeyError, TypeError):
+            print("No publication ID found!")
+        try:
+            bibl_title_obj = init_methods['publication']['data']['attributes']['field_titel']
+            obj["title_main"] = escape(bibl_title_obj['value'])
+        except (KeyError, TypeError):
+            print("No publication main title found!")
+        try:
+            bibl_title_obj = init_methods['publication']['data']['attributes']['field_secondary_title']
+            obj["title_sub"] = escape(bibl_title_obj['value'])
+        except (KeyError, TypeError):
+            print("No publication secodnary title found!")
+        try:
+            bibl_title_obj = init_methods['publication']['data']['attributes']['field_shorttitle']
+            obj["title_short"] = escape(bibl_title_obj['value'])
+        except (KeyError, TypeError):
+            print("No publication short title found!")
+        try:
+            bibl_jahrgang = init_methods['publication']['data']['attributes']['field_jahrgang']
+            obj["jahrgang"] = bibl_jahrgang['value']
+        except (KeyError, TypeError):
+            print("No publication jahrgang found!")
+        try:
+            bibl_orig_year = init_methods['publication']['data']['attributes']['field_original_publication_year']
+            obj["original_publication_year"] = bibl_orig_year
+        except (KeyError, TypeError):
+            print("No original publication year found!")
+        try:
+            places = init_methods['publication']['data']['attributes']['field_publication_place']
+            for x in places:
+                place = escape(x["value"])
+                obj["places"] = []
+                obj["places"].append({"name": place})
+        except (KeyError, TypeError):
+            print("No publication place(s) found!")
+        try:
+            bibl_date_obj = init_methods['publication']['data']['attributes']['field_publication_year']
+            obj["date"] = bibl_date_obj
+        except (KeyError, TypeError):
+            print("No publication year found!")
+        try:
+            bibl_scope_obj = init_methods['publication']['data']['attributes']['field_band']
+            bibl_scope_no = init_methods['publication']['data']['attributes']['field_band_nr']
+            obj["band"] = {
+                "name": escape(bibl_scope_obj['value']),
+                "number": bibl_scope_no
+            }
+        except (KeyError, TypeError):
+            print("No publication field band found!")
+        try:
+            if type(init_methods['pub_publisher']) is list:
+                for x in init_methods['pub_publisher']:
+                    pub_type = x['data']['type'].replace('--', '/')
+                    obj["publisher"] = []
+                    obj["publisher"].append(
+                        {
+                            "id": f"pub__{x['data']['id']}",
+                            "name": f"{escape(x['data']['attributes']['name'])}",
+                            "url": f"{init_methods.endpoint}{pub_type}/{x['data']['id']}"
+                        }
+                    )
+            else:
+                pub_type = init_methods['pub_publisher']['data']['type'].replace('--', '/')
+                obj["publisher"] = []
+                obj["publisher"] = [
+                    {
+                        "id": f"pub__{init_methods['pub_publisher']['data']['id']}",
+                        "name": f"{escape(init_methods['pub_publisher']['data']['attributes']['name'])}",
+                        "url": f"{init_methods['endpoint']}{pub_type}/{init_methods['pub_publisher']['data']['id']}"
+                    }
+                ]
+        except (KeyError, TypeError):
+            print("No publication publisher found!")
+        try:
+            if type(init_methods['pub_herausgeber']) is list:
+                for x in init_methods['pub_herausgeber']:
+                    pub_type = x['data']['type'].replace('--', '/')
+                    obj["herausgeber"] = []
+                    obj["herausgeber"].append(
+                        {
+                            "id": f"hgs__{x['data']['id']}",
+                            "name": f"{escape(x['data']['attributes']['name'])}",
+                            "url": f"{init_methods['endpoint']}{pub_type}/{x['data']['id']}"
+                        }
+                    )
+            else:
+                pub_type = init_methods['pub_herausgeber']['data']['type'].replace('--', '/')
+                obj["herausgeber"] = []
+                obj["herausgeber"].append(
+                    {
+                        "id": f"hgs__{init_methods['pub_herausgeber']['data']['id']}",
+                        "name": f"{escape(init_methods['pub_herausgeber']['data']['attributes']['name'])}",
+                        "url": f"{init_methods['endpoint']}{pub_type}/{init_methods['pub_herausgeber']['data']['id']}"
+                    }
+                )
+        except (KeyError, TypeError):
+            print("No publication herausgeber found!")
+        try:
+            if type(init_methods['pub_author']) is list:
+                for x in init_methods['pub_author']:
+                    pub_type = x['data']['type'].replace('--', '/')
+                    obj["author"] = []
+                    obj["author"].append(
+                        {
+                            "id": f"aut__{x['data']['id']}",
+                            "name": f"{escape(x['data']['attributes']['name'])}",
+                            "url": f"{init_methods['endpoint']}{pub_type}/{x['data']['id']}"
+                        }
+                    )
+            else:
+                pub_type = init_methods['pub_author']['data']['type'].replace('--', '/')
+                obj["author"] = []
+                obj["author"].append(
+                    {
+                        "id": f"aut__{init_methods['pub_author']['data']['id']}",
+                        "name": f"{escape(init_methods['pub_author']['data']['attributes']['name'])}",
+                        "url": f"{init_methods['endpoint']}{pub_type}/{init_methods['pub_author']['data']['id']}"
+                    }
+                )
+        except (KeyError, TypeError):
+            print("No publication author(s) found!")
+        try:
+            if type(init_methods['pub_editors']) is list:
+                for x in init_methods['pub_editors']:
+                    pub_type = x['data']['type'].replace('--', '/')
+                    obj["editor"] = []
+                    obj["editor"].append(
+                        {
+                            "id": f"edi__{x['data']['id']}",
+                            "name": f"{escape(x['data']['attributes']['name'])}",
+                            "url": f"{init_methods['endpoint']}{pub_type}/{x['data']['id']}"
+                        }
+                    )
+            else:
+                pub_type = init_methods['pub_editors']['data']['type'].replace('--', '/')
+                obj["editor"] = []
+                obj["editor"].append(
+                    {
+                        "id": f"edi__{init_methods['pub_editors']['data']['id']}",
+                        "name": f"{escape(init_methods['pub_editors']['data']['attributes']['name'])}",
+                        "url": f"{init_methods['endpoint']}{pub_type}/{init_methods['pub_editors']['data']['id']}"
+                    }
+                )
+        except (KeyError, TypeError):
+            print("No publication editor(s) found!")
+        try:
+            if type(init_methods['pub_advisors']) is list:
+                for x in init_methods['pub_advisors']:
+                    pub_type = x['data']['type'].replace('--', '/')
+                    obj["advisor"] = []
+                    obj["advisor"].append(
+                        {
+                            "id": f"edi__{x['data']['id']}",
+                            "name": f"{escape(x['data']['attributes']['name'])}",
+                            "url": f"{init_methods['endpoint']}{pub_type}/{x['data']['id']}"
+                        }
+                    )
+            else:
+                pub_type = init_methods['pub_advisors']['data']['type'].replace('--', '/')
+                obj["advisor"] = []
+                obj["advisor"].append(
+                    {
+                        "id": f"edi__{init_methods['pub_advisors']['data']['id']}",
+                        "name": f"{escape(init_methods['pub_advisors']['data']['attributes']['name'])}",
+                        "url": f"{init_methods['endpoint']}{pub_type}/{init_methods['pub_advisors']['data']['id']}"
+                    }
+                )
+        except (KeyError, TypeError):
+            print("No publication advisors(s) found!")
+        return obj
 
     def __init__(
         self,
@@ -718,6 +928,13 @@ class FrdManifestation(FrdClient):
         self.advisors = self.get_fields_any('field_advisors')
         self.editors = self.get_fields_any('field_editors')
         self.herausgeber = self.get_fields_any('field_herausgeber')
+        self.art = self.get_fields_any('field_art')
+        self.font = self.get_fields_any('field_font')
+        self.format = self.get_fields_any('field_format')
+        self.mediatype = self.get_fields_any('field_mediatype')
+        self.sprache = self.get_fields_any('field_sprache')
+        self.type = self.get_fields_any('field_publication_type')
+        self.edition = self.get_fields_any('field_edition')
         # first level publication
         self.publication = self.get_fields_any('field_published_in')
         self.pub_publisher = self.get_fields_any_any('field_publisher', self.publication)
@@ -726,6 +943,7 @@ class FrdManifestation(FrdClient):
         self.pub_edition = self.get_fields_any_any('field_edition', self.publication)
         self.pub_advisors = self.get_fields_any_any('field_advisor', self.publication)
         self.pub_editors = self.get_fields_any_any('field_editors', self.publication)
+        self.pub_type = self.get_fields_any_any('field_publication_type', self.publication)
         # 2nd level publication
         self.publication2 = self.get_fields_any_any('field_published_in', self.publication)
         self.pub2_publisher = self.get_fields_any_any('field_publisher', self.publication2)
@@ -734,6 +952,7 @@ class FrdManifestation(FrdClient):
         self.pub2_edition = self.get_fields_any_any('field_edition', self.publication2)
         self.pub2_advisors = self.get_fields_any_any('field_advisor', self.publication2)
         self.pub2_editors = self.get_fields_any_any('field_editors', self.publication2)
+        self.pub2_type = self.get_fields_any_any('field_publication_type', self.publication2)
         # 3rd level publication
         self.publication3 = self.get_fields_any_any('field_published_in', self.publication2)
         self.pub3_publisher = self.get_fields_any_any('field_publisher', self.publication3)
@@ -742,8 +961,9 @@ class FrdManifestation(FrdClient):
         self.pub3_edition = self.get_fields_any_any('field_edition', self.publication3)
         self.pub3_advisors = self.get_fields_any_any('field_advisor', self.publication3)
         self.pub3_editors = self.get_fields_any_any('field_editors', self.publication3)
+        self.pub3_type = self.get_fields_any_any('field_publication_type', self.publication3)
         self.werk_folder = self.werk['attributes']['path']['alias']
-        self.manifestation_folder = self.manifestation['attributes']['path']['alias']
+        self.manifestation_folder = self.manifestation['data']['attributes']['path']['alias']
         self.man_attrib = self.manifestation['data']['attributes']
         for x in self.man_attrib.keys():
             value = self.man_attrib[x]
