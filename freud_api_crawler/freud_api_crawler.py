@@ -1,5 +1,6 @@
 import os
 import json
+import re
 import time
 from collections import defaultdict
 
@@ -405,6 +406,7 @@ class FrdManifestation(FrdClient):
         templateEnv = jinja2.Environment(loader=templateLoader)
         template = templateEnv.get_template('./tei.xml')
         tei = template.render({"objects": [json_dump]})
+        tei = re.sub(r'\s+$', '', tei, flags=re.MULTILINE)
         tei = ET.fromstring(tei)
         transform = ET.XSLT(self.xsl_doc)
         tei = transform(tei)
@@ -420,7 +422,8 @@ class FrdManifestation(FrdClient):
             json_dump["browser_url"] = f"{self.browser}{self.manifestation_folder}"
             man_type = self.manifestation['data']['type'].replace('--', '/')
             json_dump["url"] = f"{self.endpoint}{man_type}/{self.manifestation_id}"
-            json_dump['man_title'] = f"{self.md__title} ({self.manifestation_signatur})"
+            json_dump['man_title'] = self.md__title
+            json_dump['signature'] = self.manifestation_signatur
             try:
                 s_title_t = self.manifestation['data']['attributes']['field_shorttitle']
                 json_dump['man_shorttitle'] = escape(s_title_t['value'])
@@ -502,9 +505,24 @@ class FrdManifestation(FrdClient):
             except (KeyError, TypeError):
                 print("manifestation has no field_edition")
             try:
-                json_dump["author"] = escape(self.author['data']['attributes']['name'])
+                attr = self.author['data']['attributes']
+                json_dump["author"] = {
+                    "name": escape(attr['name']),
+                    "id": f"aut__{self.author['data']['id']}",
+                    "tid": attr['drupal_internal__tid'],
+                    "rev_id": attr['drupal_internal__revision_id'],
+                    "url": f"{self.endpoint}taxonomy_term/personen/{self.author['data']['id']}",
+                    "browser_url": f"{self.browser}/taxonomy/term/{attr['drupal_internal__revision_id']}"
+                }
             except (KeyError, TypeError):
-                json_dump["author"] = "Freud, Sigmund"
+                json_dump["author"] = {
+                    "name": "Freud, Sigmund",
+                    "id": "aut__80f26163-0581-4079-a0ce-4f2417f09b97",
+                    "tid": "111",
+                    "rev_id": "111",
+                    "url": f"{self.endpoint}taxonomy_term/personen/80f26163-0581-4079-a0ce-4f2417f09b97",
+                    "browser_url": f"{self.browser}/taxonomy/term/111"
+                }
             # work level
             json_dump["work"] = {}
             json_dump["work"]["id"] = f"bibl__{self.werk['id']}"
@@ -794,21 +812,31 @@ class FrdManifestation(FrdClient):
                 for x in init_methods['pub_publisher']:
                     pub_type = x['data']['type'].replace('--', '/')
                     obj["publisher"] = []
+                    attr = x['data']['attributes']
+                    browser = f"{init_methods['browser']}/taxonomy/term/"
                     obj["publisher"].append(
                         {
                             "id": f"pub__{x['data']['id']}",
                             "name": f"{escape(x['data']['attributes']['name'])}",
-                            "url": f"{init_methods.endpoint}{pub_type}/{x['data']['id']}"
+                            "url": f"{init_methods.endpoint}{pub_type}/{x['data']['id']}",
+                            "tid": attr['drupal_internal__tid'],
+                            "rev_id": attr['drupal_internal__revision_id'],
+                            "browser_url": f"{browser}{attr['drupal_internal__revision_id']}"
                         }
                     )
             else:
                 pub_type = init_methods['pub_publisher']['data']['type'].replace('--', '/')
                 obj["publisher"] = []
+                attr = init_methods['pub_publisher']['data']['attributes']
+                browser = f"{init_methods['browser']}/taxonomy/term/"
                 obj["publisher"] = [
                     {
                         "id": f"pub__{init_methods['pub_publisher']['data']['id']}",
-                        "name": f"{escape(init_methods['pub_publisher']['data']['attributes']['name'])}",
-                        "url": f"{init_methods['endpoint']}{pub_type}/{init_methods['pub_publisher']['data']['id']}"
+                        "name": f"{escape(attr['name'])}",
+                        "url": f"{init_methods['endpoint']}{pub_type}/{init_methods['pub_publisher']['data']['id']}",
+                        "tid": attr['drupal_internal__tid'],
+                        "rev_id": attr['drupal_internal__revision_id'],
+                        "browser_url": f"{browser}{attr['drupal_internal__revision_id']}"
                     }
                 ]
         except (KeyError, TypeError):
@@ -818,21 +846,31 @@ class FrdManifestation(FrdClient):
                 for x in init_methods['pub_herausgeber']:
                     pub_type = x['data']['type'].replace('--', '/')
                     obj["herausgeber"] = []
+                    attr = x['data']['attributes']
+                    browser = f"{init_methods['browser']}/taxonomy/term/"
                     obj["herausgeber"].append(
                         {
                             "id": f"hgs__{x['data']['id']}",
                             "name": f"{escape(x['data']['attributes']['name'])}",
-                            "url": f"{init_methods['endpoint']}{pub_type}/{x['data']['id']}"
+                            "url": f"{init_methods['endpoint']}{pub_type}/{x['data']['id']}",
+                            "tid": attr['drupal_internal__tid'],
+                            "rev_id": attr['drupal_internal__revision_id'],
+                            "browser_url": f"{browser}{attr['drupal_internal__revision_id']}"
                         }
                     )
             else:
                 pub_type = init_methods['pub_herausgeber']['data']['type'].replace('--', '/')
                 obj["herausgeber"] = []
+                attr = init_methods['pub_herausgeber']['data']['attributes']
+                browser = f"{init_methods['browser']}/taxonomy/term/"
                 obj["herausgeber"].append(
                     {
                         "id": f"hgs__{init_methods['pub_herausgeber']['data']['id']}",
-                        "name": f"{escape(init_methods['pub_herausgeber']['data']['attributes']['name'])}",
-                        "url": f"{init_methods['endpoint']}{pub_type}/{init_methods['pub_herausgeber']['data']['id']}"
+                        "name": f"{escape(attr['name'])}",
+                        "url": f"{init_methods['endpoint']}{pub_type}/{init_methods['pub_herausgeber']['data']['id']}",
+                        "tid": attr['drupal_internal__tid'],
+                        "rev_id": attr['drupal_internal__revision_id'],
+                        "browser_url": f"{browser}{attr['drupal_internal__revision_id']}"
                     }
                 )
         except (KeyError, TypeError):
@@ -842,21 +880,31 @@ class FrdManifestation(FrdClient):
                 for x in init_methods['pub_author']:
                     pub_type = x['data']['type'].replace('--', '/')
                     obj["author"] = []
+                    attr = x['data']['attributes']
+                    browser = f"{init_methods['browser']}/taxonomy/term/"
                     obj["author"].append(
                         {
                             "id": f"aut__{x['data']['id']}",
                             "name": f"{escape(x['data']['attributes']['name'])}",
-                            "url": f"{init_methods['endpoint']}{pub_type}/{x['data']['id']}"
+                            "url": f"{init_methods['endpoint']}{pub_type}/{x['data']['id']}",
+                            "tid": attr['drupal_internal__tid'],
+                            "rev_id": attr['drupal_internal__revision_id'],
+                            "browser_url": f"{browser}{attr['drupal_internal__revision_id']}"
                         }
                     )
             else:
                 pub_type = init_methods['pub_author']['data']['type'].replace('--', '/')
                 obj["author"] = []
+                attr = init_methods['pub_author']['data']['attributes']
+                browser = f"{init_methods['browser']}/taxonomy/term/"
                 obj["author"].append(
                     {
                         "id": f"aut__{init_methods['pub_author']['data']['id']}",
-                        "name": f"{escape(init_methods['pub_author']['data']['attributes']['name'])}",
-                        "url": f"{init_methods['endpoint']}{pub_type}/{init_methods['pub_author']['data']['id']}"
+                        "name": f"{escape(attr['attributes']['name'])}",
+                        "url": f"{init_methods['endpoint']}{pub_type}/{init_methods['pub_author']['data']['id']}",
+                        "tid": attr['drupal_internal__tid'],
+                        "rev_id": attr['drupal_internal__revision_id'],
+                        "browser_url": f"{browser}{attr['drupal_internal__revision_id']}"
                     }
                 )
         except (KeyError, TypeError):
@@ -866,21 +914,31 @@ class FrdManifestation(FrdClient):
                 for x in init_methods['pub_editors']:
                     pub_type = x['data']['type'].replace('--', '/')
                     obj["editor"] = []
+                    browser = f"{init_methods['browser']}/taxonomy/term/"
+                    attr = x['data']['attributes']
                     obj["editor"].append(
                         {
                             "id": f"edi__{x['data']['id']}",
                             "name": f"{escape(x['data']['attributes']['name'])}",
-                            "url": f"{init_methods['endpoint']}{pub_type}/{x['data']['id']}"
+                            "url": f"{init_methods['endpoint']}{pub_type}/{x['data']['id']}",
+                            "tid": x['data']['attributes']['drupal_internal__tid'],
+                            "rev_id": x['data']['attributes']['drupal_internal__revision_id'],
+                            "browser_url": f"{browser}{x['drupal_internal__revision_id']}"
                         }
                     )
             else:
                 pub_type = init_methods['pub_editors']['data']['type'].replace('--', '/')
                 obj["editor"] = []
+                attr = init_methods['pub_editors']['data']['attributes']
+                browser = f"{init_methods['browser']}/taxonomy/term/"
                 obj["editor"].append(
                     {
                         "id": f"edi__{init_methods['pub_editors']['data']['id']}",
                         "name": f"{escape(init_methods['pub_editors']['data']['attributes']['name'])}",
-                        "url": f"{init_methods['endpoint']}{pub_type}/{init_methods['pub_editors']['data']['id']}"
+                        "url": f"{init_methods['endpoint']}{pub_type}/{init_methods['pub_editors']['data']['id']}",
+                        "tid": attr['drupal_internal__tid'],
+                        "rev_id": attr['drupal_internal__revision_id'],
+                        "browser_url": f"{browser}{attr['drupal_internal__revision_id']}"
                     }
                 )
         except (KeyError, TypeError):
@@ -890,21 +948,31 @@ class FrdManifestation(FrdClient):
                 for x in init_methods['pub_advisors']:
                     pub_type = x['data']['type'].replace('--', '/')
                     obj["advisor"] = []
+                    attr = x['data']['attributes']
+                    browser = f"{init_methods['browser']}/taxonomy/term/"
                     obj["advisor"].append(
                         {
                             "id": f"edi__{x['data']['id']}",
-                            "name": f"{escape(x['data']['attributes']['name'])}",
-                            "url": f"{init_methods['endpoint']}{pub_type}/{x['data']['id']}"
+                            "name": f"{escape(attr['name'])}",
+                            "url": f"{init_methods['endpoint']}{pub_type}/{x['data']['id']}",
+                            "tid": attr['drupal_internal__tid'],
+                            "rev_id": attr['drupal_internal__revision_id'],
+                            "browser_url": f"{browser}{attr['drupal_internal__revision_id']}"
                         }
                     )
             else:
                 pub_type = init_methods['pub_advisors']['data']['type'].replace('--', '/')
                 obj["advisor"] = []
+                attr = init_methods['pub_advisors']['data']['attributes']
+                browser = f"{init_methods['browser']}/taxonomy/term/"
                 obj["advisor"].append(
                     {
                         "id": f"edi__{init_methods['pub_advisors']['data']['id']}",
                         "name": f"{escape(init_methods['pub_advisors']['data']['attributes']['name'])}",
-                        "url": f"{init_methods['endpoint']}{pub_type}/{init_methods['pub_advisors']['data']['id']}"
+                        "url": f"{init_methods['endpoint']}{pub_type}/{init_methods['pub_advisors']['data']['id']}",
+                        "tid": attr['drupal_internal__tid'],
+                        "rev_id": attr['drupal_internal__revision_id'],
+                        "browser_url": f"{browser}{attr['drupal_internal__revision_id']}"
                     }
                 )
         except (KeyError, TypeError):
@@ -987,6 +1055,89 @@ class FrdManifestation(FrdClient):
         )
         self.save_path_json = os.path.join(
             self.save_dir, self.werk_signatur, "data", self.file_name_json
+        )
+
+
+class FrdPersons(FrdClient):
+
+    def make_index(self, save, dump):
+        """serializes a person index as XML/TEI document
+
+        :param save: if set, a XML/TEI file `{self.save_path}` is saved
+        :param type: bool
+
+        :return: A lxml.etree
+        """
+        persons = self.get_persons(dmp=dump)
+        templateLoader = jinja2.PackageLoader(
+            "freud_api_crawler", "templates"
+        )
+        templateEnv = jinja2.Environment(loader=templateLoader)
+        template = templateEnv.get_template('./persons.xml')
+        tei = template.render({"objects": [persons]})
+        tei = re.sub(r'\s+$', '', tei, flags=re.MULTILINE)
+        tei = ET.fromstring(tei)
+        # transform = ET.XSLT(self.xsl_doc)
+        # tei = transform(tei)
+        if save:
+            with open(self.save_path, 'wb') as f:
+                f.write(ET.tostring(tei, pretty_print=True, encoding="utf-8"))
+        return tei
+
+    def get_persons(self, dmp):
+        if dmp:
+            r = requests.get(
+                f"{self.endpoint}taxonomy_term/personen",
+                cookies=self.cookie,
+                allow_redirects=True
+            )
+            result = r.json()
+            data = result['data']
+            persons = {
+                "data": []
+            }
+            for x in data:
+                persons['data'].append(
+                    {
+                        "name": escape(x['attributes']['name']),
+                        "birthdate": x['attributes']['field_birthdate'],
+                        "birthplace": x['attributes']['field_birthplace'],
+                        "birthname": x['attributes']['field_birthname'],
+                        "deathdate": x['attributes']['field_deathdate'],
+                        "deathplace": x['attributes']['field_deathplace'],
+                        "id": f"aut__{x['id']}",
+                        "tid": x['attributes']['drupal_internal__tid'],
+                        "rev_id": x['attributes']['drupal_internal__revision_id'],
+                        "field_name_id": x['attributes']['field_name_id'],
+                        "url": f"{self.endpoint}taxonomy_term/personen/{x['id']}",
+                        "browser_url": f"{self.browser}/taxonomy/term/{x['attributes']['drupal_internal__revision_id']}"
+                    }
+                )
+            os.makedirs(os.path.join(self.save_dir, "persons/data"), exist_ok=True)
+            with open(self.save_path_json, 'w', encoding='utf8') as f:
+                json.dump(persons, f)
+        else:
+            try:
+                with open(self.save_path_json, 'r', encoding='utf8') as f:
+                    persons = json.load(f)
+            except FileNotFoundError:
+                print(f"file {self.save_path_json} not found, switching dump=True and restarting")
+                persons = self.get_persons(dmp=True)
+        return persons
+
+    def __init__(
+        self,
+        **kwargs
+    ):
+        super().__init__(**kwargs)
+        self.save_dir = os.path.join(self.out_dir)
+        self.file_name = "person_index.xml"
+        self.file_name_json = "person_index.json"
+        self.save_path = os.path.join(
+            self.save_dir, "persons", self.file_name
+        )
+        self.save_path_json = os.path.join(
+            self.save_dir, "persons/data", self.file_name_json
         )
 
 

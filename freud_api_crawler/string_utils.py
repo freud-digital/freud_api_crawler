@@ -12,8 +12,8 @@ CLEAN_UP_PATTERNS = [
     ('</strong>', '</hi>'),
 ]
 
-JINJA_CLEAN_UP_PATTERNS = [
-    ('&', '&amp;'),
+POST_TEI_PROCESSING = [
+    ('\n', ''),
 ]
 
 
@@ -81,19 +81,3 @@ def always_https(url):
     else:
         https_url = url.replace('http://', 'https://')
         return https_url
-
-
-def escape_string(source, patterns=JINJA_CLEAN_UP_PATTERNS):
-    """ applies search and replace for specified pattners
-    on string xml file created with jinja2
-
-    Args:
-        source (string): loads xml created with jinaj2
-        patterns (string): string patters
-
-    Returns:
-        string: xml string file with cleaned up patterns
-    """
-    for x in patterns:
-        source = source.replace(x[0], x[1])
-    return source
