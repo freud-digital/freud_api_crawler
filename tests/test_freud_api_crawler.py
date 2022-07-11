@@ -24,6 +24,10 @@ FRD_MANIFESTATION = frd.FrdManifestation(
     auth_items=frd.AUTH_ITEMS,
     manifestation_id=MANIFESTATION_ID
 )
+FRD_INDEX = frd.FrdIndex(
+    auth_items=frd.AUTH_ITEMS,
+    out_dir="indices"
+)
 
 
 class TestFrdWerk(unittest.TestCase):
@@ -180,6 +184,14 @@ class TestFreud_api_crawler(unittest.TestCase):
         item2_id = item2['data']['id']
         frd_obj_sub_field_id = item['data']['relationships']['vid']['data']['id']
         self.assertTrue(item2_id == frd_obj_sub_field_id)
+
+    def test_019_check_tei_serialiazer_index(self):
+        """test tei serialisation"""
+        frd_obj = FRD_INDEX
+        xml = frd_obj.make_index(save=False, dump=False, index_type='personen')
+        xml_str = ET.tostring(xml).decode('utf-8')
+        print(type(xml), type(xml_str))
+        self.assertTrue("p__7df674ca-0716-4c3f-88bc-c36d65b2db56" in xml_str)
 
 
 class TestStringUtils(unittest.TestCase):

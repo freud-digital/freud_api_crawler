@@ -2,7 +2,8 @@
    <teiHeader>
       <fileDesc>
          <titleStmt>
-            <title type="main">Sigmund Freud Edition: Personenindex</title>
+            <title type="main">Institutionen Index</title>
+            <title type="sub">Sigmund Freud Edition</title>
             <editor>
                <name>Diercks, Christine</name>
                <name>Rohrwasser, Michael</name>
@@ -78,16 +79,13 @@
    </teiHeader>
    <text>
       <body>
-         {% for item in objects %}<listPerson>
-            {% for x in item.data %}
-            <person xml:id="{{ x.id }}">
-               <forename>{{ x.name.split(', ')[1] }}</forename>
-               <surname>{{ x.name.split(', ')[0] }}</surname>
+         {% for item in objects %}<listOrg>{% for x in item.data %}
+            <org xml:id="{{ x.id }}">
+               <orgName>{{ x.name }}</orgName>
                <idno type="url">{{ x.browser_url }}</idno>
                <idno type="api">{{ x.url }}</idno>
-            </person>
-            {% endfor %}
-         </listPerson>{% endfor %}
+            </org>{% endfor %}
+         </listOrg>{% endfor %}
       </body>
    </text>
 </TEI>

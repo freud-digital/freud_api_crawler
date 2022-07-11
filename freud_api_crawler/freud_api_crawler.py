@@ -508,7 +508,7 @@ class FrdManifestation(FrdClient):
                 attr = self.author['data']['attributes']
                 json_dump["author"] = {
                     "name": escape(attr['name']),
-                    "id": f"aut__{self.author['data']['id']}",
+                    "id": f"p__{self.author['data']['id']}",
                     "tid": attr['drupal_internal__tid'],
                     "rev_id": attr['drupal_internal__revision_id'],
                     "url": f"{self.endpoint}taxonomy_term/personen/{self.author['data']['id']}",
@@ -517,7 +517,7 @@ class FrdManifestation(FrdClient):
             except (KeyError, TypeError):
                 json_dump["author"] = {
                     "name": "Freud, Sigmund",
-                    "id": "aut__80f26163-0581-4079-a0ce-4f2417f09b97",
+                    "id": "p__80f26163-0581-4079-a0ce-4f2417f09b97",
                     "tid": "111",
                     "rev_id": "111",
                     "url": f"{self.endpoint}taxonomy_term/personen/80f26163-0581-4079-a0ce-4f2417f09b97",
@@ -729,7 +729,7 @@ class FrdManifestation(FrdClient):
         try:
             obj["id"] = f"bibl__{init_methods['publication']['data']['id']}"
         except (KeyError, TypeError):
-            obj["id"] = f"man__{init_methods['manifestation']}"
+            obj["id"] = "None"
         try:
             obj["title"] = escape(init_methods['publication']['data']['attributes']['title'])
         except (KeyError, TypeError):
@@ -816,7 +816,7 @@ class FrdManifestation(FrdClient):
                     browser = f"{init_methods['browser']}/taxonomy/term/"
                     obj["publisher"].append(
                         {
-                            "id": f"pub__{x['data']['id']}",
+                            "id": f"p__{x['data']['id']}",
                             "name": f"{escape(x['data']['attributes']['name'])}",
                             "url": f"{init_methods.endpoint}{pub_type}/{x['data']['id']}",
                             "tid": attr['drupal_internal__tid'],
@@ -831,7 +831,7 @@ class FrdManifestation(FrdClient):
                 browser = f"{init_methods['browser']}/taxonomy/term/"
                 obj["publisher"] = [
                     {
-                        "id": f"pub__{init_methods['pub_publisher']['data']['id']}",
+                        "id": f"p__{init_methods['pub_publisher']['data']['id']}",
                         "name": f"{escape(attr['name'])}",
                         "url": f"{init_methods['endpoint']}{pub_type}/{init_methods['pub_publisher']['data']['id']}",
                         "tid": attr['drupal_internal__tid'],
@@ -850,7 +850,7 @@ class FrdManifestation(FrdClient):
                     browser = f"{init_methods['browser']}/taxonomy/term/"
                     obj["herausgeber"].append(
                         {
-                            "id": f"hgs__{x['data']['id']}",
+                            "id": f"p__{x['data']['id']}",
                             "name": f"{escape(x['data']['attributes']['name'])}",
                             "url": f"{init_methods['endpoint']}{pub_type}/{x['data']['id']}",
                             "tid": attr['drupal_internal__tid'],
@@ -865,7 +865,7 @@ class FrdManifestation(FrdClient):
                 browser = f"{init_methods['browser']}/taxonomy/term/"
                 obj["herausgeber"].append(
                     {
-                        "id": f"hgs__{init_methods['pub_herausgeber']['data']['id']}",
+                        "id": f"p__{init_methods['pub_herausgeber']['data']['id']}",
                         "name": f"{escape(attr['name'])}",
                         "url": f"{init_methods['endpoint']}{pub_type}/{init_methods['pub_herausgeber']['data']['id']}",
                         "tid": attr['drupal_internal__tid'],
@@ -884,7 +884,7 @@ class FrdManifestation(FrdClient):
                     browser = f"{init_methods['browser']}/taxonomy/term/"
                     obj["author"].append(
                         {
-                            "id": f"aut__{x['data']['id']}",
+                            "id": f"p__{x['data']['id']}",
                             "name": f"{escape(x['data']['attributes']['name'])}",
                             "url": f"{init_methods['endpoint']}{pub_type}/{x['data']['id']}",
                             "tid": attr['drupal_internal__tid'],
@@ -899,7 +899,7 @@ class FrdManifestation(FrdClient):
                 browser = f"{init_methods['browser']}/taxonomy/term/"
                 obj["author"].append(
                     {
-                        "id": f"aut__{init_methods['pub_author']['data']['id']}",
+                        "id": f"p__{init_methods['pub_author']['data']['id']}",
                         "name": f"{escape(attr['attributes']['name'])}",
                         "url": f"{init_methods['endpoint']}{pub_type}/{init_methods['pub_author']['data']['id']}",
                         "tid": attr['drupal_internal__tid'],
@@ -918,7 +918,7 @@ class FrdManifestation(FrdClient):
                     attr = x['data']['attributes']
                     obj["editor"].append(
                         {
-                            "id": f"edi__{x['data']['id']}",
+                            "id": f"p__{x['data']['id']}",
                             "name": f"{escape(x['data']['attributes']['name'])}",
                             "url": f"{init_methods['endpoint']}{pub_type}/{x['data']['id']}",
                             "tid": x['data']['attributes']['drupal_internal__tid'],
@@ -933,7 +933,7 @@ class FrdManifestation(FrdClient):
                 browser = f"{init_methods['browser']}/taxonomy/term/"
                 obj["editor"].append(
                     {
-                        "id": f"edi__{init_methods['pub_editors']['data']['id']}",
+                        "id": f"p__{init_methods['pub_editors']['data']['id']}",
                         "name": f"{escape(init_methods['pub_editors']['data']['attributes']['name'])}",
                         "url": f"{init_methods['endpoint']}{pub_type}/{init_methods['pub_editors']['data']['id']}",
                         "tid": attr['drupal_internal__tid'],
@@ -952,7 +952,7 @@ class FrdManifestation(FrdClient):
                     browser = f"{init_methods['browser']}/taxonomy/term/"
                     obj["advisor"].append(
                         {
-                            "id": f"edi__{x['data']['id']}",
+                            "id": f"p__{x['data']['id']}",
                             "name": f"{escape(attr['name'])}",
                             "url": f"{init_methods['endpoint']}{pub_type}/{x['data']['id']}",
                             "tid": attr['drupal_internal__tid'],
@@ -967,7 +967,7 @@ class FrdManifestation(FrdClient):
                 browser = f"{init_methods['browser']}/taxonomy/term/"
                 obj["advisor"].append(
                     {
-                        "id": f"edi__{init_methods['pub_advisors']['data']['id']}",
+                        "id": f"p__{init_methods['pub_advisors']['data']['id']}",
                         "name": f"{escape(init_methods['pub_advisors']['data']['attributes']['name'])}",
                         "url": f"{init_methods['endpoint']}{pub_type}/{init_methods['pub_advisors']['data']['id']}",
                         "tid": attr['drupal_internal__tid'],
@@ -1058,9 +1058,9 @@ class FrdManifestation(FrdClient):
         )
 
 
-class FrdPersons(FrdClient):
+class FrdIndex(FrdClient):
 
-    def make_index(self, save, dump):
+    def make_index(self, save, dump, index_type):
         """serializes a person index as XML/TEI document
 
         :param save: if set, a XML/TEI file `{self.save_path}` is saved
@@ -1068,62 +1068,98 @@ class FrdPersons(FrdClient):
 
         :return: A lxml.etree
         """
-        persons = self.get_persons(dmp=dump)
+        index = self.get_index(dmp=dump, index_type=index_type)
         templateLoader = jinja2.PackageLoader(
             "freud_api_crawler", "templates"
         )
         templateEnv = jinja2.Environment(loader=templateLoader)
-        template = templateEnv.get_template('./persons.xml')
-        tei = template.render({"objects": [persons]})
+        template = templateEnv.get_template(f'./{index_type}.xml')
+        tei = template.render({"objects": [index]})
         tei = re.sub(r'\s+$', '', tei, flags=re.MULTILINE)
         tei = ET.fromstring(tei)
-        # transform = ET.XSLT(self.xsl_doc)
-        # tei = transform(tei)
         if save:
-            with open(self.save_path, 'wb') as f:
+            with open(os.path.join(self.save_dir, f'{index_type}.xml'), 'wb') as f:
                 f.write(ET.tostring(tei, pretty_print=True, encoding="utf-8"))
         return tei
 
-    def get_persons(self, dmp):
+    def get_index(self, dmp, index_type):
         if dmp:
             r = requests.get(
-                f"{self.endpoint}taxonomy_term/personen",
+                f"{self.endpoint}taxonomy_term/{index_type}",
                 cookies=self.cookie,
                 allow_redirects=True
             )
             result = r.json()
             data = result['data']
-            persons = {
+            index = {
                 "data": []
             }
-            for x in data:
-                persons['data'].append(
-                    {
-                        "name": escape(x['attributes']['name']),
-                        "birthdate": x['attributes']['field_birthdate'],
-                        "birthplace": x['attributes']['field_birthplace'],
-                        "birthname": x['attributes']['field_birthname'],
-                        "deathdate": x['attributes']['field_deathdate'],
-                        "deathplace": x['attributes']['field_deathplace'],
-                        "id": f"aut__{x['id']}",
-                        "tid": x['attributes']['drupal_internal__tid'],
-                        "rev_id": x['attributes']['drupal_internal__revision_id'],
-                        "field_name_id": x['attributes']['field_name_id'],
-                        "url": f"{self.endpoint}taxonomy_term/personen/{x['id']}",
-                        "browser_url": f"{self.browser}/taxonomy/term/{x['attributes']['drupal_internal__revision_id']}"
-                    }
-                )
-            os.makedirs(os.path.join(self.save_dir, "persons/data"), exist_ok=True)
-            with open(self.save_path_json, 'w', encoding='utf8') as f:
-                json.dump(persons, f)
+            if index_type == "personen":
+                for x in data:
+                    index['data'].append(
+                        {
+                            "name": escape(x['attributes']['name']),
+                            "birthdate": x['attributes']['field_birthdate'],
+                            "birthplace": x['attributes']['field_birthplace'],
+                            "birthname": x['attributes']['field_birthname'],
+                            "deathdate": x['attributes']['field_deathdate'],
+                            "deathplace": x['attributes']['field_deathplace'],
+                            "id": f"p__{x['id']}",
+                            "tid": x['attributes']['drupal_internal__tid'],
+                            "rev_id": x['attributes']['drupal_internal__revision_id'],
+                            "field_name_id": x['attributes']['field_name_id'],
+                            "url": f"{self.endpoint}taxonomy_term/personen/{x['id']}",
+                            "browser_url": f"{self.browser}/taxonomy/term/{x['attributes']['drupal_internal__tid']}"
+                        }
+                    )
+            elif index_type == "publisher":
+                for x in data:
+                    index['data'].append(
+                        {
+                            "name": escape(x['attributes']['name']),
+                            "id": f"org__{x['id']}",
+                            "tid": x['attributes']['drupal_internal__tid'],
+                            "rev_id": x['attributes']['drupal_internal__revision_id'],
+                            "url": f"{self.endpoint}taxonomy_term/personen/{x['id']}",
+                            "browser_url": f"{self.browser}/taxonomy/term/{x['attributes']['drupal_internal__tid']}"
+                        }
+                    )
+            elif index_type == "ort":
+                for x in data:
+                    index['data'].append(
+                        {
+                            "name": escape(x['attributes']['name']),
+                            "id": f"place__{x['id']}",
+                            "tid": x['attributes']['drupal_internal__tid'],
+                            "rev_id": x['attributes']['drupal_internal__revision_id'],
+                            "url": f"{self.endpoint}taxonomy_term/personen/{x['id']}",
+                            "browser_url": f"{self.browser}/taxonomy/term/{x['attributes']['drupal_internal__tid']}"
+                        }
+                    )
+            else:
+                for x in data:
+                    index['data'].append(
+                        {
+                            "name": escape(x['attributes']['name']),
+                            "id": f"{index_type}__{x['id']}",
+                            "tid": x['attributes']['drupal_internal__tid'],
+                            "rev_id": x['attributes']['drupal_internal__revision_id'],
+                            "url": f"{self.endpoint}taxonomy_term/personen/{x['id']}",
+                            "browser_url": f"{self.browser}/taxonomy/term/{x['attributes']['drupal_internal__tid']}"
+                        }
+                    )
+            os.makedirs(os.path.join(self.save_dir, "data"), exist_ok=True)
+            with open(os.path.join(self.save_dir, 'data', f'{index_type}.json'), 'w', encoding='utf8') as f:
+                json.dump(index, f)
         else:
             try:
-                with open(self.save_path_json, 'r', encoding='utf8') as f:
-                    persons = json.load(f)
+                with open(os.path.join(self.save_dir, 'data', f'{index_type}.json'), 'r', encoding='utf8') as f:
+                    index = json.load(f)
             except FileNotFoundError:
-                print(f"file {self.save_path_json} not found, switching dump=True and restarting")
-                persons = self.get_persons(dmp=True)
-        return persons
+                print(f"file {os.path.join(self.save_dir, 'data', f'{index_type}.json')} not found, switching \
+                    dump=True and restarting")
+                index = self.get_index(dmp=True, index_type=index_type)
+        return index
 
     def __init__(
         self,
@@ -1131,14 +1167,6 @@ class FrdPersons(FrdClient):
     ):
         super().__init__(**kwargs)
         self.save_dir = os.path.join(self.out_dir)
-        self.file_name = "person_index.xml"
-        self.file_name_json = "person_index.json"
-        self.save_path = os.path.join(
-            self.save_dir, "persons", self.file_name
-        )
-        self.save_path_json = os.path.join(
-            self.save_dir, "persons/data", self.file_name_json
-        )
 
 
 def yield_works(url, simple=True):
