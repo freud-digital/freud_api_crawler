@@ -62,6 +62,9 @@ setup(
             'freud_api_crawler/templates',
             [
                 'freud_api_crawler/templates/tei.xml',
+                'freud_api_crawler/templates/ort.xml',
+                'freud_api_crawler/templates/personen.xml',
+                'freud_api_crawler/templates/publishers.xml',
             ]
         ),
     ],
@@ -69,6 +72,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/acdh-oeaw/freud_api_crawler',
-    version='1.9.8',
+    version='1.9.9',
     zip_safe=False,
 )

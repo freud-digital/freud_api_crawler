@@ -82,10 +82,7 @@
          {% for item in objects %}<listPerson>
             {% for x in item.data %}
             <person xml:id="{{ x.id }}">
-               <persName>
-                  <forename>{{ x.name.split(', ')[1] }}</forename>
-                  <surname>{{ x.name.split(', ')[0] }}</surname>
-               </persName>
+               <persName>{{ x.name }}</persName>
                <idno type="url">{{ x.browser_url }}</idno>
                <idno type="api">{{ x.url }}</idno>
             </person>

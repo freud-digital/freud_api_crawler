@@ -418,7 +418,7 @@ class FrdManifestation(FrdClient):
     def get_man_json_dump(self, lmt=True, dmp=False):
         if dmp:
             json_dump = {}
-            json_dump["id"] = f"man__{self.manifestation_id}"
+            json_dump["id"] = f"bibl__{self.manifestation_id}"
             json_dump["browser_url"] = f"{self.browser}{self.manifestation_folder}"
             man_type = self.manifestation['data']['type'].replace('--', '/')
             json_dump["url"] = f"{self.endpoint}{man_type}/{self.manifestation_id}"
@@ -560,7 +560,8 @@ class FrdManifestation(FrdClient):
                 "browser": self.browser,
             }
             publication = self.get_publication_md(init_methods)
-            json_dump["publication"]["publication"] = publication
+            if publication["id"]:
+                json_dump["publication"]["publication"] = publication
             # publication level 3
             init_methods = {
                 "manifestation": self.manifestation_id,
@@ -576,7 +577,8 @@ class FrdManifestation(FrdClient):
                 "browser": self.browser,
             }
             publication = self.get_publication_md(init_methods)
-            json_dump["publication"]["publication"]["publication"] = publication
+            if publication["id"]:
+                json_dump["publication"]["publication"]["publication"] = publication
             # repository
             try:
                 msType = self.repository['data']['type'].replace('--', '/')
@@ -729,11 +731,11 @@ class FrdManifestation(FrdClient):
         try:
             obj["id"] = f"bibl__{init_methods['publication']['data']['id']}"
         except (KeyError, TypeError):
-            obj["id"] = "None"
+            obj["id"] = None
         try:
             obj["title"] = escape(init_methods['publication']['data']['attributes']['title'])
         except (KeyError, TypeError):
-            obj["title"] = f"man__{init_methods['manifestation']}"
+            obj["title"] = None
         try:
             obj["type"] = escape(init_methods['pub_type']['data']['attributes']['name'])
         except (KeyError, TypeError):
