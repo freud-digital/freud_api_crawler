@@ -75,40 +75,38 @@
         <note type="footnote" prev="true"><xsl:apply-templates/></note>
     </xsl:template>
     <xsl:template match="tei:p[@class='title']">
-        <p>
-            <title type="main"><xsl:apply-templates/></title>
+        <p rendition="{@class}">
+            <xsl:apply-templates/>
         </p>
     </xsl:template>
     <xsl:template match="tei:p[@class='h1']">
-        <p>
-            <title rendition="#level_1"><xsl:apply-templates/></title>
+        <p rendition="{@class}">
+            <title><xsl:apply-templates/></title>
         </p>
     </xsl:template>
     <xsl:template match="tei:p[@class='h2']">
-        <p>
-            <title rendition="#level_2"><xsl:apply-templates/></title>
+        <p rendition="{@class}">
+            <xsl:apply-templates/>
         </p>
     </xsl:template>
     <xsl:template match="tei:p[@class='h3']">
-        <p>
-            <title rendition="#level_3"><xsl:apply-templates/></title>
+        <p rendition="{@class}">
+            <xsl:apply-templates/>
         </p>
     </xsl:template>
     <xsl:template match="tei:p[@class='h4']">
-        <p>
-            <title rendition="#level_4"><xsl:apply-templates/></title>
+        <p rendition="{@class}">
+            <xsl:apply-templates/>
         </p>
     </xsl:template>
     <xsl:template match="tei:p[@class='h5']">
-        <p>
-            <title rendition="#level_5"><xsl:apply-templates/></title>
+        <p rendition="{@class}">
+            <xsl:apply-templates/>
         </p>
     </xsl:template>
     <xsl:template match="tei:p[@class='comment_editor']">
-        <p>
-            <note type="comment_editor">
-                <xsl:apply-templates/>
-            </note>
+        <p rendition="{@class}">
+            <xsl:apply-templates/>
         </p>
     </xsl:template>
     <!-- <xsl:template match="tei:p[@class='ff']">

@@ -104,7 +104,7 @@
             <msDesc>
                {% if man.repository %}<msIdentifier>
                   <repository>{{ man.repository.name }}</repository>
-                  <idno type="url">{{ man.repository.url }}</idno>
+                  <idno type="api">{{ man.repository.url }}</idno>
                </msIdentifier>{% endif %}
                <msContents>
                   <msItem>
@@ -130,7 +130,7 @@
                            {% if man.publication.herausgeber %}{% for pub in man.publication.herausgeber %}<editor ref="#{{ pub.id }}">{{ pub.name }}</editor>{% endfor %}{% endif %}
                            {% if man.publication.editor %}{% for pub in man.publication.editor %}<editor ref="#{{ pub.id }}">{{ pub.name }}</editor>{% endfor %}{% endif %}
                            {% if man.publication.advisor %}{% for pub in man.publication.advisor %}<editor ref="#{{ pub.id }}">{{ pub.name }}</editor>{% endfor %}{% endif %}
-                           {% if man.publication.url %}<idno type="url">{{ man.publication.url }}</idno>{% endif %}
+                           {% if man.publication.url %}<idno type="api">{{ man.publication.url }}</idno>{% endif %}
                            {% if man.publication.type %}<name>{{ man.publication.type }}</name>{% endif %}
                         </bibl>{% endif %}
                      </bibl>
