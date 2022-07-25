@@ -428,6 +428,7 @@ class FrdManifestation(FrdClient):
                 s_title_t = self.manifestation['data']['attributes']['field_shorttitle']
                 json_dump['man_shorttitle'] = escape(s_title_t['value'])
             except (KeyError, TypeError):
+                json_dump['man_shorttitle'] = None
                 print("No short title found!")
             try:
                 field_date = self.manifestation['data']['attributes']['field_datum']
@@ -436,6 +437,7 @@ class FrdManifestation(FrdClient):
                     "end_value": field_date['end_value']
                 }
             except(KeyError, TypeError):
+                json_dump['date'] = {}
                 print("manifestation has no field_datum.")
             try:
                 field_reihe = self.manifestation['data']['attributes']['field_reihe']
@@ -445,6 +447,7 @@ class FrdManifestation(FrdClient):
                     "number": field_reihe_no
                 }
             except(KeyError, TypeError):
+                json_dump['reihe'] = {}
                 print("manifestation has no field_reihe")
             try:
                 field_pages = self.manifestation['data']['attributes']['field_pages']
@@ -459,11 +462,13 @@ class FrdManifestation(FrdClient):
                         name: page_num
                     }
             except (KeyError, TypeError):
+                json_dump['page_num'] = {}
                 print("manifestation has no field_pages")
             try:
                 man_art = self.art['data']['attributes']['name']
                 json_dump['man_type'] = man_art
             except (KeyError, TypeError):
+                json_dump['man_type'] = None
                 print("manifestation has no field_art")
             try:
                 json_dump['man_font'] = []
@@ -473,20 +478,24 @@ class FrdManifestation(FrdClient):
                         "name": man_font
                     })
             except (KeyError, TypeError):
+                json_dump['man_font'] = {}
                 print("manifestation has no field_font")
             try:
                 man_format = self.format['data']['attributes']['name']
                 json_dump['man_format'] = man_format
             except (KeyError, TypeError):
+                json_dump['man_format'] = None
                 print("manifestation has no field_font")
             try:
                 man_mediatype = self.mediatype['data']['attributes']['name']
                 json_dump['man_mediatype'] = man_mediatype
             except (KeyError, TypeError):
+                json_dump['man_mediatype'] = None
                 print("manifestation has no field_mediatype")
             try:
                 json_dump["type"] = escape(self.type['data']['attributes']['name'])
             except (KeyError, TypeError):
+                json_dump["type"] = None
                 print("Manifestation has no attribute field_publication_type.")
             try:
                 man_sprache = self.sprache['data']['attributes']['name']
@@ -496,6 +505,7 @@ class FrdManifestation(FrdClient):
                     "langcode": man_langcode
                 }
             except (KeyError, TypeError):
+                json_dump['man_lang'] = {}
                 print("manifestation has no field_sprache")
             try:
                 man_edition = self.edition['data']['attributes']['name']
@@ -503,6 +513,7 @@ class FrdManifestation(FrdClient):
                     "name": man_edition
                 }
             except (KeyError, TypeError):
+                json_dump['man_edition'] = None
                 print("manifestation has no field_edition")
             try:
                 attr = self.author['data']['attributes']
@@ -588,6 +599,7 @@ class FrdManifestation(FrdClient):
                     "url": f"{self.endpoint}{msType}/{self.repository['data']['id']}"
                 }
             except (KeyError, TypeError):
+                json_dump["repository"] = {}
                 print("It seems there is no 'filed_aufbewahrungsort'")
             try:
                 repo_container = self.manifestation['data']['attributes']['field_aufbewahrungsort_container']

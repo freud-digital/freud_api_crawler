@@ -3,6 +3,7 @@ import re
 CLEAN_UP_PATTERNS = [
     ('\n', ''),
     ('-<br />', '<lb break="no"/>'),
+    ('-\u00a0<br />', '<lb break="no"/>'),
     ('<br />', '<lb />\n'),
     ('</p>', '<lb break="paragraph"/></p>\n'),
     ('-<lb break="paragraph"/></p>', '<lb break="no"/></p>'),
