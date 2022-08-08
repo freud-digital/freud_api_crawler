@@ -3,9 +3,9 @@
    <teiHeader>
       <fileDesc>
          <titleStmt>
-            <title type="main">{{ man.man_title }} ({{ man.signature }})</title>
-            <title type="short">{{ man.man_shorttitle }}</title>
-            <title type="sub">Sigmund Freud Edition: Digitale Historisch-Kritische Gesamtausgabe</title>
+            <title type="work" level="a">{{ man.work.title }}</title>
+            <title type="manifestation" level="a">{{ man.man_title }} ({{ man.signature }})</title>
+            <title type="series" level="s">Sigmund Freud Edition: Digitale Historisch-Kritische Gesamtausgabe</title>
             <author ref="#{{ man.author.id }}">{{ man.author.name }}</author>
             <editor>
                <name>Diercks, Christine</name>
@@ -75,83 +75,151 @@
                </licence>
             </availability>
          </publicationStmt>
-         <seriesStmt xml:id="{{ man.work.id }}">
-            <title type="work">{{ man.work.title }}</title>
-            <title type="sub">Sigmund Freud Edition: Digitale Historisch-Kritische Gesamtausgabe</title>
-            <idno type="url">{{ man.work.browser_url }}</idno>
-            <idno type="api">{{ man.work.url }}</idno>
-         </seriesStmt>
          <sourceDesc>
-            <listBibl>
-               <bibl xml:id="{{ man.id }}">
+            <biblStruct xml:id="leit-manifestation">
+               {% if man.type == "Monographie" or man.type == "Werkausgabe" or man.type == "Periodikum (Heft)" or man.type == "Periodikum (Jahrgang)" or man.type == "Periodiukum" %}
+               <monogr>
                   <title type="manifestation">{{ man.man_title }}</title>
-                  <title type="short">{{ man.man_shorttitle }}</title>
-                  <title type="sub">Sigmund Freud Edition: Digitale Historisch-Kritische Gesamtausgabe</title>
+                  <title type="manifestation-short">{{ man.man_shorttitle }}</title>
                   <author ref="#{{ man.author.id }}">{{ man.author.name }}</author>
-                  <editor>
-                     <name>Blatow, Arkadi</name>
-                     <name>Diercks, Christine</name>
-                     <name>Huber, Christian</name>
-                     <name>Kaufmann, Kira</name>
-                     <name>Rohrwasser, Michael</name>
-                  </editor>
-                  <date when="2022">2022</date>
-                  <idno type="signature">{{ man.signature }}</idno>
-                  <idno type="url">{{ man.browser_url }}</idno>
-                  <idno type="api">{{ man.url }}</idno>
-               </bibl>
-            </listBibl>
-            <msDesc>
-               {% if man.repository %}<msIdentifier>
-                  <repository>{{ man.repository.name }}</repository>
-                  <idno type="api">{{ man.repository.url }}</idno>
-               </msIdentifier>{% endif %}
-               <msContents>
-                  <msItem>
-                     <bibl>
-                        <title>{{ man.man_title }}</title>
-                        <author ref="#{{ man.author.id }}">{{ man.author.name }}</author>
-                        {% if man.publication.id %}<date when="{{ man.publication.date }}">{{ man.publication.date }}</date>{% endif %}
-                        {% if man.repository.arch_url %}<indo type="{{ man.repository.name }}">{{ man.repository.arch_url }}</idno>{% endif %}
-                        <name>{{ man.type }}</name>
-                        {% if man.publication.id %}<bibl xml:id="{{ man.publication.id }}">
-                           {% if man.publication.title_main %}<title type="main">{{ man.publication.title_main }}</title>{% endif %}
-                           {% if man.publication.title_sub %}<title type="sub">{{ man.publication.title_sub }}</title>{% endif %}
-                           {% if man.publication.title_short %}<title type="short">{{ man.publication.title_short }}</title>{% endif %}
-                           {% if man.publication.places %}{% for place in man.publication.places %}<pubPlace>{{ place.name }}</pubPlace>{% endfor %}{% endif %}
-                           {% if man.publication.date %}<date when="{{ man.publication.date }}">{{ man.publication.date }}</date>{% endif %}
-                           {% if man.publication.band %}<biblScope unit="volume">{{ man.publication.band.name }}</biblScope>{% endif %}
-                           {% if man.publication.reihe.name %}<biblScope unit="series">{{ man.publication.reihe.name }}</biblScope>{% endif %}
-                           {% if man.publication.edition %}<biblScope unit="issue">{{ man.publication.edition.name }}</biblScope>{% endif %}
-                           {% if man.publication.jahrgang %}<biblScope unit="year">{{ man.publication.jahrgang }}</biblScope>{% endif %}
-                           {% if man.page_num %}<biblScope unit="page" {% if man.page_num.start %}from="{{ man.page_num.start }}"{% endif %} {% if man.page_num.end %}to="{{ man.page_num.end }}"{% endif %}>{% if man.page_num.start %}{{ man.page_num.start }}-{% endif %}{% if man.page_num.end %}{{ man.page_num.end }}{% endif %}</biblScope>{% endif %}
-                           {% if man.publication.publisher %}{% for pub in man.publication.publisher %}<publisher ref="#{{ pub.id }}">{{ pub.name }}</publisher>{% endfor %}{% endif %}
-                           {% if man.publication.author %}{% for pub in man.publication.author %}<author ref="#{{ pub.id }}">{{ pub.name }}</author>{% endfor %}{% endif %}
-                           {% if man.publication.herausgeber %}{% for pub in man.publication.herausgeber %}<editor ref="#{{ pub.id }}">{{ pub.name }}</editor>{% endfor %}{% endif %}
-                           {% if man.publication.editor %}{% for pub in man.publication.editor %}<editor ref="#{{ pub.id }}">{{ pub.name }}</editor>{% endfor %}{% endif %}
-                           {% if man.publication.advisor %}{% for pub in man.publication.advisor %}<editor ref="#{{ pub.id }}">{{ pub.name }}</editor>{% endfor %}{% endif %}
-                           {% if man.publication.url %}<idno type="api">{{ man.publication.url }}</idno>{% endif %}
-                           {% if man.publication.type %}<name>{{ man.publication.type }}</name>{% endif %}
-                        </bibl>{% endif %}
-                     </bibl>
-                  </msItem>
-               </msContents>
-               <physDesc>
-                  <objectDesc>
-                     <supportDesc>
-                        <support>
-                           {% if man.man_format %}{{ man.man_format }}{% endif %} aus {% if man.man_mediatype %}<material>{{ man.man_mediatype }}</material>{% endif %} in {% if man.man_font %}{% for x in man.man_font %}{{ x.name }} {% endfor %}.{% endif %}
-                        </support>
-                     </supportDesc>
-                  </objectDesc>
-                  <handDesc>
-                     <p>{% for x in man.man_font %}{{ x.name }} {% endfor %}</p>
-                  </handDesc>
-                  <typeDesc>
-                     <p>{{ man.man_type }}</p>
-                  </typeDesc>
-               </physDesc>
-            </msDesc>
+                  {% if man.publication.id %}
+                  <imprint>
+                     {% if man.publication.publisher %}{% for pub in man.publication.publisher %}<publisher ref="#{{ pub.id }}">{{ pub.name }}</publisher>{% endfor %}{% endif %}
+                     {% if man.publication.places %}{% for place in man.publication.places %}<pubPlace>{{ place.name }}</pubPlace>{% endfor %}{% endif %}
+                     {% if man.publication.date %}<date when="{{ man.publication.date }}">{{ man.publication.date }}</date>{% endif %}
+                  </imprint>
+                  {% endif %}
+                  {% if man.page_num %}
+                  <extent>{% if man.page_num.start %}{{ man.page_num.start }}{% endif %}{% if man.page_num.start and man.page_num.end %} - {% endif %}{% if man.page_num.end %}{{ man.page_num.end }} Seiten{% endif %}</extent>
+                  {% endif %}
+                  <name>{{ man.type }}</name>
+               </monogr>
+               {% if man.publication.id %}
+               <series>
+                  {% if man.publication.title_main %}<title type="publication" level="s">{{ man.publication.title_main }}</title>{% endif %}
+                  <title type="publication-short" level="s">{{ man.man_shorttitle }}</title>
+                  {% if man.publication.herausgeber %}
+                  <respStmt>
+                     <resp>Herausgegeben von</resp>
+                     {% for pub in man.publication.herausgeber %}<name type="person" ref="#{{ pub.id }}">{{ pub.name }}</name>{% endfor %}
+                  </respStmt>
+                  {% endif %}
+                  {% if man.publication.editor %}
+                  <respStmt>
+                     <resp>Editiert von</resp>
+                     {% for pub in man.publication.editor %}<name ref="#{{ pub.id }}">{{ pub.name }}</name>{% endfor %}
+                  </respStmt>
+                  {% endif %}
+                  {% if man.publication.advisor %}
+                  <respStmt>
+                     <resp>Editiert von</resp>
+                     {% for pub in man.publication.advisor %}<name ref="#{{ pub.id }}">{{ pub.name }}</name>{% endfor %}
+                  </respStmt>
+                  {% endif %}
+                  {% if man.publication.band %}<biblScope unit="volume">{{ man.publication.band.name }}</biblScope>{% endif %}
+                  {% if man.publication.reihe.name %}<biblScope unit="series">{{ man.publication.reihe.name }}</biblScope>{% endif %}
+                  {% if man.publication.edition %}<biblScope unit="issue">{{ man.publication.edition.name }}</biblScope>{% endif %}
+                  {% if man.publication.jahrgang %}<biblScope unit="year">{{ man.publication.jahrgang }}</biblScope>{% endif %}
+                  <name>{{ man.publication.type }}</name>
+               </series>
+               {% endif %}
+               {% else %}
+               <analytic>
+                  <title type="manifestation">{{ man.man_title }}</title>
+                  <author ref="#{{ man.author.id }}">{{ man.author.name }}</author>
+                  <name>{{ man.type }}</name>
+               </analytic>
+               {% if man.publication.id %}
+               <monogr>
+                  <title type="publication">{{ man.publication.title_main }}</title>
+                  <title type="publication-sub">{{ man.publication.title_sub }}</title>
+                  <title type="publication-short">{{ man.publication.title_short }}</title>
+                  {% if man.publication.herausgeber %}
+                  <respStmt>
+                     <resp>Herausgegeben von</resp>
+                     {% for pub in man.publication.herausgeber %}<name type="person" ref="#{{ pub.id }}">{{ pub.name }}</name>{% endfor %}
+                  </respStmt>
+                  {% endif %}
+                  {% if man.publication.editor %}
+                  <respStmt>
+                     <resp>Editiert von</resp>
+                     {% for pub in man.publication.editor %}<name ref="#{{ pub.id }}">{{ pub.name }}</name>{% endfor %}
+                  </respStmt>
+                  {% endif %}
+                  {% if man.publication.advisor %}
+                  <respStmt>
+                     <resp>Editiert von</resp>
+                     {% for pub in man.publication.advisor %}<name ref="#{{ pub.id }}">{{ pub.name }}</name>{% endfor %}
+                  </respStmt>
+                  {% endif %}
+                  {% if man.publication.id %}
+                  <imprint>
+                     {% if man.publication.places %}{% for place in man.publication.places %}<pubPlace>{{ place.name }}</pubPlace>{% endfor %}{% endif %}
+                     {% if man.publication.date %}<date when="{{ man.publication.date }}">{{ man.publication.date }}</date>{% endif %}
+                  </imprint>
+                  {% endif %}
+                  {% if man.page_num %}<extent>{% if man.page_num.start %}{{ man.page_num.start }}{% endif %}{% if man.page_num.start and man.page_num.end %} - {% endif %}{% if man.page_num.end %}{{ man.page_num.end }} Seiten{% endif %}</extent>{% endif %}
+                  {% if man.publication.band %}<biblScope unit="volume">{{ man.publication.band.name }}</biblScope>{% endif %}
+                  {% if man.publication.reihe.name %}<biblScope unit="series">{{ man.publication.reihe.name }}</biblScope>{% endif %}
+                  {% if man.publication.edition %}<biblScope unit="issue">{{ man.publication.edition.name }}</biblScope>{% endif %}
+                  {% if man.publication.jahrgang %}<biblScope unit="year">{{ man.publication.jahrgang }}</biblScope>{% endif %}
+                  <name>{{ man.publication.type }}</name>
+               </monogr>
+               {% endif %}
+               {% endif %}
+               <relatedItem type="digitisedVersion">
+                  <bibl xml:id="{{ man.id }}">
+                     <title>{{ man.man_title }}</title>
+                     <author ref="#{{ man.author.id }}">{{ man.author.name }}</author>
+                     <editor>
+                        <name>Blatow, Arkadi</name>
+                        <name>Diercks, Christine</name>
+                        <name>Huber, Christian</name>
+                        <name>Kaufmann, Kira</name>
+                        <name>Rohrwasser, Michael</name>
+                     </editor>
+                     <date when="2022">2022</date>
+                     <idno type="signature">{{ man.signature }}</idno>
+                     <idno type="url">{{ man.browser_url }}</idno>
+                     <idno type="api">{{ man.url }}</idno>
+                     <relatedItem type="work">
+                        <bibl xml:id="{{ man.work.id }}">
+                           <title>{{ man.work.title }}</title>
+                           <idno type="url">{{ man.work.browser_url }}</idno>
+                           <idno type="api">{{ man.work.url }}</idno>
+                        </bibl>
+                     </relatedItem>
+                  </bibl>
+               </relatedItem>
+               <relatedItem type="exemplar">
+                  <msDesc>
+                     {% if man.repository %}
+                     <msIdentifier>
+                        <repository>{{ man.repository.name }}</repository>
+                        {% if man.repository.orig_archiv_id %}
+                        <indo type="{{ man.repository.name|replace(' ', '-') }}">{{ man.repository.orig_archiv_id }}</idno>
+                        {% endif %}
+                        <idno type="api">{{ man.repository.url }}</idno>
+                     </msIdentifier>
+                     {% endif %}                     
+                     <physDesc>
+                        <objectDesc>
+                           <supportDesc>
+                              <support>
+                                 {% if man.man_format %}{{ man.man_format }}{% endif %} aus {% if man.man_mediatype %}<material>{{ man.man_mediatype }}</material>{% endif %} in {% if man.man_font %}{% for x in man.man_font %}{{ x.name }} {% endfor %}.{% endif %}
+                              </support>
+                           </supportDesc>
+                        </objectDesc>
+                        <handDesc>
+                           <p>{% for x in man.man_font %}{{ x.name }} {% endfor %}</p>
+                        </handDesc>
+                        <typeDesc>
+                           <p>{{ man.man_type }}</p>
+                        </typeDesc>
+                     </physDesc>
+                  </msDesc>
+               </relatedItem>
+            </biblStruct>
          </sourceDesc>
       </fileDesc>
       <profileDesc>
