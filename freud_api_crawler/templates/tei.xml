@@ -76,7 +76,7 @@
             </availability>
          </publicationStmt>
          <sourceDesc>
-            <biblStruct xml:id="leit-manifestation">
+            <biblStruct xml:id="guiding_manifestation">
                {% if man.type == "Monographie" or man.type == "Werkausgabe" or man.type == "Periodikum (Heft)" or man.type == "Periodikum (Jahrgang)" or man.type == "Periodiukum" %}
                <monogr>
                   <title type="manifestation">{{ man.man_title }}</title>
@@ -197,7 +197,7 @@
                      <msIdentifier>
                         <repository>{{ man.repository.name }}</repository>
                         {% if man.repository.orig_archiv_id %}
-                        <indo type="{{ man.repository.name|replace(' ', '-') }}">{{ man.repository.orig_archiv_id }}</idno>
+                        <idno type="{{ man.repository.name|replace(' ', '-') }}">{{ man.repository.orig_archiv_id }}</idno>
                         {% endif %}
                         <idno type="api">{{ man.repository.url }}</idno>
                      </msIdentifier>
