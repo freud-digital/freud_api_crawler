@@ -144,15 +144,20 @@
         <hi><xsl:attribute name="rendition"><xsl:value-of select="concat('#', ./@class)"/></xsl:attribute><xsl:apply-templates/></hi>
     </xsl:template>
     <xsl:template match="tei:span[@class='footnote-index']">
-        <hi><xsl:attribute name="rendition"><xsl:value-of select="concat('#', ./@class)"/></xsl:attribute><xsl:value-of select="."/></hi>
+        <hi><xsl:attribute name="rendition"><xsl:value-of select="concat('#', ./@class)"/></xsl:attribute><xsl:apply-templates/></hi>
+    </xsl:template>
+    <xsl:template match="tei:span[@class='inlinequote']">
+        <q><xsl:attribute name="type">inlinequote</xsl:attribute><xsl:apply-templates/></q>
+    </xsl:template>
+    <xsl:template match="tei:span[@class='blockquote']">
+        <q><xsl:attribute name="type">blockquote</xsl:attribute><xsl:apply-templates/></q>
     </xsl:template>
     <xsl:template match="tei:em">
-        <hi><xsl:attribute name="rendition">#em</xsl:attribute><xsl:value-of select="."/></hi>
+        <hi><xsl:attribute name="rendition">#em</xsl:attribute><xsl:apply-templates/></hi>
     </xsl:template>
     <xsl:template match="tei:sup">
-        <xsl:value-of select="."/>
+        <hi><xsl:attribute name="rendition">#sub</xsl:attribute><xsl:apply-templates/></hi>
     </xsl:template>
-
 
     <!--
         ####################
@@ -160,7 +165,7 @@
         ####################
 -->
     <xsl:template match="tei:blockquote">
-        <q><xsl:apply-templates/></q>
+        <q><xsl:attribute name="type">blockquote</xsl:attribute><xsl:apply-templates/></q>
     </xsl:template>
 
 </xsl:stylesheet>
