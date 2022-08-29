@@ -425,6 +425,11 @@ class FrdManifestation(FrdClient):
             json_dump['man_title'] = self.md__title
             json_dump['signature'] = self.manifestation_signatur
             try:
+                json_dump['note_i'] = self.manifestation['data']['attributes']['field_anmerkung_intern_']['processed']
+            except (KeyError, TypeError):
+                json_dump['note_i'] = None
+                print("No 'note intern' found!")
+            try:
                 s_title_t = self.manifestation['data']['attributes']['field_shorttitle']
                 json_dump['man_shorttitle'] = escape(s_title_t['value'])
             except (KeyError, TypeError):
@@ -538,7 +543,7 @@ class FrdManifestation(FrdClient):
             json_dump["work"] = {}
             json_dump["work"]["id"] = f"bibl__{self.werk['id']}"
             json_dump["work"]["title"] = escape(self.werk['attributes']['title'])
-            json_dump["work"]["url"] = f"{self.endpoint}werk/{self.werk['id']}"
+            json_dump["work"]["url"] = f"{self.endpoint}node/werk/{self.werk['id']}"
             json_dump["work"]["browser_url"] = f"{self.browser}{self.werk_folder}"
             # publication level 1
             init_methods = {

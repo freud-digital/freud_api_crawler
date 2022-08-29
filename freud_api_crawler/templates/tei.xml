@@ -75,6 +75,13 @@
                </licence>
             </availability>
          </publicationStmt>
+         {% if man.note_i %}
+         <notesStmt>
+            <note type="comment_intern">
+               {{ man.note_i }}
+            </note>
+         </notesStmt>
+         {% endif %}
          <sourceDesc>
             <biblStruct xml:id="guiding_manifestation">
                {% if man.type == "Monographie" or man.type == "Werkausgabe" or man.type == "Periodikum (Heft)" or man.type == "Periodikum (Jahrgang)" or man.type == "Periodiukum" %}
