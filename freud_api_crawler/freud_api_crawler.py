@@ -1203,7 +1203,7 @@ def yield_works(url, simple=True):
                 yield item
 
 
-def make_xml(workpath, out_dir, save=False):
+def make_xml(workpath, out_dir, dump, save=False, test=False):
     """serializes a manifestation as XML/TEI document
 
     :param save: if set, a XML/TEI file `{workpath}` is saved
@@ -1211,24 +1211,8 @@ def make_xml(workpath, out_dir, save=False):
 
     :return: A lxml.etree
     """
-    data = glob.glob(os.path.join(out_dir, workpath, "data", "*.json"))
-    doc = []
-    for x in data:
-        try:
-            with open(x, 'r', encoding='utf8') as f:
-                json_dump = json.load(f)
-        except FileNotFoundError:
-            print(f"file {x} not found, run get_man_json_dump() function first")
-        json_dump['publicationHistory'] = []
-        history = glob.glob(os.path.join(out_dir, workpath, "data", "*.json"))
-        for x in history:
-            try:
-                with open(x, 'r', encoding='utf8') as f:
-                    json_dump['publicationHistory'].append(
-                        json.load(f)
-                    )
-            except FileNotFoundError:
-                print("no json dump found")
+    if test:
+        json_dump = dump
         templateLoader = jinja2.PackageLoader(
             "freud_api_crawler", "templates"
         )
@@ -1239,11 +1223,38 @@ def make_xml(workpath, out_dir, save=False):
         tei = ET.fromstring(tei)
         transform = ET.XSLT(XSL_DOC)
         tei = transform(tei)
-        if save:
-            signatur = json_dump["signature"]
-            filename = signatur.replace("/", "__")
-            savepath = os.path.join(out_dir, workpath)
-            with open(os.path.join(savepath, f"sfe-{filename}.xml"), 'wb') as f:
-                f.write(ET.tostring(tei, pretty_print=True, encoding="utf-8"))
-        doc.append(tei)
-    return doc[0]
+    else:
+        data = glob.glob(os.path.join(out_dir, workpath, "data", "*.json"))
+        for x in data:
+            try:
+                with open(x, 'r', encoding='utf8') as f:
+                    json_dump = json.load(f)
+            except FileNotFoundError:
+                print(f"file {x} not found, run get_man_json_dump() function first")
+            json_dump['publicationHistory'] = []
+            history = glob.glob(os.path.join(out_dir, workpath, "data", "*.json"))
+            for x in history:
+                try:
+                    with open(x, 'r', encoding='utf8') as f:
+                        json_dump['publicationHistory'].append(
+                            json.load(f)
+                        )
+                except FileNotFoundError:
+                    print("no json dump found")
+            templateLoader = jinja2.PackageLoader(
+                "freud_api_crawler", "templates"
+            )
+            templateEnv = jinja2.Environment(loader=templateLoader)
+            template = templateEnv.get_template('./tei.xml')
+            tei = template.render({"objects": [json_dump]})
+            tei = re.sub(r'\s+$', '', tei, flags=re.MULTILINE)
+            tei = ET.fromstring(tei)
+            transform = ET.XSLT(XSL_DOC)
+            tei = transform(tei)
+            if save:
+                signatur = json_dump["signature"]
+                filename = signatur.replace("/", "__")
+                savepath = os.path.join(out_dir, workpath)
+                with open(os.path.join(savepath, f"sfe-{filename}.xml"), 'wb') as f:
+                    f.write(ET.tostring(tei, pretty_print=True, encoding="utf-8"))
+    return tei

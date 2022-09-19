@@ -152,8 +152,8 @@ class TestFreud_api_crawler(unittest.TestCase):
     def test_014_check_tei_serialiazer(self):
         """test tei serialisation"""
         frd_obj = FRD_MANIFESTATION
-        frd_obj.get_man_json_dump(lmt=False)
-        xml = frd.make_xml(save=False, out_dir=SAVE_DIR, workpath=WERK_PATH)
+        dump = frd_obj.get_man_json_dump(lmt=False)
+        xml = frd.make_xml(save=False, out_dir=SAVE_DIR, dump=dump, workpath=WERK_PATH, test=True)
         xml_str = ET.tostring(xml).decode('utf-8')
         print(type(xml), type(xml_str))
         self.assertTrue(frd_obj.manifestation_id in xml_str)
