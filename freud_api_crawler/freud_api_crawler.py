@@ -2,6 +2,7 @@ import os
 import json
 import re
 import time
+import glob
 from collections import defaultdict
 
 import requests
@@ -390,247 +391,214 @@ class FrdManifestation(FrdClient):
         }
         return result
 
-    def make_xml(self, save=False, limit=True, dump=False):
-
-        """serializes a manifestation as XML/TEI document
-
-        :param save: if set, a XML/TEI file `{self.save_path}` is saved
-        :param type: bool
-
-        :return: A lxml.etree
-        """
-        json_dump = self.get_man_json_dump(lmt=limit, dmp=dump)
-        templateLoader = jinja2.PackageLoader(
-            "freud_api_crawler", "templates"
-        )
-        templateEnv = jinja2.Environment(loader=templateLoader)
-        template = templateEnv.get_template('./tei.xml')
-        tei = template.render({"objects": [json_dump]})
-        tei = re.sub(r'\s+$', '', tei, flags=re.MULTILINE)
-        tei = ET.fromstring(tei)
-        transform = ET.XSLT(self.xsl_doc)
-        tei = transform(tei)
-        if save:
-            with open(self.save_path, 'wb') as f:
-                f.write(ET.tostring(tei, pretty_print=True, encoding="utf-8"))
-        return tei
-
-    def get_man_json_dump(self, lmt=True, dmp=False):
-        if dmp:
-            json_dump = {}
-            json_dump["id"] = f"bibl__{self.manifestation_id}"
-            json_dump["browser_url"] = f"{self.browser}{self.manifestation_folder}"
-            man_type = self.manifestation['data']['type'].replace('--', '/')
-            json_dump["url"] = f"{self.endpoint}{man_type}/{self.manifestation_id}"
-            json_dump['man_title'] = self.md__title
-            json_dump['signature'] = self.manifestation_signatur
-            try:
-                json_dump['note_i'] = self.manifestation['data']['attributes']['field_anmerkung_intern_']['processed']
-            except (KeyError, TypeError):
-                json_dump['note_i'] = None
-                print("No 'note intern' found!")
-            try:
-                s_title_t = self.manifestation['data']['attributes']['field_shorttitle']
-                json_dump['man_shorttitle'] = escape(s_title_t['value'])
-            except (KeyError, TypeError):
-                json_dump['man_shorttitle'] = None
-                print("No short title found!")
-            try:
-                field_date = self.manifestation['data']['attributes']['field_datum']
-                json_dump['date'] = {
-                    "value": field_date['value'],
-                    "end_value": field_date['end_value']
-                }
-            except(KeyError, TypeError):
-                json_dump['date'] = {}
-                print("manifestation has no field_datum.")
-            try:
-                field_reihe = self.manifestation['data']['attributes']['field_reihe']
-                field_reihe_no = self.manifestation['data']['attributes']['field_reihe_nummer']
-                json_dump['reihe'] = {
-                    "name": field_reihe,
-                    "number": field_reihe_no
-                }
-            except(KeyError, TypeError):
-                json_dump['reihe'] = {}
-                print("manifestation has no field_reihe")
-            try:
-                field_pages = self.manifestation['data']['attributes']['field_pages']
-                json_dump['page_num'] = []
-                for idx, x in enumerate(field_pages):
-                    page_num = x['value']
-                    if idx == 0:
-                        name = "start"
-                    else:
-                        name = "end"
-                    json_dump['page_num'] = {
-                        name: page_num
-                    }
-            except (KeyError, TypeError):
-                json_dump['page_num'] = {}
-                print("manifestation has no field_pages")
-            try:
-                man_art = self.art['data']['attributes']['name']
-                json_dump['man_type'] = man_art
-            except (KeyError, TypeError):
-                json_dump['man_type'] = None
-                print("manifestation has no field_art")
-            try:
-                json_dump['man_font'] = []
-                for x in self.font:
-                    man_font = x['data']['attributes']['name']
-                    json_dump['man_font'].append({
-                        "name": man_font
-                    })
-            except (KeyError, TypeError):
-                json_dump['man_font'] = {}
-                print("manifestation has no field_font")
-            try:
-                man_format = self.format['data']['attributes']['name']
-                json_dump['man_format'] = man_format
-            except (KeyError, TypeError):
-                json_dump['man_format'] = None
-                print("manifestation has no field_font")
-            try:
-                man_mediatype = self.mediatype['data']['attributes']['name']
-                json_dump['man_mediatype'] = man_mediatype
-            except (KeyError, TypeError):
-                json_dump['man_mediatype'] = None
-                print("manifestation has no field_mediatype")
-            try:
-                json_dump["type"] = escape(self.type['data']['attributes']['name'])
-            except (KeyError, TypeError):
-                json_dump["type"] = None
-                print("Manifestation has no attribute field_publication_type.")
-            try:
-                man_sprache = self.sprache['data']['attributes']['name']
-                man_langcode = self.sprache['data']['attributes']['langcode']
-                json_dump['man_lang'] = {
-                    "name": man_sprache,
-                    "langcode": man_langcode
-                }
-            except (KeyError, TypeError):
-                json_dump['man_lang'] = {}
-                print("manifestation has no field_sprache")
-            try:
-                man_edition = self.edition['data']['attributes']['name']
-                json_dump['man_edition'] = {
-                    "name": man_edition
-                }
-            except (KeyError, TypeError):
-                json_dump['man_edition'] = None
-                print("manifestation has no field_edition")
-            try:
-                attr = self.author['data']['attributes']
-                json_dump["author"] = {
-                    "name": escape(attr['name']),
-                    "id": f"p__{self.author['data']['id']}",
-                    "tid": attr['drupal_internal__tid'],
-                    "rev_id": attr['drupal_internal__revision_id'],
-                    "url": f"{self.endpoint}taxonomy_term/personen/{self.author['data']['id']}",
-                    "browser_url": f"{self.browser}/taxonomy/term/{attr['drupal_internal__revision_id']}"
-                }
-            except (KeyError, TypeError):
-                json_dump["author"] = {
-                    "name": "Freud, Sigmund",
-                    "id": "p__80f26163-0581-4079-a0ce-4f2417f09b97",
-                    "tid": "111",
-                    "rev_id": "111",
-                    "url": f"{self.endpoint}taxonomy_term/personen/80f26163-0581-4079-a0ce-4f2417f09b97",
-                    "browser_url": f"{self.browser}/taxonomy/term/111"
-                }
-            # work level
-            json_dump["work"] = {}
-            json_dump["work"]["id"] = f"bibl__{self.werk['id']}"
-            json_dump["work"]["title"] = escape(self.werk['attributes']['title'])
-            json_dump["work"]["url"] = f"{self.endpoint}node/werk/{self.werk['id']}"
-            json_dump["work"]["browser_url"] = f"{self.browser}{self.werk_folder}"
-            # publication level 1
-            init_methods = {
-                "manifestation": self.manifestation_id,
-                "publication": self.publication,
-                "publisher": self.pub_publisher,
-                "pub_herausgeber": self.pub_herausgeber,
-                "pub_author": self.pub_author,
-                "pub_edition": self.pub_edition,
-                "pub_advisors": self.pub_advisors,
-                "pub_editors": self.pub_editors,
-                "pub_type": self.pub_type,
-                "endpoint": self.endpoint,
-                "browser": self.browser,
+    def get_man_json_dump(self, lmt=True):
+        json_dump = {}
+        json_dump["id"] = f"bibl__{self.manifestation_id}"
+        json_dump["browser_url"] = f"{self.browser}{self.manifestation_folder}"
+        man_type = self.manifestation['data']['type'].replace('--', '/')
+        json_dump["url"] = f"{self.endpoint}{man_type}/{self.manifestation_id}"
+        json_dump['man_title'] = self.md__title
+        json_dump['signature'] = self.manifestation_signatur
+        try:
+            json_dump['note_i'] = self.manifestation['data']['attributes']['field_anmerkung_intern_']['processed']
+        except (KeyError, TypeError):
+            json_dump['note_i'] = None
+            print("No 'note intern' found!")
+        try:
+            s_title_t = self.manifestation['data']['attributes']['field_shorttitle']
+            json_dump['man_shorttitle'] = escape(s_title_t['value'])
+        except (KeyError, TypeError):
+            json_dump['man_shorttitle'] = None
+            print("No short title found!")
+        try:
+            field_date = self.manifestation['data']['attributes']['field_datum']
+            json_dump['date'] = {
+                "value": field_date['value'],
+                "end_value": field_date['end_value']
             }
-            publication = self.get_publication_md(init_methods)
-            json_dump["publication"] = publication
-            # publication level 2
-            init_methods = {
-                "manifestation": self.manifestation_id,
-                "publication": self.publication2,
-                "publisher": self.pub2_publisher,
-                "pub_herausgeber": self.pub2_herausgeber,
-                "pub_author": self.pub2_author,
-                "pub_edition": self.pub2_edition,
-                "pub_advisors": self.pub2_advisors,
-                "pub_editors": self.pub2_editors,
-                "pub_type": self.pub2_type,
-                "endpoint": self.endpoint,
-                "browser": self.browser,
+        except(KeyError, TypeError):
+            json_dump['date'] = {}
+            print("manifestation has no field_datum.")
+        try:
+            field_reihe = self.manifestation['data']['attributes']['field_reihe']
+            field_reihe_no = self.manifestation['data']['attributes']['field_reihe_nummer']
+            json_dump['reihe'] = {
+                "name": field_reihe,
+                "number": field_reihe_no
             }
-            publication = self.get_publication_md(init_methods)
-            if publication["id"]:
-                json_dump["publication"]["publication"] = publication
-            # publication level 3
-            init_methods = {
-                "manifestation": self.manifestation_id,
-                "publication": self.publication3,
-                "publisher": self.pub3_publisher,
-                "pub_herausgeber": self.pub3_herausgeber,
-                "pub_author": self.pub3_author,
-                "pub_edition": self.pub3_edition,
-                "pub_advisors": self.pub3_advisors,
-                "pub_editors": self.pub3_editors,
-                "pub_type": self.pub3_type,
-                "endpoint": self.endpoint,
-                "browser": self.browser,
-            }
-            publication = self.get_publication_md(init_methods)
-            if publication["id"]:
-                json_dump["publication"]["publication"]["publication"] = publication
-            # repository
-            try:
-                msType = self.repository['data']['type'].replace('--', '/')
-                json_dump["repository"] = {
-                    "id": f"rep__{self.repository['data']['id']}",
-                    "name": escape(self.repository['data']['attributes']['name']),
-                    "url": f"{self.endpoint}{msType}/{self.repository['data']['id']}"
+        except(KeyError, TypeError):
+            json_dump['reihe'] = {}
+            print("manifestation has no field_reihe")
+        try:
+            field_pages = self.manifestation['data']['attributes']['field_pages']
+            json_dump['page_num'] = []
+            for idx, x in enumerate(field_pages):
+                page_num = x['value']
+                if idx == 0:
+                    name = "start"
+                else:
+                    name = "end"
+                json_dump['page_num'] = {
+                    name: page_num
                 }
-            except (KeyError, TypeError):
-                json_dump["repository"] = {}
-                print("It seems there is no 'filed_aufbewahrungsort'")
-            try:
-                repo_container = self.manifestation['data']['attributes']['field_aufbewahrungsort_container']
-                json_dump["repository"]["orig_archiv_id"] = repo_container['value']
-            except (KeyError, TypeError):
-                print("It seems there is no 'filed_aufbewahrungsort_container'")
-            json_dump["pages"] = []
-            pages = self.pages
-            if lmt:
-                actual_pages = pages[:2]
-            else:
-                actual_pages = pages
-            for x in actual_pages:
-                page_json = self.get_page(x['id'])
-                pp = self.process_page(page_json)
-                json_dump["pages"].append(pp)
-            os.makedirs(os.path.join(self.save_dir, self.werk_signatur, 'data'), exist_ok=True)
-            with open(self.save_path_json, 'w', encoding='utf8') as f:
-                json.dump(json_dump, f)
+        except (KeyError, TypeError):
+            json_dump['page_num'] = {}
+            print("manifestation has no field_pages")
+        try:
+            man_art = self.art['data']['attributes']['name']
+            json_dump['man_type'] = man_art
+        except (KeyError, TypeError):
+            json_dump['man_type'] = None
+            print("manifestation has no field_art")
+        try:
+            json_dump['man_font'] = []
+            for x in self.font:
+                man_font = x['data']['attributes']['name']
+                json_dump['man_font'].append({
+                    "name": man_font
+                })
+        except (KeyError, TypeError):
+            json_dump['man_font'] = {}
+            print("manifestation has no field_font")
+        try:
+            man_format = self.format['data']['attributes']['name']
+            json_dump['man_format'] = man_format
+        except (KeyError, TypeError):
+            json_dump['man_format'] = None
+            print("manifestation has no field_font")
+        try:
+            man_mediatype = self.mediatype['data']['attributes']['name']
+            json_dump['man_mediatype'] = man_mediatype
+        except (KeyError, TypeError):
+            json_dump['man_mediatype'] = None
+            print("manifestation has no field_mediatype")
+        try:
+            json_dump["type"] = escape(self.type['data']['attributes']['name'])
+        except (KeyError, TypeError):
+            json_dump["type"] = None
+            print("Manifestation has no attribute field_publication_type.")
+        try:
+            man_sprache = self.sprache['data']['attributes']['name']
+            man_langcode = self.sprache['data']['attributes']['langcode']
+            json_dump['man_lang'] = {
+                "name": man_sprache,
+                "langcode": man_langcode
+            }
+        except (KeyError, TypeError):
+            json_dump['man_lang'] = {}
+            print("manifestation has no field_sprache")
+        try:
+            man_edition = self.edition['data']['attributes']['name']
+            json_dump['man_edition'] = {
+                "name": man_edition
+            }
+        except (KeyError, TypeError):
+            json_dump['man_edition'] = None
+            print("manifestation has no field_edition")
+        try:
+            attr = self.author['data']['attributes']
+            json_dump["author"] = {
+                "name": escape(attr['name']),
+                "id": f"p__{self.author['data']['id']}",
+                "tid": attr['drupal_internal__tid'],
+                "rev_id": attr['drupal_internal__revision_id'],
+                "url": f"{self.endpoint}taxonomy_term/personen/{self.author['data']['id']}",
+                "browser_url": f"{self.browser}/taxonomy/term/{attr['drupal_internal__revision_id']}"
+            }
+        except (KeyError, TypeError):
+            json_dump["author"] = {
+                "name": "Freud, Sigmund",
+                "id": "p__80f26163-0581-4079-a0ce-4f2417f09b97",
+                "tid": "111",
+                "rev_id": "111",
+                "url": f"{self.endpoint}taxonomy_term/personen/80f26163-0581-4079-a0ce-4f2417f09b97",
+                "browser_url": f"{self.browser}/taxonomy/term/111"
+            }
+        # work level
+        json_dump["work"] = {}
+        json_dump["work"]["id"] = f"bibl__{self.werk['id']}"
+        json_dump["work"]["title"] = escape(self.werk['attributes']['title'])
+        json_dump["work"]["url"] = f"{self.endpoint}node/werk/{self.werk['id']}"
+        json_dump["work"]["browser_url"] = f"{self.browser}{self.werk_folder}"
+        # publication level 1
+        init_methods = {
+            "manifestation": self.manifestation_id,
+            "publication": self.publication,
+            "publisher": self.pub_publisher,
+            "pub_herausgeber": self.pub_herausgeber,
+            "pub_author": self.pub_author,
+            "pub_edition": self.pub_edition,
+            "pub_advisors": self.pub_advisors,
+            "pub_editors": self.pub_editors,
+            "pub_type": self.pub_type,
+            "endpoint": self.endpoint,
+            "browser": self.browser,
+        }
+        publication = self.get_publication_md(init_methods)
+        json_dump["publication"] = publication
+        # publication level 2
+        init_methods = {
+            "manifestation": self.manifestation_id,
+            "publication": self.publication2,
+            "publisher": self.pub2_publisher,
+            "pub_herausgeber": self.pub2_herausgeber,
+            "pub_author": self.pub2_author,
+            "pub_edition": self.pub2_edition,
+            "pub_advisors": self.pub2_advisors,
+            "pub_editors": self.pub2_editors,
+            "pub_type": self.pub2_type,
+            "endpoint": self.endpoint,
+            "browser": self.browser,
+        }
+        publication = self.get_publication_md(init_methods)
+        if publication["id"]:
+            json_dump["publication"]["publication"] = publication
+        # publication level 3
+        init_methods = {
+            "manifestation": self.manifestation_id,
+            "publication": self.publication3,
+            "publisher": self.pub3_publisher,
+            "pub_herausgeber": self.pub3_herausgeber,
+            "pub_author": self.pub3_author,
+            "pub_edition": self.pub3_edition,
+            "pub_advisors": self.pub3_advisors,
+            "pub_editors": self.pub3_editors,
+            "pub_type": self.pub3_type,
+            "endpoint": self.endpoint,
+            "browser": self.browser,
+        }
+        publication = self.get_publication_md(init_methods)
+        if publication["id"]:
+            json_dump["publication"]["publication"]["publication"] = publication
+        # repository
+        try:
+            msType = self.repository['data']['type'].replace('--', '/')
+            json_dump["repository"] = {
+                "id": f"rep__{self.repository['data']['id']}",
+                "name": escape(self.repository['data']['attributes']['name']),
+                "url": f"{self.endpoint}{msType}/{self.repository['data']['id']}"
+            }
+        except (KeyError, TypeError):
+            json_dump["repository"] = {}
+            print("It seems there is no 'filed_aufbewahrungsort'")
+        try:
+            repo_container = self.manifestation['data']['attributes']['field_aufbewahrungsort_container']
+            json_dump["repository"]["orig_archiv_id"] = repo_container['value']
+        except (KeyError, TypeError):
+            print("It seems there is no 'filed_aufbewahrungsort_container'")
+        json_dump["pages"] = []
+        pages = self.pages
+        if lmt:
+            actual_pages = pages[:2]
         else:
-            try:
-                with open(self.save_path_json, 'r', encoding='utf8') as f:
-                    json_dump = json.load(f)
-            except FileNotFoundError:
-                print(f"file {self.save_path_json} not found, switching dump=True and restarting")
-                json_dump = self.get_man_json_dump(lmt=lmt, dmp=True)
+            actual_pages = pages
+        for x in actual_pages:
+            page_json = self.get_page(x['id'])
+            pp = self.process_page(page_json)
+            json_dump["pages"].append(pp)
+        os.makedirs(os.path.join(self.save_dir, self.werk_signatur, 'data'), exist_ok=True)
+        with open(self.save_path_json, 'w', encoding='utf8') as f:
+            json.dump(json_dump, f)
         return json_dump
 
     def get_fe_werk_signatur(self):
@@ -1075,6 +1043,9 @@ class FrdManifestation(FrdClient):
         self.save_path_json = os.path.join(
             self.save_dir, self.werk_signatur, "data", self.file_name_json
         )
+        self.save_path_json_dir = os.path.join(
+            self.save_dir, self.werk_signatur, "data"
+        )
 
 
 class FrdIndex(FrdClient):
@@ -1230,3 +1201,47 @@ def yield_works(url, simple=True):
                 item['path'] = x['attributes']['path']['alias']
                 item['umschrift'] = x['attributes']['field_status_umschrift']
                 yield item
+
+
+def make_xml(workpath, out_dir, save=False):
+    """serializes a manifestation as XML/TEI document
+
+    :param save: if set, a XML/TEI file `{workpath}` is saved
+    :param type: bool
+
+    :return: A lxml.etree
+    """
+    data = glob.glob(os.path.join(out_dir, workpath, "data", "*.json"))
+    for x in data:
+        try:
+            with open(x, 'r', encoding='utf8') as f:
+                json_dump = json.load(f)
+        except FileNotFoundError:
+            print(f"file {x} not found, run get_man_json_dump() function first")
+        json_dump['publicationHistory'] = []
+        history = glob.glob(os.path.join(out_dir, workpath, "data", "*.json"))
+        for x in history:
+            try:
+                with open(x, 'r', encoding='utf8') as f:
+                    json_dump['publicationHistory'].append(
+                        json.load(f)
+                    )
+            except FileNotFoundError:
+                print("no json dump found")
+        templateLoader = jinja2.PackageLoader(
+            "freud_api_crawler", "templates"
+        )
+        templateEnv = jinja2.Environment(loader=templateLoader)
+        template = templateEnv.get_template('./tei.xml')
+        tei = template.render({"objects": [json_dump]})
+        tei = re.sub(r'\s+$', '', tei, flags=re.MULTILINE)
+        tei = ET.fromstring(tei)
+        transform = ET.XSLT(XSL_DOC)
+        tei = transform(tei)
+        if save:
+            signatur = json_dump["signature"]
+            filename = signatur.replace("/", "__")
+            savepath = os.path.join(out_dir, workpath)
+            with open(os.path.join(savepath, f"sfe-{filename}.xml"), 'wb') as f:
+                f.write(ET.tostring(tei, pretty_print=True, encoding="utf-8"))
+    return tei
