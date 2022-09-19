@@ -1244,7 +1244,7 @@ def make_xml(workpath, out_dir, dump, save=False, test=False):
             templateLoader = jinja2.PackageLoader(
                 "freud_api_crawler", "templates"
             )
-            templateEnv = jinja2.Environment(loader=templateLoader)
+            templateEnv = jinja2.Environment(loader=templateLoader, trim_blocks=True, lstrip_blocks=True)
             template = templateEnv.get_template('./tei.xml')
             tei = template.render({"objects": [json_dump]})
             tei = re.sub(r'\s+$', '', tei, flags=re.MULTILINE)
