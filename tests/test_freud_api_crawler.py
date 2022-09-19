@@ -13,6 +13,8 @@ from freud_api_crawler import tei_utils
 from freud_api_crawler.entities import FrdPerson
 
 
+WERK_PATH = "1905-004"
+SAVE_DIR = "./werke"
 WERK_ID = "9d035a03-28d7-4013-adaf-63337d78ece4"
 MANIFESTATION_ID = "a10e8c78-adad-4ca2-bfcb-b51bedcd7b58"
 MANIFESTATION_PAGE_ID = "5126755a-eeae-4f53-82f9-aaa3a6fd81a9"
@@ -150,7 +152,8 @@ class TestFreud_api_crawler(unittest.TestCase):
     def test_014_check_tei_serialiazer(self):
         """test tei serialisation"""
         frd_obj = FRD_MANIFESTATION
-        xml = frd_obj.make_xml(dump=False)
+        frd_obj.get_man_json_dump(lmt=False)
+        xml = frd.make_xml(save=False, out_dir=SAVE_DIR, workpath=WERK_PATH)
         xml_str = ET.tostring(xml).decode('utf-8')
         print(type(xml), type(xml_str))
         self.assertTrue(frd_obj.manifestation_id in xml_str)
