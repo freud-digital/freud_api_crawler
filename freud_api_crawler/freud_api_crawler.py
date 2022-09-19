@@ -1212,6 +1212,7 @@ def make_xml(workpath, out_dir, save=False):
     :return: A lxml.etree
     """
     data = glob.glob(os.path.join(out_dir, workpath, "data", "*.json"))
+    doc = []
     for x in data:
         try:
             with open(x, 'r', encoding='utf8') as f:
@@ -1244,4 +1245,5 @@ def make_xml(workpath, out_dir, save=False):
             savepath = os.path.join(out_dir, workpath)
             with open(os.path.join(savepath, f"sfe-{filename}.xml"), 'wb') as f:
                 f.write(ET.tostring(tei, pretty_print=True, encoding="utf-8"))
-    return tei
+        doc.append(tei)
+    return doc[0]
