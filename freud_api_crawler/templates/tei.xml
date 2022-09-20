@@ -93,134 +93,134 @@
                   {% for x in man.publicationHistory %}
                   {% if man.id not in x.id %}
                   <biblStruct xml:id="bibl-{{ x.signature|replace("/", "-") }}">
-                     {% if man.type == "Monographie" or man.type == "Werkausgabe" or man.type == "Periodikum (Heft)" or man.type == "Periodikum (Jahrgang)" or man.type == "Periodiukum" %}
+                     {% if x.type == "Monographie" or x.type == "Werkausgabe" or x.type == "Periodikum (Heft)" or x.type == "Periodikum (Jahrgang)" or x.type == "Periodiukum" %}
                      <monogr>
-                        <title type="manifestation">{{ man.man_title }}</title>
-                        <title type="manifestation-short">{{ man.man_shorttitle }}</title>
-                        <author ref="#{{ man.author.id }}">{{ man.author.name }}</author>
-                        {% if man.publication.id %}
+                        <title type="manifestation">{{ x.man_title }}</title>
+                        <title type="manifestation-short">{{ x.man_shorttitle }}</title>
+                        <author ref="#{{ x.author.id }}">{{ x.author.name }}</author>
+                        {% if x.publication.id %}
                         <imprint>
-                           {% if man.publication.publisher %}
-                           {% for pub in man.publication.publisher %}
+                           {% if x.publication.publisher %}
+                           {% for pub in x.publication.publisher %}
                               <publisher ref="#{{ pub.id }}">{{ pub.name }}</publisher>
                            {% endfor %}
                            {% endif %}
-                           {% if man.publication.places %}
-                           {% for place in man.publication.places %}
+                           {% if x.publication.places %}
+                           {% for place in x.publication.places %}
                               <pubPlace>{{ place.name }}</pubPlace>
                            {% endfor %}
                            {% endif %}
-                           {% if man.publication.date %}
-                              <date when="{{ man.publication.date }}">{{ man.publication.date }}</date>
+                           {% if x.publication.date %}
+                              <date when="{{ x.publication.date }}">{{ x.publication.date }}</date>
                            {% endif %}
                         </imprint>
                         {% endif %}
-                        {% if man.page_num %}
-                        <extent>{% if man.page_num.start %}{{ man.page_num.start }}{% endif %}{% if man.page_num.start and man.page_num.end %} - {% endif %}{% if man.page_num.end %}{{ man.page_num.end }} Seiten{% endif %}</extent>
+                        {% if x.page_num %}
+                        <extent>{% if x.page_num.start %}{{ x.page_num.start }}{% endif %}{% if x.page_num.start and x.page_num.end %} - {% endif %}{% if x.page_num.end %}{{ x.page_num.end }} Seiten{% endif %}</extent>
                         {% endif %}
                      </monogr>
-                     {% if man.publication.id %}
+                     {% if x.publication.id %}
                      <series>
-                        {% if man.publication.title_main %}
-                        <title type="publication" level="s">{{ man.publication.title_main }}</title>
+                        {% if x.publication.title_main %}
+                        <title type="publication" level="s">{{ x.publication.title_main }}</title>
                         {% endif %}
-                        <title type="publication-short" level="s">{{ man.man_shorttitle }}</title>
-                        {% if man.publication.herausgeber %}
+                        <title type="publication-short" level="s">{{ x.man_shorttitle }}</title>
+                        {% if x.publication.herausgeber %}
                         <respStmt>
                            <resp>Herausgegeben von</resp>
-                           {% for pub in man.publication.herausgeber %}
+                           {% for pub in x.publication.herausgeber %}
                            <name type="person" ref="#{{ pub.id }}">{{ pub.name }}</name>
                            {% endfor %}
                         </respStmt>
                         {% endif %}
-                        {% if man.publication.editor %}
+                        {% if x.publication.editor %}
                         <respStmt>
                            <resp>Editiert von</resp>
-                           {% for pub in man.publication.editor %}
+                           {% for pub in x.publication.editor %}
                            <name ref="#{{ pub.id }}">{{ pub.name }}</name>
                            {% endfor %}
                         </respStmt>
                         {% endif %}
-                        {% if man.publication.advisor %}
+                        {% if x.publication.advisor %}
                         <respStmt>
                            <resp>Editiert von</resp>
-                           {% for pub in man.publication.advisor %}
+                           {% for pub in x.publication.advisor %}
                            <name ref="#{{ pub.id }}">{{ pub.name }}</name>
                            {% endfor %}
                         </respStmt>
                         {% endif %}
-                        {% if man.publication.band %}
-                        <biblScope unit="volume">{{ man.publication.band.name }}</biblScope>
+                        {% if x.publication.band %}
+                        <biblScope unit="volume">{{ x.publication.band.name }}</biblScope>
                         {% endif %}
-                        {% if man.publication.reihe.name %}
-                        <biblScope unit="series">{{ man.publication.reihe.name }}</biblScope>
+                        {% if x.publication.reihe.name %}
+                        <biblScope unit="series">{{ x.publication.reihe.name }}</biblScope>
                         {% endif %}
-                        {% if man.publication.edition %}
-                        <biblScope unit="issue">{{ man.publication.edition.name }}</biblScope>
+                        {% if x.publication.edition %}
+                        <biblScope unit="issue">{{ x.publication.edition.name }}</biblScope>
                         {% endif %}
-                        {% if man.publication.jahrgang %}
-                        <biblScope unit="year">{{ man.publication.jahrgang }}</biblScope>
+                        {% if x.publication.jahrgang %}
+                        <biblScope unit="year">{{ x.publication.jahrgang }}</biblScope>
                         {% endif %}
                      </series>
                      {% endif %}
                      {% else %}
                      <analytic>
-                        <title type="manifestation">{{ man.man_title }}</title>
-                        <author ref="#{{ man.author.id }}">{{ man.author.name }}</author>
+                        <title type="manifestation">{{ x.man_title }}</title>
+                        <author ref="#{{ x.author.id }}">{{ x.author.name }}</author>
                      </analytic>
-                     {% if man.publication.id %}
+                     {% if x.publication.id %}
                      <monogr>
-                        <title type="publication">{{ man.publication.title_main }}</title>
-                        <title type="publication-sub">{{ man.publication.title_sub }}</title>
-                        <title type="publication-short">{{ man.publication.title_short }}</title>
-                        {% if man.publication.herausgeber %}
+                        <title type="publication">{{ x.publication.title_main }}</title>
+                        <title type="publication-sub">{{ x.publication.title_sub }}</title>
+                        <title type="publication-short">{{ x.publication.title_short }}</title>
+                        {% if x.publication.herausgeber %}
                         <respStmt>
                            <resp>Herausgegeben von</resp>
-                           {% for pub in man.publication.herausgeber %}
+                           {% for pub in x.publication.herausgeber %}
                            <name type="person" ref="#{{ pub.id }}">{{ pub.name }}</name>
                            {% endfor %}
                         </respStmt>
                         {% endif %}
-                        {% if man.publication.editor %}
+                        {% if x.publication.editor %}
                         <respStmt>
                            <resp>Editiert von</resp>
-                           {% for pub in man.publication.editor %}
+                           {% for pub in x.publication.editor %}
                            <name ref="#{{ pub.id }}">{{ pub.name }}</name>
                            {% endfor %}
                         </respStmt>
                         {% endif %}
-                        {% if man.publication.advisor %}
+                        {% if x.publication.advisor %}
                         <respStmt>
                            <resp>Editiert von</resp>
-                           {% for pub in man.publication.advisor %}
+                           {% for pub in x.publication.advisor %}
                            <name ref="#{{ pub.id }}">{{ pub.name }}</name>
                            {% endfor %}
                         </respStmt>
                         {% endif %}
-                        {% if man.publication.id %}
+                        {% if x.publication.id %}
                         <imprint>
-                           {% if man.publication.places %}
-                           {% for place in man.publication.places %}
+                           {% if x.publication.places %}
+                           {% for place in x.publication.places %}
                            <pubPlace>{{ place.name }}</pubPlace>
                            {% endfor %}
                            {% endif %}
-                           {% if man.publication.date %}
-                           <date when="{{ man.publication.date }}">{{ man.publication.date }}</date>
+                           {% if x.publication.date %}
+                           <date when="{{ x.publication.date }}">{{ x.publication.date }}</date>
                            {% endif %}
                         </imprint>
                         {% endif %}
-                        {% if man.page_num %}<extent>{% if man.page_num.start %}{{ man.page_num.start }}{% endif %}{% if man.page_num.start and man.page_num.end %} - {% endif %}{% if man.page_num.end %}{{ man.page_num.end }} Seiten{% endif %}</extent>{% endif %}
-                        {% if man.publication.band %}
-                        <biblScope unit="volume">{{ man.publication.band.name }}</biblScope>
+                        {% if x.page_num %}<extent>{% if x.page_num.start %}{{ x.page_num.start }}{% endif %}{% if x.page_num.start and x.page_num.end %} - {% endif %}{% if x.page_num.end %}{{ x.page_num.end }} Seiten{% endif %}</extent>{% endif %}
+                        {% if x.publication.band %}
+                        <biblScope unit="volume">{{ x.publication.band.name }}</biblScope>
                         {% endif %}
-                        {% if man.publication.reihe.name %}
-                        <biblScope unit="series">{{ man.publication.reihe.name }}</biblScope>
+                        {% if x.publication.reihe.name %}
+                        <biblScope unit="series">{{ x.publication.reihe.name }}</biblScope>
                         {% endif %}
-                        {% if man.publication.edition %}
-                        <biblScope unit="issue">{{ man.publication.edition.name }}</biblScope>
+                        {% if x.publication.edition %}
+                        <biblScope unit="issue">{{ x.publication.edition.name }}</biblScope>
                         {% endif %}
-                        {% if man.publication.jahrgang %}
-                        <biblScope unit="year">{{ man.publication.jahrgang }}</biblScope>
+                        {% if x.publication.jahrgang %}
+                        <biblScope unit="year">{{ x.publication.jahrgang }}</biblScope>
                         {% endif %}
                      </monogr>
                      {% endif %}
