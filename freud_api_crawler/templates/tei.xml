@@ -26,6 +26,11 @@
          <editionStmt>
             <edition>Sigmund Freud Edition: Digitale Historisch-Kritische Gesamtausgabe</edition>
             <respStmt>
+               <resp>Herausgegeben von</resp>
+               <name>Diercks, Christine</name>
+               <name>Rohrwasser, Michael</name>
+            </respStmt>
+            <respStmt>
                <resp>Konzept für die Edition und die Datenbank, Richtlinien, Quellenforschung, Signaturen, Referenzsystem</resp>
                <name>Diercks, Christine</name>
             </respStmt>
@@ -35,11 +40,10 @@
             </respStmt>
             <respStmt>
                <resp>Diplomatische Umschrift, Lektorat</resp>
-               <name>Blatow, Arkadi</name>
                <name>Diercks, Christine</name>
                <name>Huber, Christian</name>
                <name>Kaufmann, Kira</name>
-               <name>Rohrwasser, Michael</name>
+               <name>Liepold, Sophie</name>
             </respStmt>
             <respStmt>
                <resp>Technische Umsetzung der Datenbank und der digitalen Instrumente</resp>
@@ -87,7 +91,8 @@
                <head>Publikationsgeschichte</head>
                {% if man.publicationHistory %}
                   {% for x in man.publicationHistory %}
-                  <biblStruct xml:id="bibl-{{ x.signature|replace("/", "-") }}" {% if man.id in x.id %}sameAs="#guidingManifestation"{% endif %}>
+                  {% if man.id not in x.id %}
+                  <biblStruct xml:id="bibl-{{ x.signature|replace("/", "-") }}">
                      {% if man.type == "Monographie" or man.type == "Werkausgabe" or man.type == "Periodikum (Heft)" or man.type == "Periodikum (Jahrgang)" or man.type == "Periodiukum" %}
                      <monogr>
                         <title type="manifestation">{{ man.man_title }}</title>
@@ -97,23 +102,22 @@
                         <imprint>
                            {% if man.publication.publisher %}
                            {% for pub in man.publication.publisher %}
-                           <publisher ref="#{{ pub.id }}">{{ pub.name }}</publisher>
+                              <publisher ref="#{{ pub.id }}">{{ pub.name }}</publisher>
                            {% endfor %}
                            {% endif %}
                            {% if man.publication.places %}
                            {% for place in man.publication.places %}
-                           <pubPlace>{{ place.name }}</pubPlace>
+                              <pubPlace>{{ place.name }}</pubPlace>
                            {% endfor %}
                            {% endif %}
                            {% if man.publication.date %}
-                           <date when="{{ man.publication.date }}">{{ man.publication.date }}</date>
+                              <date when="{{ man.publication.date }}">{{ man.publication.date }}</date>
                            {% endif %}
                         </imprint>
                         {% endif %}
                         {% if man.page_num %}
                         <extent>{% if man.page_num.start %}{{ man.page_num.start }}{% endif %}{% if man.page_num.start and man.page_num.end %} - {% endif %}{% if man.page_num.end %}{{ man.page_num.end }} Seiten{% endif %}</extent>
                         {% endif %}
-                        <note>{{ man.type }}</note>
                      </monogr>
                      {% if man.publication.id %}
                      <series>
@@ -157,14 +161,12 @@
                         {% if man.publication.jahrgang %}
                         <biblScope unit="year">{{ man.publication.jahrgang }}</biblScope>
                         {% endif %}
-                        <note>{{ man.publication.type }}</note>
                      </series>
                      {% endif %}
                      {% else %}
                      <analytic>
                         <title type="manifestation">{{ man.man_title }}</title>
                         <author ref="#{{ man.author.id }}">{{ man.author.name }}</author>
-                        <note>{{ man.type }}</note>
                      </analytic>
                      {% if man.publication.id %}
                      <monogr>
@@ -197,8 +199,14 @@
                         {% endif %}
                         {% if man.publication.id %}
                         <imprint>
-                           {% if man.publication.places %}{% for place in man.publication.places %}<pubPlace>{{ place.name }}</pubPlace>{% endfor %}{% endif %}
-                           {% if man.publication.date %}<date when="{{ man.publication.date }}">{{ man.publication.date }}</date>{% endif %}
+                           {% if man.publication.places %}
+                           {% for place in man.publication.places %}
+                           <pubPlace>{{ place.name }}</pubPlace>
+                           {% endfor %}
+                           {% endif %}
+                           {% if man.publication.date %}
+                           <date when="{{ man.publication.date }}">{{ man.publication.date }}</date>
+                           {% endif %}
                         </imprint>
                         {% endif %}
                         {% if man.page_num %}<extent>{% if man.page_num.start %}{{ man.page_num.start }}{% endif %}{% if man.page_num.start and man.page_num.end %} - {% endif %}{% if man.page_num.end %}{{ man.page_num.end }} Seiten{% endif %}</extent>{% endif %}
@@ -214,14 +222,14 @@
                         {% if man.publication.jahrgang %}
                         <biblScope unit="year">{{ man.publication.jahrgang }}</biblScope>
                         {% endif %}
-                        <note>{{ man.publication.type }}</note>
                      </monogr>
                      {% endif %}
                      {% endif %}
                   </biblStruct>
+                  {% endif %}
                   {% endfor %}
                {% endif %}
-               <biblStruct xml:id="guidingManifestation">
+               <biblStruct xml:id="bibl-{{ man.signature|replace("/", "-") }}" type="guidingManifestation">
                   {% if man.type == "Monographie" or man.type == "Werkausgabe" or man.type == "Periodikum (Heft)" or man.type == "Periodikum (Jahrgang)" or man.type == "Periodiukum" %}
                   <monogr>
                      <title type="manifestation">{{ man.man_title }}</title>
@@ -247,7 +255,6 @@
                      {% if man.page_num %}
                      <extent>{% if man.page_num.start %}{{ man.page_num.start }}{% endif %}{% if man.page_num.start and man.page_num.end %} - {% endif %}{% if man.page_num.end %}{{ man.page_num.end }} Seiten{% endif %}</extent>
                      {% endif %}
-                     <note>{{ man.type }}</note>
                   </monogr>
                   {% if man.publication.id %}
                   <series>
@@ -291,14 +298,12 @@
                      {% if man.publication.jahrgang %}
                      <biblScope unit="year">{{ man.publication.jahrgang }}</biblScope>
                      {% endif %}
-                     <note>{{ man.publication.type }}</note>
                   </series>
                   {% endif %}
                   {% else %}
                   <analytic>
                      <title type="manifestation">{{ man.man_title }}</title>
                      <author ref="#{{ man.author.id }}">{{ man.author.name }}</author>
-                     <note>{{ man.type }}</note>
                   </analytic>
                   {% if man.publication.id %}
                   <monogr>
@@ -356,7 +361,6 @@
                      {% if man.publication.jahrgang %}
                      <biblScope unit="year">{{ man.publication.jahrgang }}</biblScope>
                      {% endif %}
-                     <note>{{ man.publication.type }}</note>
                   </monogr>
                   {% endif %}
                   {% endif %}
@@ -370,6 +374,11 @@
                            <idno type="url">https://www.freud-edition.net</idno>
                         </series>
                         <author ref="#{{ man.author.id }}">{{ man.author.name }}</author>
+                        <respStmt>
+                           <resp>Herausgegeben von</resp>
+                           <name>Diercks, Christine</name>
+                           <name>Rohrwasser, Michael</name>
+                        </respStmt>
                         <respStmt>
                            <resp>Konzept für die Edition und die Datenbank, Richtlinien, Quellenforschung,
                               Signaturen, Referenzsystem</resp>
