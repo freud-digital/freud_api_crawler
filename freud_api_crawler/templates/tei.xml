@@ -441,7 +441,7 @@
          </sourceDesc>
       </fileDesc>
       <encodingDesc>
-         <tagsDecsl>
+         <tagsDecl>
             <rendition xml:id="smallcaps" scheme="css" selector="hi">font-variant:small-caps;letter-spacing:8px;</rendition>
             <rendition xml:id="em" scheme="css" selector="hi">font-style:italic;</rendition>
             <rendition xml:id="bold" scheme="css" selector="hi">font-weight:bold;</rendition>
@@ -450,7 +450,7 @@
             <rendition xml:id="marginalie_place" selector="p">TBA</rendition>
             <rendition xml:id="title" selector="p[@class='title']">Haupttitle des Dokuments</rendition>
             <rendition xml:id="h1" selector="p[@class='h1']">Titel eines Paragraphen</rendition>
-         </tagsDecsl>
+         </tagsDecl>
       </encodingDesc>
       <profileDesc>
          <langUsage>
