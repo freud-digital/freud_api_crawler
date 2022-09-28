@@ -66,7 +66,7 @@
         </xsl:choose>        
     </xsl:template>
     <xsl:template match="tei:p[@class='marginalie_place']">
-        <p rendition="#marginalie_place"><xsl:apply-templates/></p>
+        <p rendition="#{@class}"><xsl:apply-templates/></p>
     </xsl:template>
     <xsl:template match="tei:p[@class='footnote']">
         <note type="footnote"><xsl:apply-templates/></note>
@@ -75,37 +75,37 @@
         <note type="footnote" prev="true"><xsl:apply-templates/></note>
     </xsl:template>
     <xsl:template match="tei:p[@class='title']">
-        <p rendition="{@class}">
+        <p rendition="#{@class}">
             <xsl:apply-templates/>
         </p>
     </xsl:template>
     <xsl:template match="tei:p[@class='h1']">
-        <p rendition="{@class}">
+        <p rendition="#{@class}">
             <title><xsl:apply-templates/></title>
         </p>
     </xsl:template>
     <xsl:template match="tei:p[@class='h2']">
-        <p rendition="{@class}">
+        <p rendition="#{@class}">
             <xsl:apply-templates/>
         </p>
     </xsl:template>
     <xsl:template match="tei:p[@class='h3']">
-        <p rendition="{@class}">
+        <p rendition="#{@class}">
             <xsl:apply-templates/>
         </p>
     </xsl:template>
     <xsl:template match="tei:p[@class='h4']">
-        <p rendition="{@class}">
+        <p rendition="#{@class}">
             <xsl:apply-templates/>
         </p>
     </xsl:template>
     <xsl:template match="tei:p[@class='h5']">
-        <p rendition="{@class}">
+        <p rendition="#{@class}">
             <xsl:apply-templates/>
         </p>
     </xsl:template>
     <xsl:template match="tei:p[@class='comment_editor']">
-        <p rendition="{@class}">
+        <p rendition="#{@class}">
             <xsl:apply-templates/>
         </p>
     </xsl:template>
@@ -144,6 +144,9 @@
         <hi><xsl:attribute name="rendition"><xsl:value-of select="concat('#', ./@class)"/></xsl:attribute><xsl:apply-templates/></hi>
     </xsl:template>
     <xsl:template match="tei:span[@class='footnote-index']">
+        <hi><xsl:attribute name="rendition"><xsl:value-of select="concat('#', ./@class)"/></xsl:attribute><xsl:apply-templates/></hi>
+    </xsl:template>
+    <xsl:template match="tei:span[@class='endnote-index']">
         <hi><xsl:attribute name="rendition"><xsl:value-of select="concat('#', ./@class)"/></xsl:attribute><xsl:apply-templates/></hi>
     </xsl:template>
     <xsl:template match="tei:span[@class='inlinequote']">
