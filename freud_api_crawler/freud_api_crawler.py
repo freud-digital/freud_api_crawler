@@ -416,7 +416,7 @@ class FrdManifestation(FrdClient):
                 "value": field_date['value'],
                 "end_value": field_date['end_value']
             }
-        except(KeyError, TypeError):
+        except (KeyError, TypeError):
             json_dump['date'] = {}
             print("manifestation has no field_datum.")
         try:
@@ -426,7 +426,7 @@ class FrdManifestation(FrdClient):
                 "name": field_reihe,
                 "number": field_reihe_no
             }
-        except(KeyError, TypeError):
+        except (KeyError, TypeError):
             json_dump['reihe'] = {}
             print("manifestation has no field_reihe")
         try:
@@ -732,7 +732,7 @@ class FrdManifestation(FrdClient):
                 "name": field_reihe,
                 "number": field_reihe_no
             }
-        except(KeyError, TypeError):
+        except (KeyError, TypeError):
             print("publication has no field_reihe")
         try:
             edition = init_methods['pub_edition']['data']['attributes']['name']
