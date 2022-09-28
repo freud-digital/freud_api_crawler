@@ -114,6 +114,10 @@
                               <date when="{{ x.publication.date }}">{{ x.publication.date }}</date>
                            {% endif %}
                         </imprint>
+                        {% else %}
+                        <imprint>
+                           <date when="{{ x.date.value }}">{{ x.date.value }}</date>
+                        </imprint>
                         {% endif %}
                         {% if x.page_num %}
                         <extent>{% if x.page_num.start %}{{ x.page_num.start }}{% endif %}{% if x.page_num.start and x.page_num.end %} - {% endif %}{% if x.page_num.end %}{{ x.page_num.end }} Seiten{% endif %}</extent>
@@ -208,6 +212,10 @@
                            <date when="{{ x.publication.date }}">{{ x.publication.date }}</date>
                            {% endif %}
                         </imprint>
+                        {% else %}
+                        <imprint>
+                           <date when="{{ x.date.value }}">{{ x.date.value }}</date>
+                        </imprint>
                         {% endif %}
                         {% if x.page_num %}<extent>{% if x.page_num.start %}{{ x.page_num.start }}{% endif %}{% if x.page_num.start and x.page_num.end %} - {% endif %}{% if x.page_num.end %}{{ x.page_num.end }} Seiten{% endif %}</extent>{% endif %}
                         {% if x.publication.band %}
@@ -250,6 +258,10 @@
                         {% if man.publication.date %}
                         <date when="{{ man.publication.date }}">{{ man.publication.date }}</date>
                         {% endif %}
+                     </imprint>
+                     {% else %}
+                     <imprint>
+                        <date when="{{ man.date.value }}">{{ man.date.value }}</date>
                      </imprint>
                      {% endif %}
                      {% if man.page_num %}
@@ -344,6 +356,10 @@
                         {% if man.publication.date %}
                         <date when="{{ man.publication.date }}">{{ man.publication.date }}</date>
                         {% endif %}
+                     </imprint>
+                     {% else %}
+                     <imprint>
+                        <date when="{{ man.date.value }}">{{ man.date.value }}</date>
                      </imprint>
                      {% endif %}
                      {% if man.page_num %}
