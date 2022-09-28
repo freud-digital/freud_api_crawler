@@ -71,6 +71,9 @@
     <xsl:template match="tei:p[@class='footnote']">
         <note type="footnote"><xsl:apply-templates/></note>
     </xsl:template>
+    <xsl:template match="tei:p[@class='endnote']">
+        <note type="endnote"><xsl:apply-templates/></note>
+    </xsl:template>
     <xsl:template match="tei:p[@class='footnote footnote-ff']">
         <note type="footnote" prev="true"><xsl:apply-templates/></note>
     </xsl:template>
