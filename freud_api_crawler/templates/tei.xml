@@ -79,13 +79,23 @@
                </licence>
             </availability>
          </publicationStmt>
-         {% if man.note_i %}
          <notesStmt>
+            {% if man.note_i %}
             <note type="comment_intern">
                {{ man.note_i }}
             </note>
+            {% endif %}
+            {% if man.doc_component %}
+            <note type="doc_component">
+               {{ man.doc_component.name }}
+            </note>
+            {% endif %}
+            {% if man.man_doc_type %}
+            <note type="man_type">
+               {{ man.man_doc_type.name }}
+            </note>
+            {% endif %}
          </notesStmt>
-         {% endif %}
          <sourceDesc>
             <listBibl>
                <head>Publikationsgeschichte</head>
@@ -473,6 +483,19 @@
             <language ident="de">Deutsch</language>
          </langUsage>
       </profileDesc>
+      {% if man.status %}
+      <revisionDesc status="{{ man.status.name }}">
+         <change who="#dstoxreiter" when="{{ man.status.date }}">
+            {% if man.status.name == "complete" %}
+            Der Status 'complete' entspricht einer abgeschlossenen Korrektur der OCR Umschrift.
+            {% elif man.status.name == "proposed" %}
+            Der Status 'proposed' entspricht einer nicht abgeschlossenen Korrektur der OCR Umschrift.
+            {% elif man.status.name == "undefined" %}
+            Der Status 'undefined' entspricht einem unklaren Status der OCR Umschrift.
+            {% endif %}
+         </change>
+      </revisionDesc>
+      {% endif %}
    </teiHeader>
    <text>
       <body>

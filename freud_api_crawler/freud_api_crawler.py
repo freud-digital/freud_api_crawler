@@ -4,6 +4,7 @@ import re
 import time
 import glob
 from collections import defaultdict
+from datetime import datetime
 
 import requests
 import lxml.etree as ET
@@ -393,12 +394,54 @@ class FrdManifestation(FrdClient):
 
     def get_man_json_dump(self, lmt=True):
         json_dump = {}
-        json_dump["id"] = f"bibl__{self.manifestation_id}"
-        json_dump["browser_url"] = f"{self.browser}{self.manifestation_folder}"
+        json_dump['id'] = f"bibl__{self.manifestation_id}"
+        json_dump['browser_url'] = f"{self.browser}{self.manifestation_folder}"
         man_type = self.manifestation['data']['type'].replace('--', '/')
-        json_dump["url"] = f"{self.endpoint}{man_type}/{self.manifestation_id}"
+        json_dump['url'] = f"{self.endpoint}{man_type}/{self.manifestation_id}"
         json_dump['man_title'] = self.md__title
         json_dump['signature'] = self.manifestation_signatur
+        try:
+            field_status = self.manifestation['data']['attributes']['field_status_umschrift']
+            if field_status == 2:
+                field_name = "complete"
+                field_status = str(field_status)
+            elif field_status == None:
+                field_name = "proposed"
+                field_status = "0"
+            else:
+                field_name = "undefined"
+                field_status = str(field_status)
+            d = datetime.now()
+            dt = f"{d.year}-{d.month}-{d.day}"
+            json_dump['status'] = {
+                "id": field_status,
+                "name": field_name,
+                "date": dt
+            }
+        except (KeyError, TypeError):
+            json_dump['status'] = {}
+        try:
+            man_type_name = self.manifestation_typ['data']['attributes']['name']
+            man_type_id = self.manifestation_typ['data']['id']
+            man_type_type = self.manifestation_typ['data']['type']
+            json_dump['man_doc_type'] = {
+                "id": man_type_id,
+                "type": man_type_type,
+                "name": man_type_name
+            }
+        except (KeyError, TypeError):
+            json_dump['man_doc_type'] = {}
+        try:
+            doc_type_name = self.doc_component['data']['attributes']['name']
+            doc_type_id = self.doc_component['data']['id']
+            doc_type_type = self.doc_component['data']['type']
+            json_dump['doc_component'] = {
+                "id": doc_type_id,
+                "type": doc_type_type,
+                "name": doc_type_name
+            }
+        except (KeyError, TypeError):
+            json_dump['doc_component'] = {}
         try:
             json_dump['note_i'] = self.manifestation['data']['attributes']['field_anmerkung_intern_']['processed']
         except (KeyError, TypeError):
@@ -990,6 +1033,8 @@ class FrdManifestation(FrdClient):
         self.sprache = self.get_fields_any('field_sprache')
         self.type = self.get_fields_any('field_publication_type')
         self.edition = self.get_fields_any('field_edition')
+        self.doc_component = self.get_fields_any('field_doc_component')
+        self.manifestation_typ = self.get_fields_any('field_manifestation_typ')
         # first level publication
         self.publication = self.get_fields_any('field_published_in')
         self.pub_publisher = self.get_fields_any_any('field_publisher', self.publication)
