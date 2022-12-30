@@ -405,7 +405,7 @@ class FrdManifestation(FrdClient):
             if field_status == 2:
                 field_name = "complete"
                 field_status = str(field_status)
-            elif field_status == None:
+            elif field_status is None:
                 field_name = "proposed"
                 field_status = "0"
             else:
